@@ -37,6 +37,10 @@ class DefaultActor<in Intent, State, SideEffect>(
                 postSideEffect(sideEffect)
             }
 
+            override fun intent(intent: Intent) {
+                onIntent(intent)
+            }
+
             override fun reduce(block: State.() -> State) {
                 reduce(block)
             }
