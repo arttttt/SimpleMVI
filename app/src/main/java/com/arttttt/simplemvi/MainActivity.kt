@@ -18,10 +18,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.arttttt.simplemvi.store.DefaultStore
 import com.arttttt.simplemvi.store.Store
+import com.arttttt.simplemvi.store.actorDsl
 import com.arttttt.simplemvi.store.createStore
-import com.arttttt.simplemvi.store.defaultActor
 import com.arttttt.simplemvi.store.loggingActor
 import com.arttttt.simplemvi.store.plus
 import com.arttttt.simplemvi.ui.theme.SimpleMVITheme
@@ -58,7 +57,30 @@ class MainActivity : ComponentActivity() {
             actor = loggingActor(
                 name = "CounterStore",
                 logger = { message -> Log.e("CounterStore", message) },
-                delegate = defaultActor(
+                delegate = actorDsl(
+                    coroutineContext = Dispatchers.Main.immediate
+                ) {
+                    onIntent<CounterStore.Intent.Increment> {
+                        reduce {
+                            copy(
+                                counter = counter + 1
+                            )
+                        }
+
+                        sideEffect(CounterStore.SideEffect.CounterChanged(counter = getState().counter))
+                    }
+
+                    onIntent<CounterStore.Intent.Decrement> {
+                        reduce {
+                            copy(
+                                counter = counter - 1
+                            )
+                        }
+
+                        sideEffect(CounterStore.SideEffect.CounterChanged(counter = getState().counter))
+                    }
+                },
+                /*delegate = defaultActor(
                     coroutineContext = Dispatchers.Main.immediate
                 ) { intent ->
                     when (intent) {
@@ -81,7 +103,7 @@ class MainActivity : ComponentActivity() {
                             sideEffect(CounterStore.SideEffect.CounterChanged(counter = getState().counter))
                         }
                     }
-                }
+                }*/
             )
         )
 

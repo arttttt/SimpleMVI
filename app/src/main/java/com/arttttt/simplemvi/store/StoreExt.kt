@@ -4,6 +4,7 @@ import com.arttttt.simplemvi.store.actor.Actor
 import com.arttttt.simplemvi.store.actor.ActorScope
 import com.arttttt.simplemvi.store.actor.DefaultActor
 import com.arttttt.simplemvi.store.actor.LoggingActor
+import com.arttttt.simplemvi.store.actor.dsl.ActorBuilder
 import com.arttttt.simplemvi.store.logger.Logger
 import kotlin.coroutines.CoroutineContext
 
@@ -45,4 +46,18 @@ fun <Intent, State, SideEffect> loggingActor(
         logger = logger,
         delegate = delegate,
     )
+}
+
+fun <Intent: Any, State: Any, SideEffect: Any> actorDsl(
+    coroutineContext: CoroutineContext,
+    block: ActorBuilder<Intent, State, SideEffect>.() -> Unit
+): Actor<Intent, State, SideEffect> {
+    val builder = ActorBuilder<Intent, State, SideEffect>()
+    builder.block()
+
+    return defaultActor(
+        coroutineContext = coroutineContext,
+    ) { intent ->
+        builder.intentHandlers[intent::class]?.invoke(this, intent) ?: IllegalArgumentException("intent handler not found for $intent")
+    }
 }
