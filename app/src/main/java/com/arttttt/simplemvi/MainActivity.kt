@@ -80,30 +80,6 @@ class MainActivity : ComponentActivity() {
                         sideEffect(CounterStore.SideEffect.CounterChanged(counter = getState().counter))
                     }
                 },
-                /*delegate = defaultActor(
-                    coroutineContext = Dispatchers.Main.immediate
-                ) { intent ->
-                    when (intent) {
-                        is CounterStore.Intent.Increment -> {
-                            reduce {
-                                copy(
-                                    counter = counter + 1
-                                )
-                            }
-
-                            sideEffect(CounterStore.SideEffect.CounterChanged(counter = getState().counter))
-                        }
-                        is CounterStore.Intent.Decrement -> {
-                            reduce {
-                                copy(
-                                    counter = counter - 1
-                                )
-                            }
-
-                            sideEffect(CounterStore.SideEffect.CounterChanged(counter = getState().counter))
-                        }
-                    }
-                }*/
             )
         )
 
