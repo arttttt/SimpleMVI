@@ -3,10 +3,9 @@ package com.arttttt.simplemvi.store
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
-interface Store<in Intent, out State, out SideEffect> {
+interface Store<in Intent : Any, out State : Any, out SideEffect : Any> {
 
     val states: StateFlow<State>
-    val state: State
 
     val sideEffects: Flow<SideEffect>
 

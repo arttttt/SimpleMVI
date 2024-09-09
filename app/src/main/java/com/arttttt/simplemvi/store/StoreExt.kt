@@ -8,15 +8,20 @@ import com.arttttt.simplemvi.store.actor.dsl.ActorBuilder
 import com.arttttt.simplemvi.store.logger.Logger
 import kotlin.coroutines.CoroutineContext
 
-operator fun <Intent> Store<Intent, *, *>.plus(intent: Intent) {
+operator fun <Intent : Any> Store<Intent, *, *>.plus(intent: Intent) {
     accept(intent)
 }
 
-operator fun <Intent> Store<Intent, *, *>.plusAssign(intent: Intent) {
+operator fun <Intent : Any> Store<Intent, *, *>.plusAssign(intent: Intent) {
     accept(intent)
 }
 
-fun<Intent, State, SideEffect> createStore(
+val <State : Any>Store<*, State, *>.state: State
+    get() {
+        return states.value
+    }
+
+fun <Intent : Any, State : Any, SideEffect : Any> createStore(
     initialState: State,
     actor: Actor<Intent, State, SideEffect>,
 ): Store<Intent, State, SideEffect> {
@@ -26,7 +31,7 @@ fun<Intent, State, SideEffect> createStore(
     )
 }
 
-fun <Intent, State, SideEffect> defaultActor(
+fun <Intent : Any, State : Any, SideEffect : Any> defaultActor(
     coroutineContext: CoroutineContext,
     block: ActorScope<Intent, State, SideEffect>.(intent: Intent) -> Unit
 ): Actor<Intent, State, SideEffect> {
@@ -36,7 +41,7 @@ fun <Intent, State, SideEffect> defaultActor(
     )
 }
 
-fun <Intent, State, SideEffect> loggingActor(
+fun <Intent : Any, State : Any, SideEffect : Any> loggingActor(
     name: String,
     logger: Logger,
     delegate: Actor<Intent, State, SideEffect>,
@@ -48,7 +53,7 @@ fun <Intent, State, SideEffect> loggingActor(
     )
 }
 
-fun <Intent: Any, State: Any, SideEffect: Any> actorDsl(
+fun <Intent : Any, State : Any, SideEffect : Any> actorDsl(
     coroutineContext: CoroutineContext,
     block: ActorBuilder<Intent, State, SideEffect>.() -> Unit
 ): Actor<Intent, State, SideEffect> {
@@ -58,6 +63,9 @@ fun <Intent: Any, State: Any, SideEffect: Any> actorDsl(
     return defaultActor(
         coroutineContext = coroutineContext,
     ) { intent ->
-        builder.intentHandlers[intent::class]?.invoke(this, intent) ?: IllegalArgumentException("intent handler not found for $intent")
+        builder
+            .intentHandlers[intent::class]
+            ?.invoke(this, intent)
+            ?: IllegalArgumentException("intent handler not found for $intent")
     }
 }

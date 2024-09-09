@@ -1,6 +1,6 @@
 package com.arttttt.simplemvi.store.actor
 
-interface Actor<Intent, State, out SideEffect> {
+interface Actor<Intent : Any, State : Any, out SideEffect : Any> {
 
     fun init(
         getState: () -> State,

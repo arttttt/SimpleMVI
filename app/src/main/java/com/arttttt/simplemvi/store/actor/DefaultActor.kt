@@ -6,7 +6,7 @@ import kotlinx.coroutines.cancelChildren
 import kotlin.coroutines.CoroutineContext
 import kotlin.properties.Delegates
 
-class DefaultActor<Intent, State, SideEffect>(
+class DefaultActor<Intent : Any, State : Any, SideEffect : Any>(
     coroutineContext: CoroutineContext,
     private val block: ActorScope<Intent, State, SideEffect>.(intent: Intent) -> Unit
 ) : Actor<Intent, State, SideEffect> {

@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class DefaultStore<in Intent, out State, out SideEffect>(
+class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any>(
     initialState: State,
     private val actor: Actor<Intent, State, SideEffect>,
 ) : Store<Intent, State, SideEffect> {
@@ -18,9 +18,6 @@ class DefaultStore<in Intent, out State, out SideEffect>(
     private val _states: MutableStateFlow<State> = MutableStateFlow(initialState)
 
     override val states: StateFlow<State> = _states.asStateFlow()
-
-    override val state: State
-        get() = _states.value
 
     private val _sideEffects: MutableSharedFlow<SideEffect> = MutableSharedFlow(
         extraBufferCapacity = 1,

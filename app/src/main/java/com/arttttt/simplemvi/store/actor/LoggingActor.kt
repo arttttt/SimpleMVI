@@ -2,7 +2,7 @@ package com.arttttt.simplemvi.store.actor
 
 import com.arttttt.simplemvi.store.logger.Logger
 
-class LoggingActor<in Intent, State, SideEffect>(
+class LoggingActor<Intent : Any, State : Any, SideEffect : Any>(
     private val name: String,
     private val logger: Logger,
     private val delegate: Actor<Intent, State, SideEffect>,
@@ -11,6 +11,7 @@ class LoggingActor<in Intent, State, SideEffect>(
     override fun init(
         getState: () -> State,
         reduce: ((State) -> State) -> Unit,
+        onNewIntent: (intent: Intent) -> Unit,
         postSideEffect: (sideEffect: SideEffect) -> Unit
     ) {
         delegate.init(
@@ -35,6 +36,16 @@ class LoggingActor<in Intent, State, SideEffect>(
 
                     newState
                 }
+            },
+            onNewIntent = { intent ->
+                logger.log(
+                    buildMessage(
+                        tag = name,
+                        message = "Intent($intent)",
+                    )
+                )
+
+                onNewIntent(intent)
             },
             postSideEffect = { sideEffect ->
                 logger.log(

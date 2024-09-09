@@ -2,7 +2,7 @@ package com.arttttt.simplemvi.store.actor
 
 import kotlinx.coroutines.CoroutineScope
 
-interface ActorScope<in Intent, State, in SideEffect> {
+interface ActorScope<in Intent : Any, State : Any, in SideEffect : Any> {
 
     val scope: CoroutineScope
 
