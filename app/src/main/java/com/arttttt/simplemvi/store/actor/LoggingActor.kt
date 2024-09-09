@@ -37,16 +37,7 @@ class LoggingActor<Intent : Any, State : Any, SideEffect : Any>(
                     newState
                 }
             },
-            onNewIntent = { intent ->
-                logger.log(
-                    buildMessage(
-                        tag = name,
-                        message = "Intent($intent)",
-                    )
-                )
-
-                onNewIntent(intent)
-            },
+            onNewIntent = onNewIntent,
             postSideEffect = { sideEffect ->
                 logger.log(
                     buildMessage(
