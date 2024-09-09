@@ -6,7 +6,7 @@ import kotlinx.coroutines.cancelChildren
 import kotlin.coroutines.CoroutineContext
 import kotlin.properties.Delegates
 
-class DefaultActor<in Intent, State, SideEffect>(
+class DefaultActor<Intent, State, SideEffect>(
     coroutineContext: CoroutineContext,
     private val block: ActorScope<Intent, State, SideEffect>.(intent: Intent) -> Unit
 ) : Actor<Intent, State, SideEffect> {
@@ -20,6 +20,7 @@ class DefaultActor<in Intent, State, SideEffect>(
     override fun init(
         getState: () -> State,
         reduce: ((State) -> State) -> Unit,
+        onNewIntent: (intent: Intent) -> Unit,
         postSideEffect: (sideEffect: SideEffect) -> Unit
     ) {
         if (isInitialized.value) return
@@ -38,7 +39,7 @@ class DefaultActor<in Intent, State, SideEffect>(
             }
 
             override fun intent(intent: Intent) {
-                onIntent(intent)
+                onNewIntent(intent)
             }
 
             override fun reduce(block: State.() -> State) {

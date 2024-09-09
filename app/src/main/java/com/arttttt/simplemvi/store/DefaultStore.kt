@@ -42,6 +42,7 @@ class DefaultStore<in Intent, out State, out SideEffect>(
                     block(state)
                 }
             },
+            onNewIntent = this::accept,
             postSideEffect = ::postSideEffect,
         )
     }
