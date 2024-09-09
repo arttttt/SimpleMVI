@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -60,4 +61,8 @@ dependencies {
     implementation(libs.kotlin.atomicfu)
     implementation(libs.kotlin.coroutines.core)
     implementation(libs.kotlin.coroutines.android)
+
+    implementation(libs.androidx.compose.navigation)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.kotlin.serialization.json)
 }
