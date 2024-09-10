@@ -53,6 +53,6 @@ abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any>(
     }
 
     override fun destroy() {
-        scope.coroutineContext.cancelChildren()
+        scope.cancel()
     }
 }
