@@ -69,3 +69,15 @@ fun <Intent : Any, State : Any, SideEffect : Any> actorDsl(
             ?: IllegalArgumentException("intent handler not found for $intent")
     }
 }
+
+fun <Intent : Any, State : Any, SideEffect : Any> ViewModel.attachStore(
+    store: Store<Intent, State, SideEffect>,
+) {
+    addCloseable(
+        AutoCloseable {
+            store.destroy()
+        }
+    )
+
+    store.init()
+}

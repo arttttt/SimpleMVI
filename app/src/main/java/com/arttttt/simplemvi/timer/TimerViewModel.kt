@@ -1,9 +1,8 @@
 package com.arttttt.simplemvi.timer
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import com.arttttt.simplemvi.store.attachStore
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class TimerViewModel : ViewModel() {
 
@@ -12,8 +11,6 @@ class TimerViewModel : ViewModel() {
     )
 
     init {
-        viewModelScope
-            .launch { store.init() }
-            .invokeOnCompletion { store.destroy() }
+        attachStore(store)
     }
 }
