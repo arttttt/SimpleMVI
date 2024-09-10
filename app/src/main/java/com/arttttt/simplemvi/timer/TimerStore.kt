@@ -55,6 +55,11 @@ class TimerStore(
                     )
                 }
             }
+
+            onDestroy {
+                timerJob?.cancel()
+                timerJob = null
+            }
         }
     )
 ) {
