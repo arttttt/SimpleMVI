@@ -8,39 +8,34 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.arttttt.simplemvi.store.plus
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @Composable
 fun CounterContent() {
-    val store = remember {
-        CounterStore(
-            coroutineContext = Dispatchers.Main.immediate,
-        )
-    }
+    val viewModel: CounterViewModel = viewModel()
 
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        val state by store.states.collectAsState()
+        val state by viewModel.store.states.collectAsState()
 
         val context = LocalContext.current
 
         LaunchedEffect(Unit) {
-            store
+            viewModel
+                .store
                 .sideEffects
                 .onEach { sideEffect ->
                     when (sideEffect) {
@@ -63,7 +58,7 @@ fun CounterContent() {
         ) {
             Button(
                 onClick = {
-                    store + CounterStore.Intent.Increment
+                    viewModel.store + CounterStore.Intent.Increment
                 }
             ) {
                 Text("Increment")
@@ -71,7 +66,7 @@ fun CounterContent() {
 
             Button(
                 onClick = {
-                    store + CounterStore.Intent.Decrement
+                    viewModel.store + CounterStore.Intent.Decrement
                 }
             ) {
                 Text("Decrement")
@@ -79,7 +74,7 @@ fun CounterContent() {
 
             Button(
                 onClick = {
-                    store + CounterStore.Intent.Reset
+                    viewModel.store + CounterStore.Intent.Reset
                 }
             ) {
                 Text("Reset")
@@ -89,13 +84,5 @@ fun CounterContent() {
         Text(
             text = "counter: ${state.counter}"
         )
-    }
-
-    DisposableEffect(store) {
-        store.init()
-
-        onDispose {
-            store.destroy()
-        }
     }
 }
