@@ -14,6 +14,13 @@ class LoggingActor<Intent : Any, State : Any, SideEffect : Any>(
         onNewIntent: (intent: Intent) -> Unit,
         postSideEffect: (sideEffect: SideEffect) -> Unit
     ) {
+        logger.log(
+            buildMessage(
+                tag = name,
+                message = "Initialization",
+            )
+        )
+
         delegate.init(
             getState = getState,
             reduce = { updateState ->
@@ -63,6 +70,13 @@ class LoggingActor<Intent : Any, State : Any, SideEffect : Any>(
     }
 
     override fun destroy() {
+        logger.log(
+            buildMessage(
+                tag = name,
+                message = "Destroying",
+            )
+        )
+
         delegate.destroy()
     }
 
