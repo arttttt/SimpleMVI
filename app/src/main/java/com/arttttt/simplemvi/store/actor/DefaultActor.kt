@@ -2,20 +2,20 @@ package com.arttttt.simplemvi.store.actor
 
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.cancel
 import kotlin.coroutines.CoroutineContext
 import kotlin.properties.Delegates
 
-class DefaultActor<Intent : Any, State : Any, SideEffect : Any>(
+abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any>(
     coroutineContext: CoroutineContext,
     private val block: ActorScope<Intent, State, SideEffect>.(intent: Intent) -> Unit
 ) : Actor<Intent, State, SideEffect> {
 
-    private val scope = CoroutineScope(coroutineContext)
+    protected val scope = CoroutineScope(coroutineContext)
 
-    private var actorScope: ActorScope<Intent, State, SideEffect> by Delegates.notNull()
+    protected var actorScope: ActorScope<Intent, State, SideEffect> by Delegates.notNull()
 
-    private val isInitialized = atomic(false)
+    protected val isInitialized = atomic(false)
 
     override fun init(
         getState: () -> State,

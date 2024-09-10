@@ -35,10 +35,10 @@ fun <Intent : Any, State : Any, SideEffect : Any> defaultActor(
     coroutineContext: CoroutineContext,
     block: ActorScope<Intent, State, SideEffect>.(intent: Intent) -> Unit
 ): Actor<Intent, State, SideEffect> {
-    return DefaultActor(
+    return object : DefaultActor<Intent, State, SideEffect>(
         coroutineContext = coroutineContext,
         block = block,
-    )
+    ) {}
 }
 
 fun <Intent : Any, State : Any, SideEffect : Any> loggingActor(
