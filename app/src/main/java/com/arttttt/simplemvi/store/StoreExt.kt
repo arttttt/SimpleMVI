@@ -1,5 +1,6 @@
 package com.arttttt.simplemvi.store
 
+import androidx.lifecycle.ViewModel
 import com.arttttt.simplemvi.store.actor.Actor
 import com.arttttt.simplemvi.store.actor.ActorScope
 import com.arttttt.simplemvi.store.actor.DefaultActor
@@ -60,13 +61,20 @@ fun <Intent : Any, State : Any, SideEffect : Any> actorDsl(
     val builder = ActorBuilder<Intent, State, SideEffect>()
     builder.block()
 
-    return defaultActor(
+    return object : DefaultActor<Intent, State, SideEffect>(
         coroutineContext = coroutineContext,
-    ) { intent ->
-        builder
-            .intentHandlers[intent::class]
-            ?.invoke(this, intent)
-            ?: IllegalArgumentException("intent handler not found for $intent")
+        block = { intent ->
+            builder
+                .intentHandlers[intent::class]
+                ?.invoke(this, intent)
+                ?: throw IllegalArgumentException("intent handler not found for $intent")
+        }
+    ) {
+        override fun destroy() {
+            super.destroy()
+
+            builder.destroyHandler(actorScope)
+        }
     }
 }
 
