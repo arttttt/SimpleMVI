@@ -20,5 +20,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "SimpleMVI"
-include(":app")
+include(":sample")
 include(":simplemvi")
