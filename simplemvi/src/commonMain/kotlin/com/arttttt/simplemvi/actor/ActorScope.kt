@@ -1,5 +1,6 @@
 package com.arttttt.simplemvi.actor
 
+import com.arttttt.simplemvi.utils.mainthread.MainThread
 import kotlinx.coroutines.CoroutineScope
 
 interface ActorScope<in Intent : Any, State : Any, in SideEffect : Any> {
@@ -8,7 +9,10 @@ interface ActorScope<in Intent : Any, State : Any, in SideEffect : Any> {
 
     fun getState(): State
     fun sideEffect(sideEffect: SideEffect)
+
+    @MainThread
     fun intent(intent: Intent)
 
+    @MainThread
     fun reduce(block: (state: State) -> State)
 }

@@ -1,7 +1,7 @@
 package com.arttttt.simplemvi.counter
 
 import androidx.lifecycle.ViewModel
-import com.arttttt.simplemvi.attachStore
+import com.arttttt.simplemvi.utils.attachStore
 import kotlinx.coroutines.Dispatchers
 
 class CounterViewModel : ViewModel() {

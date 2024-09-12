@@ -13,7 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.arttttt.simplemvi.plus
+import com.arttttt.simplemvi.utils.plus
 
 @Composable
 fun TimerContent() {

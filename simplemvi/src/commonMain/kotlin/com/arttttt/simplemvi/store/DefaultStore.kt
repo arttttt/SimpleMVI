@@ -1,6 +1,9 @@
-package com.arttttt.simplemvi
+package com.arttttt.simplemvi.store
 
 import com.arttttt.simplemvi.actor.Actor
+import com.arttttt.simplemvi.utils.mainthread.MainThread
+import com.arttttt.simplemvi.utils.mainthread.assertOnMainThread
+import com.arttttt.simplemvi.utils.state
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -27,7 +30,10 @@ class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any>(
 
     private val isInitialized = atomic(false)
 
+    @MainThread
     override fun init() {
+        assertOnMainThread()
+
         if (isInitialized.value) return
 
         isInitialized.value = true
@@ -44,11 +50,17 @@ class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any>(
         )
     }
 
+    @MainThread
     override fun accept(intent: Intent) {
+        assertOnMainThread()
+
         actor.onIntent(intent)
     }
 
+    @MainThread
     override fun destroy() {
+        assertOnMainThread()
+
         actor.destroy()
     }
 

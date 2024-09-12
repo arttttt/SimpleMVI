@@ -1,10 +1,10 @@
 package com.arttttt.simplemvi.timer
 
 import android.util.Log
-import com.arttttt.simplemvi.Store
-import com.arttttt.simplemvi.actorDsl
-import com.arttttt.simplemvi.createStore
-import com.arttttt.simplemvi.loggingActor
+import com.arttttt.simplemvi.store.Store
+import com.arttttt.simplemvi.utils.actorDsl
+import com.arttttt.simplemvi.utils.createStore
+import com.arttttt.simplemvi.utils.loggingActor
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
