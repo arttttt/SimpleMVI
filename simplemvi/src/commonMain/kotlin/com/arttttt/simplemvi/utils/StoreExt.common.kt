@@ -25,10 +25,12 @@ val <State : Any>Store<*, State, *>.state: State
 
 inline fun <Intent : Any, State : Any, SideEffect : Any> createStore(
     initialState: State,
+    initialIntents: List<Intent> = emptyList(),
     actor: Actor<Intent, State, SideEffect>,
 ): Store<Intent, State, SideEffect> {
     return DefaultStore(
         initialState = initialState,
+        initialIntents = initialIntents,
         actor = actor,
     )
 }
