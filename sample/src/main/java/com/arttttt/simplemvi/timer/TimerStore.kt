@@ -32,7 +32,7 @@ class TimerStore(
                     while (true) {
                         ensureActive()
 
-                        delay(1000)
+                        delay(300)
 
                         reduce { state ->
                             state.copy(
