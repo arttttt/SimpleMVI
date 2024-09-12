@@ -1,6 +1,6 @@
-package com.arttttt.simplemvi.store.actor
+package com.arttttt.simplemvi.actor
 
-import com.arttttt.simplemvi.store.logger.Logger
+import com.arttttt.simplemvi.logger.Logger
 
 class LoggingActor<Intent : Any, State : Any, SideEffect : Any>(
     private val name: String,

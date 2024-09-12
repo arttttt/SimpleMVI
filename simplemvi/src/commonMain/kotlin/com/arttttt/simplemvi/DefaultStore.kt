@@ -1,6 +1,6 @@
-package com.arttttt.simplemvi.store
+package com.arttttt.simplemvi
 
-import com.arttttt.simplemvi.store.actor.Actor
+import com.arttttt.simplemvi.actor.Actor
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow

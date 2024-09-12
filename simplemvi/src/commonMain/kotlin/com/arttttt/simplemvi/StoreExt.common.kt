@@ -1,12 +1,11 @@
-package com.arttttt.simplemvi.store
+package com.arttttt.simplemvi
 
-import androidx.lifecycle.ViewModel
-import com.arttttt.simplemvi.store.actor.Actor
-import com.arttttt.simplemvi.store.actor.ActorScope
-import com.arttttt.simplemvi.store.actor.DefaultActor
-import com.arttttt.simplemvi.store.actor.LoggingActor
-import com.arttttt.simplemvi.store.actor.dsl.ActorBuilder
-import com.arttttt.simplemvi.store.logger.Logger
+import com.arttttt.simplemvi.actor.Actor
+import com.arttttt.simplemvi.actor.ActorScope
+import com.arttttt.simplemvi.actor.DefaultActor
+import com.arttttt.simplemvi.actor.LoggingActor
+import com.arttttt.simplemvi.actor.dsl.ActorBuilder
+import com.arttttt.simplemvi.logger.Logger
 import kotlin.coroutines.CoroutineContext
 
 operator fun <Intent : Any> Store<Intent, *, *>.plus(intent: Intent) {
@@ -76,16 +75,4 @@ fun <Intent : Any, State : Any, SideEffect : Any> actorDsl(
             builder.destroyHandler(actorScope)
         }
     }
-}
-
-fun <Intent : Any, State : Any, SideEffect : Any> ViewModel.attachStore(
-    store: Store<Intent, State, SideEffect>,
-) {
-    addCloseable(
-        AutoCloseable {
-            store.destroy()
-        }
-    )
-
-    store.init()
 }

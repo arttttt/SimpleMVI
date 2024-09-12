@@ -1,4 +1,4 @@
-package com.arttttt.simplemvi.store.actor
+package com.arttttt.simplemvi.actor
 
 interface Actor<Intent : Any, State : Any, out SideEffect : Any> {
 

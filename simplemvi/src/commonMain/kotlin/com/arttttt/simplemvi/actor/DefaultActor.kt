@@ -1,4 +1,4 @@
-package com.arttttt.simplemvi.store.actor
+package com.arttttt.simplemvi.actor
 
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope

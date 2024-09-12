@@ -1,6 +1,6 @@
-package com.arttttt.simplemvi.store.actor.dsl
+package com.arttttt.simplemvi.actor.dsl
 
-import com.arttttt.simplemvi.store.actor.ActorScope
+import com.arttttt.simplemvi.actor.ActorScope
 import kotlin.reflect.KClass
 
 @ActorDslMarker

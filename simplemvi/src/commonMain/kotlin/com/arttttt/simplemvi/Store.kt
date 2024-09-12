@@ -1,4 +1,4 @@
-package com.arttttt.simplemvi.store
+package com.arttttt.simplemvi
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow

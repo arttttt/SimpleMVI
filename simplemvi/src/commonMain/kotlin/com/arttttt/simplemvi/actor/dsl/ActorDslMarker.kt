@@ -1,4 +1,4 @@
-package com.arttttt.simplemvi.store.actor.dsl
+package com.arttttt.simplemvi.actor.dsl
 
 @Retention(AnnotationRetention.SOURCE)
 @DslMarker

@@ -1,7 +1,7 @@
 package com.arttttt.simplemvi.timer
 
 import androidx.lifecycle.ViewModel
-import com.arttttt.simplemvi.store.attachStore
+import com.arttttt.simplemvi.attachStore
 import kotlinx.coroutines.Dispatchers
 
 class TimerViewModel : ViewModel() {
