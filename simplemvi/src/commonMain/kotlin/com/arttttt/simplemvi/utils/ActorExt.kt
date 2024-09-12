@@ -46,6 +46,17 @@ fun <Intent : Any, State : Any, SideEffect : Any> actorDsl(
                 ?: throw IllegalArgumentException("intent handler not found for $intent")
         }
     ) {
+        override fun init(
+            getState: () -> State,
+            reduce: ((State) -> State) -> Unit,
+            onNewIntent: (intent: Intent) -> Unit,
+            postSideEffect: (sideEffect: SideEffect) -> Unit
+        ) {
+            super.init(getState, reduce, onNewIntent, postSideEffect)
+
+            builder.initHandler(actorScope)
+        }
+
         override fun destroy() {
             super.destroy()
 
