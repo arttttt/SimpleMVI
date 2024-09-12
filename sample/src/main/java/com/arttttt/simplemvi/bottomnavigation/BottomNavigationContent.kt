@@ -15,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.arttttt.simplemvi.counter.CounterContent
+import com.arttttt.simplemvi.notes.NotesContent
 import com.arttttt.simplemvi.timer.TimerContent
 
 @Composable
@@ -32,6 +33,7 @@ fun BottomNavigationContent() {
             when (selectedTab) {
                 BottomTab.COUNTER -> CounterContent()
                 BottomTab.TIMER -> TimerContent()
+                BottomTab.NOTES -> NotesContent()
             }
         }
 
