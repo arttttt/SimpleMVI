@@ -28,7 +28,7 @@ class TimerStore(
             onIntent<Intent.StartTimer> {
                 if (timerJob != null) return@onIntent
 
-                timerJob = scope.launch {
+                timerJob = launch {
                     while (true) {
                         ensureActive()
 

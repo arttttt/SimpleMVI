@@ -3,9 +3,7 @@ package com.arttttt.simplemvi.actor
 import com.arttttt.simplemvi.utils.mainthread.MainThread
 import kotlinx.coroutines.CoroutineScope
 
-interface ActorScope<in Intent : Any, State : Any, in SideEffect : Any> {
-
-    val scope: CoroutineScope
+interface ActorScope<in Intent : Any, State : Any, in SideEffect : Any> : CoroutineScope {
 
     fun getState(): State
     fun sideEffect(sideEffect: SideEffect)
