@@ -8,9 +8,9 @@ import com.arttttt.simplemvi.actor.dsl.ActorBuilder
 import com.arttttt.simplemvi.logger.Logger
 import kotlin.coroutines.CoroutineContext
 
-fun <Intent : Any, State : Any, SideEffect : Any> defaultActor(
+inline fun <Intent : Any, State : Any, SideEffect : Any> defaultActor(
     coroutineContext: CoroutineContext,
-    block: ActorScope<Intent, State, SideEffect>.(intent: Intent) -> Unit
+    noinline block: ActorScope<Intent, State, SideEffect>.(intent: Intent) -> Unit
 ): Actor<Intent, State, SideEffect> {
     return object : DefaultActor<Intent, State, SideEffect>(
         coroutineContext = coroutineContext,
@@ -18,7 +18,7 @@ fun <Intent : Any, State : Any, SideEffect : Any> defaultActor(
     ) {}
 }
 
-fun <Intent : Any, State : Any, SideEffect : Any> loggingActor(
+inline fun <Intent : Any, State : Any, SideEffect : Any> loggingActor(
     name: String,
     logger: Logger,
     delegate: Actor<Intent, State, SideEffect>,
@@ -30,9 +30,9 @@ fun <Intent : Any, State : Any, SideEffect : Any> loggingActor(
     )
 }
 
-fun <Intent : Any, State : Any, SideEffect : Any> actorDsl(
+inline fun <Intent : Any, State : Any, SideEffect : Any> actorDsl(
     coroutineContext: CoroutineContext,
-    block: ActorBuilder<Intent, State, SideEffect>.() -> Unit
+    crossinline block: ActorBuilder<Intent, State, SideEffect>.() -> Unit,
 ): Actor<Intent, State, SideEffect> {
     val builder = ActorBuilder<Intent, State, SideEffect>()
     builder.block()
