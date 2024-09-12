@@ -15,7 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.arttttt.simplemvi.counter.CounterContent
-import com.arttttt.simplemvi.notes.NotesContent
+import com.arttttt.simplemvi.notes.presentation.NotesContent
 import com.arttttt.simplemvi.timer.TimerContent
 
 @Composable

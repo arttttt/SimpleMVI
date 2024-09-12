@@ -1,4 +1,4 @@
-package com.arttttt.simplemvi.notes
+package com.arttttt.simplemvi.notes.presentation
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,7 +19,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 @Composable
 fun NotesContent() {
 
-    val viewModel: NotesViewModer = viewModel()
+    val viewModel: NotesViewModel = viewModel()
 
     Column(
         modifier = Modifier
