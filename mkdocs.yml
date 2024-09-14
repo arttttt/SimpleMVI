@@ -1,0 +1,8 @@
+site_name: SimpleMVI
+site_url: https://arttttt.github.io/SimpleMVI
+edit_uri: ""
+theme:
+  name: material
+
+# Copyright
+copyright: Copyright &copy; 2024 Artem Bambalov aka arttttt
