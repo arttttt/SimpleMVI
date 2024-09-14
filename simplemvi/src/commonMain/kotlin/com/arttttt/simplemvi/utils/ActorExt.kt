@@ -8,9 +8,9 @@ import com.arttttt.simplemvi.actor.dsl.ActorBuilder
 import com.arttttt.simplemvi.logger.Logger
 import kotlin.coroutines.CoroutineContext
 
-inline fun <Intent : Any, State : Any, SideEffect : Any> defaultActor(
+fun <Intent : Any, State : Any, SideEffect : Any> defaultActor(
     coroutineContext: CoroutineContext,
-    noinline block: ActorScope<Intent, State, SideEffect>.(intent: Intent) -> Unit
+    block: ActorScope<Intent, State, SideEffect>.(intent: Intent) -> Unit
 ): Actor<Intent, State, SideEffect> {
     return object : DefaultActor<Intent, State, SideEffect>(
         coroutineContext = coroutineContext,
@@ -18,7 +18,7 @@ inline fun <Intent : Any, State : Any, SideEffect : Any> defaultActor(
     ) {}
 }
 
-inline fun <Intent : Any, State : Any, SideEffect : Any> loggingActor(
+fun <Intent : Any, State : Any, SideEffect : Any> loggingActor(
     name: String,
     logger: Logger,
     delegate: Actor<Intent, State, SideEffect>,

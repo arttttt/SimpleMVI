@@ -23,7 +23,7 @@ val <State : Any>Store<*, State, *>.state: State
         return states.value
     }
 
-inline fun <Intent : Any, State : Any, SideEffect : Any> createStore(
+fun <Intent : Any, State : Any, SideEffect : Any> createStore(
     initialState: State,
     initialIntents: List<Intent> = emptyList(),
     actor: Actor<Intent, State, SideEffect>,
