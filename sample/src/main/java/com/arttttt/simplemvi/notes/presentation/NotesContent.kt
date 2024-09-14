@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
@@ -12,6 +13,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -20,6 +23,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.arttttt.simplemvi.notes.data.database.NotesDatabase
 import com.arttttt.simplemvi.notes.data.repository.NotesRepositoryImpl
+import com.arttttt.simplemvi.notes.presentation.models.NoteListItem
 
 @Composable
 fun NotesContent() {
@@ -42,6 +46,8 @@ fun NotesContent() {
         }
     )
 
+    val uiState by viewModel.uiStates.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -54,7 +60,15 @@ fun NotesContent() {
                 .fillMaxWidth()
                 .weight(1f),
         ) {
-
+            items(
+                items = uiState.items,
+                key = { item -> item.key },
+                contentType = { item -> item::class }
+            ) { item ->
+                when (item) {
+                    is NoteListItem -> NoteItemContent(item)
+                }
+            }
         }
 
         OutlinedTextField(
@@ -63,19 +77,21 @@ fun NotesContent() {
                 .padding(
                     horizontal = 16.dp,
                 ),
-            value = "",
-            onValueChange = {},
+            value = uiState.currentMessage,
+            onValueChange = viewModel::updateCurrentNote,
             label = {
                 Text(text = "Add note")
             },
             trailingIcon = {
-                IconButton(
-                    onClick = {}
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = null,
-                    )
+                if (uiState.currentMessage.isNotEmpty()) {
+                    IconButton(
+                        onClick = viewModel::addNote,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = null,
+                        )
+                    }
                 }
             },
         )

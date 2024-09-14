@@ -16,6 +16,7 @@ class NotesStore(
     notesRepository: NotesRepository,
 ) : Store<NotesStore.Intent, NotesStore.State, NotesStore.SideEffect> by createStore(
     initialState = State(
+        currentMessage = "",
         isInProgress = false,
         notes = emptyList(),
     ),
@@ -51,11 +52,11 @@ class NotesStore(
                     }
             }
 
-            onIntent<Intent.AddNote> { intent ->
+            onIntent<Intent.AddNote> {
                 launch {
                     val note = Note(
                         id = Uuid.random().toString(),
-                        message = intent.message,
+                        message = getState().currentMessage,
                     )
 
                     notesRepository.addNote(
@@ -64,6 +65,7 @@ class NotesStore(
 
                     reduce { state ->
                         state.copy(
+                            currentMessage = "",
                             notes = state.notes + note,
                         )
                     }
@@ -81,6 +83,14 @@ class NotesStore(
                     }
                 }
             }
+
+            onIntent<Intent.CurrentMessageChanged> { intent ->
+                reduce { state ->
+                    state.copy(
+                        currentMessage = intent.message,
+                    )
+                }
+            }
         }
     )
 ) {
@@ -89,11 +99,14 @@ class NotesStore(
 
         data object LoadNotes : Intent
 
-        data class AddNote(val message: String) : Intent
+        data object AddNote : Intent
         data class RemoveNote(val id: String) : Intent
+
+        data class CurrentMessageChanged(val message: String) : Intent
     }
 
     data class State(
+        val currentMessage: String,
         val isInProgress: Boolean,
         val notes: List<Note>,
     )
