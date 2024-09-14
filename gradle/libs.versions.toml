@@ -13,7 +13,7 @@ coroutines = "1.9.0-RC.2"
 composeNavigation = "2.8.0"
 serialization = "1.7.2"
 ksp = "2.0.20-1.0.25"
-room = "2.6.1"
+room = "2.7.0-alpha07"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }

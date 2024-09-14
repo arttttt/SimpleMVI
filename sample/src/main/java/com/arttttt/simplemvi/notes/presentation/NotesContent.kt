@@ -13,13 +13,34 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.arttttt.simplemvi.notes.data.database.NotesDatabase
+import com.arttttt.simplemvi.notes.data.repository.NotesRepositoryImpl
 
 @Composable
 fun NotesContent() {
 
-    val viewModel: NotesViewModel = viewModel()
+    val context = LocalContext.current.applicationContext
+
+    val viewModel: NotesViewModel = viewModel(
+        factory = object : ViewModelProvider.Factory {
+            val dataBase = NotesDatabase.create(
+                context = context,
+            )
+
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return NotesViewModel(
+                    notesRepository = NotesRepositoryImpl(
+                        notesDao = dataBase.getNotesDao(),
+                    ),
+                ) as T
+            }
+        }
+    )
 
     Column(
         modifier = Modifier
