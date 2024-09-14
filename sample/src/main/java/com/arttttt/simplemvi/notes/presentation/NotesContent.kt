@@ -74,8 +74,13 @@ fun NotesContent() {
             ) { item ->
                 when (item) {
                     is NoteListItem -> NoteItemContent(
-                        modifier = Modifier.fillParentMaxWidth(),
+                        modifier = Modifier
+                            .fillParentMaxWidth()
+                            .animateItem(),
                         item = item,
+                        onRemoveClikced = {
+                            viewModel.removeNote(item.id)
+                        }
                     )
                 }
             }

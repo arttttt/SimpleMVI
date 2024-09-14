@@ -52,6 +52,10 @@ class NotesViewModel(
         store + NotesStore.Intent.CurrentMessageChanged(message)
     }
 
+    fun removeNote(id: String) {
+        store + NotesStore.Intent.RemoveNote(id)
+    }
+
     private fun NotesStore.State.toUiModel(): UiState {
         return UiState(
             currentMessage = currentMessage,
