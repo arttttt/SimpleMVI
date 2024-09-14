@@ -66,7 +66,10 @@ fun NotesContent() {
                 contentType = { item -> item::class }
             ) { item ->
                 when (item) {
-                    is NoteListItem -> NoteItemContent(item)
+                    is NoteListItem -> NoteItemContent(
+                        modifier = Modifier.fillParentMaxWidth(),
+                        item = item,
+                    )
                 }
             }
         }
