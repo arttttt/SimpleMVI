@@ -12,6 +12,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -55,6 +56,12 @@ fun NotesContent() {
                 vertical = 16.dp,
             ),
     ) {
+        TopAppBar(
+            title = {
+                Text("Notes")
+            },
+        )
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()

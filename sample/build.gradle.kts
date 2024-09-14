@@ -39,6 +39,7 @@ android {
         jvmTarget = "1.8"
 
         freeCompilerArgs += "-opt-in=kotlin.uuid.ExperimentalUuidApi"
+        freeCompilerArgs += "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api"
     }
 
     buildFeatures {

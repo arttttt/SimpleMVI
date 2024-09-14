@@ -2,11 +2,13 @@ package com.arttttt.simplemvi.counter
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -53,36 +55,48 @@ fun CounterContent() {
                 .launchIn(this)
         }
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Button(
-                onClick = {
-                    viewModel.store + CounterStore.Intent.Increment
-                }
-            ) {
-                Text("Increment")
-            }
-
-            Button(
-                onClick = {
-                    viewModel.store + CounterStore.Intent.Decrement
-                }
-            ) {
-                Text("Decrement")
-            }
-
-            Button(
-                onClick = {
-                    viewModel.store + CounterStore.Intent.Reset
-                }
-            ) {
-                Text("Reset")
-            }
-        }
-
-        Text(
-            text = "counter: ${state.counter}"
+        TopAppBar(
+            title = {
+                Text("Notes")
+            },
         )
+
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Button(
+                    onClick = {
+                        viewModel.store + CounterStore.Intent.Increment
+                    }
+                ) {
+                    Text("Increment")
+                }
+
+                Button(
+                    onClick = {
+                        viewModel.store + CounterStore.Intent.Decrement
+                    }
+                ) {
+                    Text("Decrement")
+                }
+
+                Button(
+                    onClick = {
+                        viewModel.store + CounterStore.Intent.Reset
+                    }
+                ) {
+                    Text("Reset")
+                }
+            }
+
+            Text(
+                text = "counter: ${state.counter}"
+            )
+        }
     }
 }
