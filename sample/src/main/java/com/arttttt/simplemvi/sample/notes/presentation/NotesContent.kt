@@ -78,7 +78,7 @@ fun NotesContent() {
                             .fillParentMaxWidth()
                             .animateItem(),
                         item = item,
-                        onRemoveClikced = {
+                        onRemoveClicked = {
                             viewModel.removeNote(item.id)
                         }
                     )

@@ -16,7 +16,7 @@ import com.arttttt.simplemvi.sample.notes.presentation.models.NoteListItem
 fun NoteItemContent(
     modifier: Modifier,
     item: NoteListItem,
-    onRemoveClikced: () -> Unit,
+    onRemoveClicked: () -> Unit,
 ) {
 
     Row(
@@ -28,7 +28,7 @@ fun NoteItemContent(
         )
 
         IconButton(
-            onClick = onRemoveClikced,
+            onClick = onRemoveClicked,
         ) {
             Icon(
                 imageVector = Icons.Default.Delete,
