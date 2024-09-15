@@ -13,7 +13,7 @@ class ActorBuilder<Intent : Any, State : Any, SideEffect: Any> {
     internal var initHandler: ActorScope<Intent, State, SideEffect>.() -> Unit = defaultInitHandler
 
     @PublishedApi
-    internal val intentHandlers = mutableMapOf<KClass<out Intent>, ActorScope<Intent, State, SideEffect>.(Intent) -> Boolean>()
+    internal val intentHandlers = mutableMapOf<KClass<out Intent>, ActorScope<Intent, State, SideEffect>.(Intent) -> Unit>()
 
     @PublishedApi
     internal var destroyHandler: ActorScope<Intent, State, SideEffect>.() -> Unit = defaultDestroyHandler
@@ -38,10 +38,7 @@ class ActorBuilder<Intent : Any, State : Any, SideEffect: Any> {
         intentHandlers[T::class] = { intent ->
             if (intent is T) {
                 handler(intent)
-                true
-            } else {
-                false
-            }
+             }
         }
     }
 
