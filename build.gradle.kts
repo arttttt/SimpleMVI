@@ -7,4 +7,6 @@ plugins {
     alias(libs.plugins.kotlin.compose) apply false
     alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.google.ksp) apply false
+
+    alias((libs.plugins.simplemvi.library.module)) apply false
 }

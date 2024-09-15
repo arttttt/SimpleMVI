@@ -50,3 +50,5 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 google-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 
+#local plugins
+simplemvi-library-module = { id = "simplemvi-library-module", version = "1.0.0" }
