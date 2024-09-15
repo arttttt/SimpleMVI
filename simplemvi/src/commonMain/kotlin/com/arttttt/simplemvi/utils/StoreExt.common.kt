@@ -20,11 +20,16 @@ val <State : Any>Store<*, State, *>.state: State
 fun <Intent : Any, State : Any, SideEffect : Any> createStore(
     initialState: State,
     initialIntents: List<Intent>,
+    initialize: Boolean = true,
     actor: Actor<Intent, State, SideEffect>,
 ): Store<Intent, State, SideEffect> {
     return DefaultStore(
         initialState = initialState,
         initialIntents = initialIntents,
         actor = actor,
-    )
+    ).apply {
+        if (initialize) {
+            init()
+        }
+    }
 }
