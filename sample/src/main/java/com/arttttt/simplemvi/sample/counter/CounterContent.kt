@@ -56,7 +56,7 @@ fun CounterContent() {
 
         TopAppBar(
             title = {
-                Text("Notes")
+                Text("Counter")
             },
         )
 

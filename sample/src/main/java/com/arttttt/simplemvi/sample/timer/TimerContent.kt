@@ -29,7 +29,7 @@ fun TimerContent() {
     ) {
         TopAppBar(
             title = {
-                Text("Notes")
+                Text("Timer")
             },
         )
 
