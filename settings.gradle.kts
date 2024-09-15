@@ -25,3 +25,4 @@ includeBuild("build-logic")
 
 include(":sample")
 include(":simplemvi")
+include(":simplemvi-viewmodel")

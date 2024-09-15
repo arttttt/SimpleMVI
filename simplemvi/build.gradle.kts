@@ -8,10 +8,6 @@ kotlin {
             implementation(libs.kotlin.atomicfu)
             implementation(libs.kotlin.coroutines.core)
         }
-
-        androidMain.dependencies {
-            implementation(libs.androidx.lifecycle.viewmodel.ktx)
-        }
     }
 }
 

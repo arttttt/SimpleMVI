@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "com.arttttt.simplemvi"
+    namespace = "com.arttttt.simplemvi.sample"
     compileSdk = 34
 
     defaultConfig {
@@ -50,6 +50,7 @@ android {
 dependencies {
 
     implementation(project(":simplemvi"))
+    implementation(project(":simplemvi-viewmodel"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
