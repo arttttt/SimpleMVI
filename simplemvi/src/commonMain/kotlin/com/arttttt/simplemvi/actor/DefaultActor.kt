@@ -28,9 +28,7 @@ abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any>(
     ) {
         assertOnMainThread()
 
-        if (isInitialized.value) return
-
-        isInitialized.value = true
+        if (isInitialized.getAndSet(true)) return
 
         actorScope = object : ActorScope<Intent, State, SideEffect>, CoroutineScope by scope {
 
