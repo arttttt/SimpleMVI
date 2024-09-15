@@ -1,5 +1,5 @@
 plugins {
-    alias((libs.plugins.simplemvi.library.module))
+    alias(libs.plugins.simplemvi.library.module)
 }
 
 kotlin {

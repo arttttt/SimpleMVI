@@ -3,9 +3,7 @@ package com.arttttt.simplemvi.utils
 import com.arttttt.simplemvi.actor.Actor
 import com.arttttt.simplemvi.actor.ActorScope
 import com.arttttt.simplemvi.actor.DefaultActor
-import com.arttttt.simplemvi.actor.LoggingActor
 import com.arttttt.simplemvi.actor.dsl.ActorBuilder
-import com.arttttt.simplemvi.logger.Logger
 import kotlin.coroutines.CoroutineContext
 
 fun <Intent : Any, State : Any, SideEffect : Any> defaultActor(
@@ -16,18 +14,6 @@ fun <Intent : Any, State : Any, SideEffect : Any> defaultActor(
         coroutineContext = coroutineContext,
         block = block,
     ) {}
-}
-
-fun <Intent : Any, State : Any, SideEffect : Any> loggingActor(
-    name: String,
-    logger: Logger,
-    delegate: Actor<Intent, State, SideEffect>,
-): Actor<Intent, State, SideEffect> {
-    return LoggingActor(
-        name = name,
-        logger = logger,
-        delegate = delegate,
-    )
 }
 
 inline fun <Intent : Any, State : Any, SideEffect : Any> actorDsl(

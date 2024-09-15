@@ -50,6 +50,7 @@ android {
 dependencies {
 
     implementation(project(":simplemvi"))
+    implementation(project(":simplemvi-logging"))
     implementation(project(":simplemvi-viewmodel"))
 
     implementation(libs.androidx.core.ktx)

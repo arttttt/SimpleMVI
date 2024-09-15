@@ -1,4 +1,4 @@
-package com.arttttt.simplemvi.logger
+package com.arttttt.simplemvi.logging.logger
 
 enum class LoggerEventType {
 

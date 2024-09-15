@@ -5,12 +5,11 @@ plugins {
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation(libs.kotlin.atomicfu)
-            implementation(libs.kotlin.coroutines.core)
+            implementation(project(":simplemvi"))
         }
     }
 }
 
 android {
-    namespace = "com.arttttt.simplemvi"
+    namespace = "com.arttttt.simplemvi.logging"
 }
