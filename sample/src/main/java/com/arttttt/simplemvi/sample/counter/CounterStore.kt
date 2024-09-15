@@ -29,7 +29,7 @@ class CounterStore(
             handleDecrement()
 
             onIntent<Intent.Reset> {
-                if (getState().counter == 0) {
+                if (state.counter == 0) {
                     sideEffect(SideEffect.CantResetCounter)
                 } else {
                     reduce { state ->
@@ -73,7 +73,7 @@ private fun ActorScope<CounterStore.Intent, CounterStore.State, CounterStore.Sid
         )
     }
 
-    sideEffect(CounterStore.SideEffect.CounterChanged(counter = getState().counter))
+    sideEffect(CounterStore.SideEffect.CounterChanged(counter = state.counter))
 }
 
 private fun ActorBuilder<CounterStore.Intent, CounterStore.State, CounterStore.SideEffect>.handleDecrement() {
@@ -84,6 +84,6 @@ private fun ActorBuilder<CounterStore.Intent, CounterStore.State, CounterStore.S
             )
         }
 
-        sideEffect(CounterStore.SideEffect.CounterChanged(counter = getState().counter))
+        sideEffect(CounterStore.SideEffect.CounterChanged(counter = state.counter))
     }
 }

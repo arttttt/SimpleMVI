@@ -5,7 +5,7 @@ import kotlinx.coroutines.CoroutineScope
 
 interface ActorScope<in Intent : Any, State : Any, in SideEffect : Any> : CoroutineScope {
 
-    fun getState(): State
+    val state: State
     fun sideEffect(sideEffect: SideEffect)
 
     @MainThread

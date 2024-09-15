@@ -56,7 +56,7 @@ class NotesStore(
                 launch {
                     val note = Note(
                         id = Uuid.random().toString(),
-                        message = getState().currentMessage,
+                        message = state.currentMessage,
                     )
 
                     notesRepository.addNote(

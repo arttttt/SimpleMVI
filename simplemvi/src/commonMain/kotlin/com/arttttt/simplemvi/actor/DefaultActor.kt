@@ -32,9 +32,8 @@ abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any>(
 
         actorScope = object : ActorScope<Intent, State, SideEffect>, CoroutineScope by scope {
 
-            override fun getState(): State {
-                return getState()
-            }
+            override val state: State
+                get() = getState()
 
             override fun sideEffect(sideEffect: SideEffect) {
                 postSideEffect(sideEffect)
