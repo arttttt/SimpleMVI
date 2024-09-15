@@ -20,5 +20,8 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "SimpleMVI"
+
+includeBuild("build-logic")
+
 include(":sample")
 include(":simplemvi")
