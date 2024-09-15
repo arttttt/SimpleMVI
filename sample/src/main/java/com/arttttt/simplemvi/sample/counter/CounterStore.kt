@@ -15,6 +15,7 @@ class CounterStore(
     initialState = State(
         counter = 0,
     ),
+    initialIntents = emptyList(),
     actor = loggingActor(
         name = "CounterStore",
         logger = { message -> Log.e("CounterStore", message) },

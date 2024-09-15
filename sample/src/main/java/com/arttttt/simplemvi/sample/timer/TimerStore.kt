@@ -17,6 +17,7 @@ class TimerStore(
     initialState = State(
         value = 0,
     ),
+    initialIntents = emptyList(),
     actor = loggingActor(
         name = "TimerStore",
         logger = { message -> Log.e("TimerStore", message) },
