@@ -53,7 +53,7 @@ fun NotesContent() {
         modifier = Modifier
             .fillMaxSize()
             .padding(
-                vertical = 16.dp,
+                bottom = 16.dp,
             ),
     ) {
         TopAppBar(
