@@ -21,7 +21,9 @@ class SimpleMVILibraryModule : Plugin<Project> {
         pluginManager.apply(libs.pluginId("android-library"))
 
         extensions.configure<KotlinMultiplatformExtension> {
-            androidTarget()
+            androidTarget {
+                publishLibraryVariants("debug", "release")
+            }
             iosX64()
             iosArm64()
             iosSimulatorArm64()
