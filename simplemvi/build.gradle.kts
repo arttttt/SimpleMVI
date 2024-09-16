@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.simplemvi.library.module)
+    alias(libs.plugins.simplemvi.publishing)
 }
 
 kotlin {
@@ -13,4 +14,9 @@ kotlin {
 
 android {
     namespace = "com.arttttt.simplemvi"
+}
+
+libraryPublishing {
+    artifactId = "simplemvi"
+    description = "Simple, but powerful multiplatform MVI library"
 }
