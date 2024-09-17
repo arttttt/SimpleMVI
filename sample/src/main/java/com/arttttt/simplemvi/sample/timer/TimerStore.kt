@@ -35,8 +35,8 @@ class TimerStore(
 
                         delay(300)
 
-                        reduce { state ->
-                            state.copy(
+                        reduce {
+                            copy(
                                 value = state.value + 1
                             )
                         }
@@ -50,8 +50,8 @@ class TimerStore(
             }
 
             onIntent<Intent.ResetTimer> {
-                reduce { state ->
-                    state.copy(
+                reduce {
+                    copy(
                         value = 0
                     )
                 }

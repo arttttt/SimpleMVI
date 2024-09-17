@@ -22,8 +22,8 @@ class CounterStore(
         delegate = actorDsl(
             coroutineContext = coroutineContext,
         ) {
-            onIntent<Intent.Increment> { intent ->
-                handleIncrement(intent)
+            onIntent<Intent.Increment> {
+                handleIncrement()
             }
 
             handleDecrement()
@@ -32,8 +32,8 @@ class CounterStore(
                 if (state.counter == 0) {
                     sideEffect(SideEffect.CantResetCounter)
                 } else {
-                    reduce { state ->
-                        state.copy(
+                    reduce {
+                        copy(
                             counter = 0
                         )
                     }
@@ -64,12 +64,10 @@ class CounterStore(
     }
 }
 
-private fun ActorScope<CounterStore.Intent, CounterStore.State, CounterStore.SideEffect>.handleIncrement(
-    intent: CounterStore.Intent.Increment,
-) {
-    reduce { state ->
-        state.copy(
-            counter = state.counter + 1
+private fun ActorScope<CounterStore.Intent, CounterStore.State, CounterStore.SideEffect>.handleIncrement() {
+    reduce {
+        copy(
+            counter = counter + 1
         )
     }
 
@@ -78,9 +76,9 @@ private fun ActorScope<CounterStore.Intent, CounterStore.State, CounterStore.Sid
 
 private fun ActorBuilder<CounterStore.Intent, CounterStore.State, CounterStore.SideEffect>.handleDecrement() {
     onIntent<CounterStore.Intent.Decrement> {
-        reduce { state ->
-            state.copy(
-                counter = state.counter - 1
+        reduce {
+            copy(
+                counter = counter - 1
             )
         }
 

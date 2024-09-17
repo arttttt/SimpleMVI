@@ -12,5 +12,5 @@ interface ActorScope<in Intent : Any, State : Any, in SideEffect : Any> : Corout
     fun intent(intent: Intent)
 
     @MainThread
-    fun reduce(block: (state: State) -> State)
+    fun reduce(block: State.() -> State)
 }

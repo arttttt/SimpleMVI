@@ -7,7 +7,7 @@ interface Actor<Intent : Any, State : Any, out SideEffect : Any> {
     @MainThread
     fun init(
         getState: () -> State,
-        reduce: ((State) -> State) -> Unit,
+        reduce: (State.() -> State) -> Unit,
         onNewIntent: (Intent) -> Unit,
         postSideEffect: (sideEffect: SideEffect) -> Unit,
     )

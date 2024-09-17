@@ -29,23 +29,23 @@ class NotesStore(
         ) {
             onIntent<Intent.LoadNotes> {
                 launch {
-                    reduce { state ->
-                        state.copy(
+                    reduce {
+                        copy(
                             isInProgress = true,
                         )
                     }
 
                     val notes = notesRepository.getNotes()
 
-                    reduce { state ->
-                        state.copy(
+                    reduce {
+                        copy(
                             notes = notes,
                         )
                     }
                 }
                     .invokeOnCompletion {
-                        reduce { state ->
-                            state.copy(
+                        reduce {
+                            copy(
                                 isInProgress = false,
                             )
                         }
@@ -63,8 +63,8 @@ class NotesStore(
                         note = note,
                     )
 
-                    reduce { state ->
-                        state.copy(
+                    reduce {
+                        copy(
                             currentMessage = "",
                             notes = state.notes + note,
                         )
@@ -76,8 +76,8 @@ class NotesStore(
                 launch {
                     notesRepository.removeNote(intent.id)
 
-                    reduce { state ->
-                        state.copy(
+                    reduce {
+                        copy(
                             notes = state.notes.filter { it.id != intent.id },
                         )
                     }
@@ -85,8 +85,8 @@ class NotesStore(
             }
 
             onIntent<Intent.CurrentMessageChanged> { intent ->
-                reduce { state ->
-                    state.copy(
+                reduce {
+                    copy(
                         currentMessage = intent.message,
                     )
                 }
