@@ -10,14 +10,15 @@ import kotlin.properties.Delegates
 
 abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any>(
     coroutineContext: CoroutineContext,
-    private val block: ActorScope<Intent, State, SideEffect>.(intent: Intent) -> Unit
 ) : Actor<Intent, State, SideEffect> {
 
-    protected val scope = CoroutineScope(coroutineContext)
+    private val scope = CoroutineScope(coroutineContext)
 
-    protected var actorScope: ActorScope<Intent, State, SideEffect> by Delegates.notNull()
+    private var actorScope: ActorScope<Intent, State, SideEffect> by Delegates.notNull()
 
-    protected val isInitialized = atomic(false)
+    private val isInitialized = atomic(false)
+
+    abstract fun handleIntent(intent: Intent)
 
     @MainThread
     override fun init(
@@ -59,7 +60,7 @@ abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any>(
     override fun onIntent(intent: Intent) {
         assertOnMainThread()
 
-        actorScope.block(intent)
+        handleIntent(intent)
     }
 
     @MainThread
@@ -67,5 +68,20 @@ abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any>(
         assertOnMainThread()
 
         scope.cancel()
+    }
+
+    @MainThread
+    protected fun intent(intent: Intent) {
+        actorScope.intent(intent)
+    }
+
+    @MainThread
+    protected fun reduce(block: State.() -> State) {
+        actorScope.reduce(block)
+    }
+
+    @MainThread
+    protected fun sideEffect(sideEffect: SideEffect) {
+        actorScope.sideEffect(sideEffect)
     }
 }
