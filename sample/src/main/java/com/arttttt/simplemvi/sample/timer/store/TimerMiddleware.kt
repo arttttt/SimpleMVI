@@ -1,4 +1,4 @@
-package com.arttttt.simplemvi.sample.timer
+package com.arttttt.simplemvi.sample.timer.store
 
 import android.util.Log
 import com.arttttt.simplemvi.middleware.Middleware

@@ -12,7 +12,10 @@ abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any>(
     coroutineContext: CoroutineContext,
 ) : Actor<Intent, State, SideEffect> {
 
-    private val scope = CoroutineScope(coroutineContext)
+    protected val scope = CoroutineScope(coroutineContext)
+
+    protected val state: State
+        get() = actorScope.state
 
     private var actorScope: ActorScope<Intent, State, SideEffect> by Delegates.notNull()
 
