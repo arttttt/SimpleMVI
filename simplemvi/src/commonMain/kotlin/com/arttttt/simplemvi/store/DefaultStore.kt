@@ -1,6 +1,7 @@
 package com.arttttt.simplemvi.store
 
 import com.arttttt.simplemvi.actor.Actor
+import com.arttttt.simplemvi.middleware.Middleware
 import com.arttttt.simplemvi.utils.mainthread.MainThread
 import com.arttttt.simplemvi.utils.mainthread.assertOnMainThread
 import com.arttttt.simplemvi.utils.state
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.update
 class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any>(
     initialState: State,
     private val initialIntents: List<Intent>,
+    private val middlewares: List<Middleware<Intent, State, SideEffect>>,
     private val actor: Actor<Intent, State, SideEffect>,
 ) : Store<Intent, State, SideEffect> {
 
@@ -43,7 +45,10 @@ class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any>(
             getState = this::state::get,
             reduce = { block ->
                 _states.update { state ->
-                    block(state)
+                    block(state).also { newState ->
+                        middlewares.forEach { it.onStateChanged(state, newState) }
+                    }
+
                 }
             },
             onNewIntent = this::accept,
@@ -57,6 +62,7 @@ class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any>(
     override fun accept(intent: Intent) {
         assertOnMainThread()
 
+        middlewares.forEach { it.onIntent(intent, _states.value) }
         actor.onIntent(intent)
     }
 
@@ -68,6 +74,7 @@ class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any>(
     }
 
     private fun postSideEffect(sideEffect: SideEffect) {
+        middlewares.forEach { it.onSideEffect(sideEffect, _states.value) }
         _sideEffects.tryEmit(sideEffect)
     }
 }

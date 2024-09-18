@@ -42,14 +42,22 @@ fun TimerContent() {
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Button(
+                    enabled = !state.isTimerRunning,
                     onClick = {
                         viewModel.store + TimerStore.Intent.StartTimer
                     }
                 ) {
-                    Text("Start timer")
+                    Text(
+                        text = if (state.value != 0 && !state.isTimerRunning) {
+                            "Resume timer"
+                        } else {
+                            "Start timer"
+                        }
+                    )
                 }
 
                 Button(
+                    enabled = state.isTimerRunning,
                     onClick = {
                         viewModel.store + TimerStore.Intent.StopTimer
                     }

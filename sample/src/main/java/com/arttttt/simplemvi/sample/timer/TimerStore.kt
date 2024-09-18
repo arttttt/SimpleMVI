@@ -1,7 +1,5 @@
 package com.arttttt.simplemvi.sample.timer
 
-import android.util.Log
-import com.arttttt.simplemvi.logging.loggingActor
 import com.arttttt.simplemvi.store.Store
 import com.arttttt.simplemvi.utils.actorDsl
 import com.arttttt.simplemvi.utils.createStore
@@ -15,54 +13,68 @@ class TimerStore(
     coroutineContext: CoroutineContext,
 ) : Store<TimerStore.Intent, TimerStore.State, TimerStore.SideEffect> by createStore(
     initialState = State(
+        isTimerRunning = false,
         value = 0,
     ),
     initialIntents = emptyList(),
-    actor = loggingActor(
-        name = "TimerStore",
-        logger = { message -> Log.e("TimerStore", message) },
-        delegate = actorDsl(
-            coroutineContext = coroutineContext,
-        ) {
-            var timerJob: Job? = null
+    middlewares = listOf(
+        TimerMiddleware(),
+    ),
+    actor = actorDsl(
+        coroutineContext = coroutineContext,
+    ) {
+        var timerJob: Job? = null
 
-            onIntent<Intent.StartTimer> {
-                if (timerJob != null) return@onIntent
+        onIntent<Intent.StartTimer> {
+            if (timerJob != null) return@onIntent
 
-                timerJob = launch {
-                    while (true) {
-                        ensureActive()
+            timerJob = launch {
+                reduce {
+                    copy(
+                        isTimerRunning = true
+                    )
+                }
 
-                        delay(300)
+                while (true) {
+                    ensureActive()
 
-                        reduce {
-                            copy(
-                                value = state.value + 1
-                            )
-                        }
+                    delay(300)
+
+                    reduce {
+                        copy(
+                            value = state.value + 1
+                        )
                     }
                 }
             }
 
-            onIntent<Intent.StopTimer> {
-                timerJob?.cancel()
-                timerJob = null
-            }
-
-            onIntent<Intent.ResetTimer> {
+            timerJob!!.invokeOnCompletion {
                 reduce {
                     copy(
-                        value = 0
+                        isTimerRunning = false
                     )
                 }
             }
+        }
 
-            onDestroy {
-                timerJob?.cancel()
-                timerJob = null
+        onIntent<Intent.StopTimer> {
+            timerJob?.cancel()
+            timerJob = null
+        }
+
+        onIntent<Intent.ResetTimer> {
+            reduce {
+                copy(
+                    value = 0
+                )
             }
         }
-    )
+
+        onDestroy {
+            timerJob?.cancel()
+            timerJob = null
+        }
+    }
 ) {
 
     sealed interface Intent {
@@ -73,6 +85,7 @@ class TimerStore(
     }
 
     data class State(
+        val isTimerRunning: Boolean,
         val value: Int,
     )
 

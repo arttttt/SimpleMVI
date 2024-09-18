@@ -16,6 +16,7 @@ class CounterStore(
         counter = 0,
     ),
     initialIntents = emptyList(),
+    middlewares = emptyList(),
     actor = loggingActor(
         name = "CounterStore",
         logger = { message -> Log.e("CounterStore", message) },
