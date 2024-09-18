@@ -18,6 +18,7 @@ class TimerStore(
         value = 0,
     ),
     initialIntents = emptyList(),
+    middlewares = emptyList(),
     actor = loggingActor(
         name = "TimerStore",
         logger = { message -> Log.e("TimerStore", message) },

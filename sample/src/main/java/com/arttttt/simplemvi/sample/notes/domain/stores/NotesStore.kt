@@ -21,6 +21,7 @@ class NotesStore(
         notes = emptyList(),
     ),
     initialIntents = listOf(Intent.LoadNotes),
+    middlewares = emptyList(),
     actor = loggingActor(
         name = "NotesStore",
         logger = { message -> Log.e("NotesStore", message) },
