@@ -34,7 +34,7 @@ abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any>(
 
         if (isInitialized.getAndSet(true)) return
 
-        actorScope = object : ActorScope<Intent, State, SideEffect>, CoroutineScope by scope {
+        actorScope = object : ActorScope<Intent, State, SideEffect> {
 
             override val state: State
                 get() = getState()

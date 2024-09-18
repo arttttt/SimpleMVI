@@ -17,11 +17,11 @@ class DslActor<Intent : Any, State : Any, SideEffect : Any>(
     private val destroyHandler: DslActorScope<Intent, State, SideEffect>.() -> Unit,
 ) : Actor<Intent, State, SideEffect> {
 
-    protected val scope = CoroutineScope(coroutineContext)
+    private val scope = CoroutineScope(coroutineContext)
 
-    protected var actorScope: DslActorScope<Intent, State, SideEffect> by Delegates.notNull()
+    private var actorScope: DslActorScope<Intent, State, SideEffect> by Delegates.notNull()
 
-    protected val isInitialized = atomic(false)
+    private val isInitialized = atomic(false)
 
     @MainThread
     override fun init(
