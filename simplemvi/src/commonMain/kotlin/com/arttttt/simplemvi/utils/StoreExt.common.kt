@@ -21,8 +21,8 @@ val <State : Any>Store<*, State, *>.state: State
 fun <Intent : Any, State : Any, SideEffect : Any> createStore(
     initialize: Boolean = true,
     initialState: State,
-    initialIntents: List<Intent>,
-    middlewares: List<Middleware<Intent, State, SideEffect>>,
+    initialIntents: List<Intent> = emptyList(),
+    middlewares: List<Middleware<Intent, State, SideEffect>> = emptyList(),
     actor: Actor<Intent, State, SideEffect>,
 ): Store<Intent, State, SideEffect> {
     return DefaultStore(
