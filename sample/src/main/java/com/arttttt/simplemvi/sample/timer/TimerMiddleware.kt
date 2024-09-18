@@ -8,7 +8,7 @@ class TimerMiddleware : Middleware<TimerStore.Intent, TimerStore.State, TimerSto
     private val tag = "TimerMiddleware"
 
     override fun onIntent(intent: TimerStore.Intent, state: TimerStore.State) {
-        logE(
+        logD(
             """
                 TimerStore received intent: $intent,
                 current state: $state,
@@ -17,7 +17,7 @@ class TimerMiddleware : Middleware<TimerStore.Intent, TimerStore.State, TimerSto
     }
 
     override fun onStateChanged(oldState: TimerStore.State, newState: TimerStore.State) {
-        logE(
+        logD(
             """
                 TimerStore changed state
                 old state: $oldState
@@ -27,7 +27,7 @@ class TimerMiddleware : Middleware<TimerStore.Intent, TimerStore.State, TimerSto
     }
 
     override fun onSideEffect(sideEffect: TimerStore.SideEffect, state: TimerStore.State) {
-        logE(
+        logD(
             """
                 TimerStore emitted side effect: $sideEffect
                 current state: $state
@@ -35,7 +35,7 @@ class TimerMiddleware : Middleware<TimerStore.Intent, TimerStore.State, TimerSto
         )
     }
 
-    private fun logE(message: String) {
-        Log.e(tag, message)
+    private fun logD(message: String) {
+        Log.d(tag, message)
     }
 }
