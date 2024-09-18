@@ -24,7 +24,7 @@ abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any>(
     abstract fun handleIntent(intent: Intent)
 
     @MainThread
-    override fun init(
+    final override fun init(
         getState: () -> State,
         reduce: ((State) -> State) -> Unit,
         onNewIntent: (intent: Intent) -> Unit,
@@ -60,7 +60,7 @@ abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any>(
     }
 
     @MainThread
-    override fun onIntent(intent: Intent) {
+    final override fun onIntent(intent: Intent) {
         assertOnMainThread()
 
         handleIntent(intent)
