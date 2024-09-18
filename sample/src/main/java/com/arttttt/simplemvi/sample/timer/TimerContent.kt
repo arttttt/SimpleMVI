@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.arttttt.simplemvi.utils.plus
+import com.arttttt.simplemvi.utils.state
 
 @Composable
 fun TimerContent() {
@@ -42,14 +43,22 @@ fun TimerContent() {
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Button(
+                    enabled = !viewModel.store.state.isTimerRunning,
                     onClick = {
                         viewModel.store + TimerStore.Intent.StartTimer
                     }
                 ) {
-                    Text("Start timer")
+                    Text(
+                        text = if (viewModel.store.state.value != 0 && !viewModel.store.state.isTimerRunning) {
+                            "Resume timer"
+                        } else {
+                            "Start timer"
+                        }
+                    )
                 }
 
                 Button(
+                    enabled = viewModel.store.state.isTimerRunning,
                     onClick = {
                         viewModel.store + TimerStore.Intent.StopTimer
                     }
