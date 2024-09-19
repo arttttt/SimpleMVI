@@ -23,6 +23,8 @@ abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any>(
 
     abstract fun handleIntent(intent: Intent)
 
+    fun onInit() {}
+
     @MainThread
     final override fun init(
         getState: () -> State,
@@ -57,6 +59,8 @@ abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any>(
                 reduce(block)
             }
         }
+
+        onInit()
     }
 
     @MainThread
