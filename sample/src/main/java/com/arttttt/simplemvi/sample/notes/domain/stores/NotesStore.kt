@@ -1,11 +1,10 @@
 package com.arttttt.simplemvi.sample.notes.domain.stores
 
-import android.util.Log
+import com.arttttt.simplemvi.actor.dsl.actorDsl
 import com.arttttt.simplemvi.logging.loggingActor
 import com.arttttt.simplemvi.sample.notes.domain.models.Note
 import com.arttttt.simplemvi.sample.notes.domain.repository.NotesRepository
 import com.arttttt.simplemvi.store.Store
-import com.arttttt.simplemvi.actor.dsl.actorDsl
 import com.arttttt.simplemvi.store.createStore
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
@@ -24,7 +23,6 @@ class NotesStore(
     middlewares = emptyList(),
     actor = loggingActor(
         name = "NotesStore",
-        logger = { message -> Log.e("NotesStore", message) },
         delegate = actorDsl(
             coroutineContext = coroutineContext,
         ) {

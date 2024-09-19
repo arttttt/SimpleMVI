@@ -28,7 +28,8 @@ public class LoggingActor<Intent : Any, State : Any, SideEffect : Any>(
                 logger.log(
                     buildMessage(
                         tag = name,
-                        message = "State before reduce(${getState()})"
+                        event = "Old state",
+                        message = "${getState()}"
                     )
                 )
 
@@ -38,7 +39,8 @@ public class LoggingActor<Intent : Any, State : Any, SideEffect : Any>(
                     logger.log(
                         buildMessage(
                             tag = name,
-                            message = "State after reduce($newState)"
+                            event = "New state",
+                            message = "$newState"
                         )
                     )
 
@@ -50,7 +52,8 @@ public class LoggingActor<Intent : Any, State : Any, SideEffect : Any>(
                 logger.log(
                     buildMessage(
                         tag = name,
-                        message = "Side Effect($sideEffect)",
+                        event = "SideEffect",
+                        message = "$sideEffect",
                     )
                 )
 
@@ -63,7 +66,8 @@ public class LoggingActor<Intent : Any, State : Any, SideEffect : Any>(
         logger.log(
             buildMessage(
                 tag = name,
-                message = "Intent($intent)",
+                event = "Intent",
+                message = "$intent",
             )
         )
 
@@ -83,11 +87,18 @@ public class LoggingActor<Intent : Any, State : Any, SideEffect : Any>(
 
     private fun buildMessage(
         tag: String,
+        event: String? = null,
         message: String,
     ): String {
         return buildString {
             append(tag)
-            append(": ")
+
+            if (event != null) {
+                append(" | ")
+                append(event)
+            }
+
+            append(" | ")
             append(message)
         }
     }
