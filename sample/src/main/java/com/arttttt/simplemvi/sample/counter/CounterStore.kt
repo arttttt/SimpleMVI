@@ -17,7 +17,7 @@ class CounterStore(
     initialIntents = emptyList(),
     middlewares = emptyList(),
     actor = loggingActor(
-        name = "CounterStore",
+        name = CounterStore::class.simpleName,
         delegate = actorDsl(
             coroutineContext = coroutineContext,
         ) {

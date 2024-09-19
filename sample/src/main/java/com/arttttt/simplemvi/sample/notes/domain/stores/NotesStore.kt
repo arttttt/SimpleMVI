@@ -22,7 +22,7 @@ class NotesStore(
     initialIntents = listOf(Intent.LoadNotes),
     middlewares = emptyList(),
     actor = loggingActor(
-        name = "NotesStore",
+        name = NotesStore::class.simpleName,
         delegate = actorDsl(
             coroutineContext = coroutineContext,
         ) {
