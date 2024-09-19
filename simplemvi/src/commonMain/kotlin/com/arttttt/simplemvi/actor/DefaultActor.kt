@@ -79,11 +79,15 @@ abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any>(
 
     @MainThread
     protected fun intent(intent: Intent) {
+        assertOnMainThread()
+
         actorScope.intent(intent)
     }
 
     @MainThread
     protected fun reduce(block: State.() -> State) {
+        assertOnMainThread()
+
         actorScope.reduce(block)
     }
 
