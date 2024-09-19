@@ -1,4 +1,4 @@
-package com.arttttt.simplemvi.utils.mainthread
+package com.arttttt.simplemvi.utils
 
 import platform.Foundation.NSThread
 

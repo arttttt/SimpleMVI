@@ -6,7 +6,6 @@ plugins {
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation(libs.kotlin.atomicfu)
             implementation(libs.kotlin.coroutines.core)
         }
     }

@@ -1,22 +1,7 @@
-package com.arttttt.simplemvi.utils
+package com.arttttt.simplemvi.store
 
 import com.arttttt.simplemvi.actor.Actor
 import com.arttttt.simplemvi.middleware.Middleware
-import com.arttttt.simplemvi.store.DefaultStore
-import com.arttttt.simplemvi.store.Store
-
-operator fun <Intent : Any> Store<Intent, *, *>.plus(intent: Intent) {
-    accept(intent)
-}
-
-operator fun <Intent : Any> Store<Intent, *, *>.plusAssign(intent: Intent) {
-    accept(intent)
-}
-
-val <State : Any>Store<*, State, *>.state: State
-    get() {
-        return states.value
-    }
 
 fun <Intent : Any, State : Any, SideEffect : Any> createStore(
     initialize: Boolean = true,

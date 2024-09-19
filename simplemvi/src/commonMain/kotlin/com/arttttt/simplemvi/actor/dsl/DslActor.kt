@@ -1,29 +1,27 @@
-package com.arttttt.simplemvi.actor
+package com.arttttt.simplemvi.actor.dsl
 
+import com.arttttt.simplemvi.actor.Actor
 import com.arttttt.simplemvi.utils.MainThread
 import com.arttttt.simplemvi.utils.assertOnMainThread
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlin.coroutines.CoroutineContext
 import kotlin.properties.Delegates
+import kotlin.reflect.KClass
 
-abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any>(
+class DslActor<Intent : Any, State : Any, SideEffect : Any>(
     coroutineContext: CoroutineContext,
+    private val initHandler: DslActorScope<Intent, State, SideEffect>.() -> Unit,
+    private val intentHandlers: Map<KClass<out Intent>, DslActorScope<Intent, State, SideEffect>.(Intent) -> Unit>,
+    private val destroyHandler: DslActorScope<Intent, State, SideEffect>.() -> Unit,
 ) : Actor<Intent, State, SideEffect> {
 
-    protected val scope = CoroutineScope(coroutineContext)
+    private val scope = CoroutineScope(coroutineContext)
 
-    protected val state: State
-        get() = actorScope.state
-
-    private var actorScope: ActorScope<Intent, State, SideEffect> by Delegates.notNull()
-
-    abstract fun handleIntent(intent: Intent)
-
-    open fun onInit() {}
+    private var actorScope: DslActorScope<Intent, State, SideEffect> by Delegates.notNull()
 
     @MainThread
-    final override fun init(
+    override fun init(
         getState: () -> State,
         reduce: ((State) -> State) -> Unit,
         onNewIntent: (intent: Intent) -> Unit,
@@ -31,7 +29,7 @@ abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any>(
     ) {
         assertOnMainThread()
 
-        actorScope = object : ActorScope<Intent, State, SideEffect> {
+        actorScope = object : DslActorScope<Intent, State, SideEffect>, CoroutineScope by scope {
 
             override val state: State
                 get() = getState()
@@ -55,41 +53,24 @@ abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any>(
             }
         }
 
-        onInit()
+        actorScope.apply(initHandler)
     }
 
     @MainThread
-    final override fun onIntent(intent: Intent) {
+    override fun onIntent(intent: Intent) {
         assertOnMainThread()
 
-        handleIntent(intent)
+        val handler = intentHandlers[intent::class] ?: throw IllegalArgumentException("intent handler not found for $intent")
+
+        handler.invoke(actorScope, intent)
     }
 
     @MainThread
     override fun destroy() {
         assertOnMainThread()
 
+        actorScope.apply(destroyHandler)
+
         scope.cancel()
-    }
-
-    @MainThread
-    protected fun intent(intent: Intent) {
-        assertOnMainThread()
-
-        actorScope.intent(intent)
-    }
-
-    @MainThread
-    protected fun reduce(block: State.() -> State) {
-        assertOnMainThread()
-
-        actorScope.reduce(block)
-    }
-
-    @MainThread
-    protected fun sideEffect(sideEffect: SideEffect) {
-        assertOnMainThread()
-
-        actorScope.sideEffect(sideEffect)
     }
 }

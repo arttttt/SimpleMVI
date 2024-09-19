@@ -1,6 +1,6 @@
 package com.arttttt.simplemvi.store
 
-import com.arttttt.simplemvi.utils.mainthread.MainThread
+import com.arttttt.simplemvi.utils.MainThread
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 

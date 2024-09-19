@@ -2,10 +2,8 @@ package com.arttttt.simplemvi.store
 
 import com.arttttt.simplemvi.actor.Actor
 import com.arttttt.simplemvi.middleware.Middleware
-import com.arttttt.simplemvi.utils.mainthread.MainThread
-import com.arttttt.simplemvi.utils.mainthread.assertOnMainThread
-import com.arttttt.simplemvi.utils.state
-import kotlinx.atomicfu.atomic
+import com.arttttt.simplemvi.utils.MainThread
+import com.arttttt.simplemvi.utils.assertOnMainThread
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,15 +29,15 @@ class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any>(
 
     override val sideEffects: Flow<SideEffect> = _sideEffects.asSharedFlow()
 
-    private val isInitialized = atomic(false)
+    private var isInitialized = false
 
     @MainThread
     override fun init() {
         assertOnMainThread()
 
-        if (isInitialized.value) return
+        if (isInitialized) return
 
-        isInitialized.value = true
+        isInitialized = true
 
         actor.init(
             getState = this::state::get,
@@ -73,7 +71,10 @@ class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any>(
         actor.destroy()
     }
 
+    @MainThread
     private fun postSideEffect(sideEffect: SideEffect) {
+        assertOnMainThread()
+
         middlewares.forEach { it.onSideEffect(sideEffect, _states.value) }
         _sideEffects.tryEmit(sideEffect)
     }
