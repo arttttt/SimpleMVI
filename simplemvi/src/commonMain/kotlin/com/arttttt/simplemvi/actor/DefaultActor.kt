@@ -23,7 +23,7 @@ abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any>(
 
     abstract fun handleIntent(intent: Intent)
 
-    fun onInit() {}
+    open fun onInit() {}
 
     @MainThread
     final override fun init(
