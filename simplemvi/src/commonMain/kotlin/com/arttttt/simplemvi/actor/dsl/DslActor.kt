@@ -3,7 +3,6 @@ package com.arttttt.simplemvi.actor.dsl
 import com.arttttt.simplemvi.actor.Actor
 import com.arttttt.simplemvi.utils.MainThread
 import com.arttttt.simplemvi.utils.assertOnMainThread
-import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlin.coroutines.CoroutineContext
@@ -21,8 +20,6 @@ class DslActor<Intent : Any, State : Any, SideEffect : Any>(
 
     private var actorScope: DslActorScope<Intent, State, SideEffect> by Delegates.notNull()
 
-    private val isInitialized = atomic(false)
-
     @MainThread
     override fun init(
         getState: () -> State,
@@ -31,8 +28,6 @@ class DslActor<Intent : Any, State : Any, SideEffect : Any>(
         postSideEffect: (sideEffect: SideEffect) -> Unit
     ) {
         assertOnMainThread()
-
-        if (isInitialized.getAndSet(true)) return
 
         actorScope = object : DslActorScope<Intent, State, SideEffect>, CoroutineScope by scope {
 

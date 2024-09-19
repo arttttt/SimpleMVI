@@ -2,7 +2,6 @@ package com.arttttt.simplemvi.actor
 
 import com.arttttt.simplemvi.utils.MainThread
 import com.arttttt.simplemvi.utils.assertOnMainThread
-import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlin.coroutines.CoroutineContext
@@ -19,8 +18,6 @@ abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any>(
 
     private var actorScope: ActorScope<Intent, State, SideEffect> by Delegates.notNull()
 
-    private val isInitialized = atomic(false)
-
     abstract fun handleIntent(intent: Intent)
 
     open fun onInit() {}
@@ -33,8 +30,6 @@ abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any>(
         postSideEffect: (sideEffect: SideEffect) -> Unit
     ) {
         assertOnMainThread()
-
-        if (isInitialized.getAndSet(true)) return
 
         actorScope = object : ActorScope<Intent, State, SideEffect> {
 
