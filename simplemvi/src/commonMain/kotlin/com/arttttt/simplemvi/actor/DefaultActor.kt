@@ -85,6 +85,8 @@ abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any>(
 
     @MainThread
     protected fun sideEffect(sideEffect: SideEffect) {
+        assertOnMainThread()
+
         actorScope.sideEffect(sideEffect)
     }
 }

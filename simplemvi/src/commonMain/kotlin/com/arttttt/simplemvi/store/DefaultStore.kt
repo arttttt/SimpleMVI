@@ -73,7 +73,10 @@ class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any>(
         actor.destroy()
     }
 
+    @MainThread
     private fun postSideEffect(sideEffect: SideEffect) {
+        assertOnMainThread()
+
         middlewares.forEach { it.onSideEffect(sideEffect, _states.value) }
         _sideEffects.tryEmit(sideEffect)
     }
