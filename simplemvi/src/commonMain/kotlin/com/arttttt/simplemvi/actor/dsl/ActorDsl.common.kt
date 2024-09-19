@@ -1,8 +1,6 @@
-package com.arttttt.simplemvi.utils
+package com.arttttt.simplemvi.actor.dsl
 
 import com.arttttt.simplemvi.actor.Actor
-import com.arttttt.simplemvi.actor.dsl.ActorBuilder
-import com.arttttt.simplemvi.actor.dsl.DslActor
 import kotlin.coroutines.CoroutineContext
 
 inline fun <Intent : Any, State : Any, SideEffect : Any> actorDsl(

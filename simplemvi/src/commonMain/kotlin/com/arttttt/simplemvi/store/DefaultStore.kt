@@ -2,9 +2,8 @@ package com.arttttt.simplemvi.store
 
 import com.arttttt.simplemvi.actor.Actor
 import com.arttttt.simplemvi.middleware.Middleware
-import com.arttttt.simplemvi.utils.mainthread.MainThread
-import com.arttttt.simplemvi.utils.mainthread.assertOnMainThread
-import com.arttttt.simplemvi.utils.state
+import com.arttttt.simplemvi.utils.MainThread
+import com.arttttt.simplemvi.utils.assertOnMainThread
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow

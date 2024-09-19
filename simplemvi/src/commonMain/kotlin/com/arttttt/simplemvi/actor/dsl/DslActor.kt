@@ -1,8 +1,8 @@
 package com.arttttt.simplemvi.actor.dsl
 
 import com.arttttt.simplemvi.actor.Actor
-import com.arttttt.simplemvi.utils.mainthread.MainThread
-import com.arttttt.simplemvi.utils.mainthread.assertOnMainThread
+import com.arttttt.simplemvi.utils.MainThread
+import com.arttttt.simplemvi.utils.assertOnMainThread
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel

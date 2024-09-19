@@ -1,6 +1,6 @@
 package com.arttttt.simplemvi.actor
 
-import com.arttttt.simplemvi.utils.mainthread.MainThread
+import com.arttttt.simplemvi.utils.MainThread
 
 interface ActorScope<in Intent : Any, State : Any, in SideEffect : Any> {
 

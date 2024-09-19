@@ -1,9 +1,7 @@
-package com.arttttt.simplemvi.utils
+package com.arttttt.simplemvi.store
 
 import com.arttttt.simplemvi.actor.Actor
 import com.arttttt.simplemvi.middleware.Middleware
-import com.arttttt.simplemvi.store.DefaultStore
-import com.arttttt.simplemvi.store.Store
 
 fun <Intent : Any, State : Any, SideEffect : Any> createStore(
     initialize: Boolean = true,

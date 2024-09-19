@@ -1,7 +1,7 @@
 package com.arttttt.simplemvi.sample.timer.store
 
 import com.arttttt.simplemvi.store.Store
-import com.arttttt.simplemvi.utils.createStore
+import com.arttttt.simplemvi.store.createStore
 import kotlin.coroutines.CoroutineContext
 
 class TimerStore(

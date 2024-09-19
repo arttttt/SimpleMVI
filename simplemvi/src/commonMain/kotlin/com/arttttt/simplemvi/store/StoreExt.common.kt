@@ -1,6 +1,4 @@
-package com.arttttt.simplemvi.utils
-
-import com.arttttt.simplemvi.store.Store
+package com.arttttt.simplemvi.store
 
 operator fun <Intent : Any> Store<Intent, *, *>.plus(intent: Intent) {
     accept(intent)

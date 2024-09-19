@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.arttttt.simplemvi.utils.plus
+import com.arttttt.simplemvi.store.plus
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
