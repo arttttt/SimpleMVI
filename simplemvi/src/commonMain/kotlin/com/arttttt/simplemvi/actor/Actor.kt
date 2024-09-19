@@ -2,10 +2,10 @@ package com.arttttt.simplemvi.actor
 
 import com.arttttt.simplemvi.utils.MainThread
 
-interface Actor<Intent : Any, State : Any, out SideEffect : Any> {
+public interface Actor<Intent : Any, State : Any, out SideEffect : Any> {
 
     @MainThread
-    fun init(
+    public fun init(
         getState: () -> State,
         reduce: (State.() -> State) -> Unit,
         onNewIntent: (Intent) -> Unit,
@@ -13,8 +13,8 @@ interface Actor<Intent : Any, State : Any, out SideEffect : Any> {
     )
 
     @MainThread
-    fun onIntent(intent: Intent)
+    public fun onIntent(intent: Intent)
 
     @MainThread
-    fun destroy()
+    public fun destroy()
 }

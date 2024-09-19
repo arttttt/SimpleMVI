@@ -3,7 +3,7 @@ package com.arttttt.simplemvi.actor.dsl
 import com.arttttt.simplemvi.actor.Actor
 import kotlin.coroutines.CoroutineContext
 
-inline fun <Intent : Any, State : Any, SideEffect : Any> actorDsl(
+public inline fun <Intent : Any, State : Any, SideEffect : Any> actorDsl(
     coroutineContext: CoroutineContext,
     crossinline block: ActorBuilder<Intent, State, SideEffect>.() -> Unit,
 ): Actor<Intent, State, SideEffect> {

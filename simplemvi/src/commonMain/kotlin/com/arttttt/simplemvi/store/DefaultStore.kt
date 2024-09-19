@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any>(
+public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any>(
     initialState: State,
     private val initialIntents: List<Intent>,
     private val middlewares: List<Middleware<Intent, State, SideEffect>>,

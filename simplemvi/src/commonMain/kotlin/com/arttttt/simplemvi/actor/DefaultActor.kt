@@ -7,20 +7,20 @@ import kotlinx.coroutines.cancel
 import kotlin.coroutines.CoroutineContext
 import kotlin.properties.Delegates
 
-abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any>(
+public abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any>(
     coroutineContext: CoroutineContext,
 ) : Actor<Intent, State, SideEffect> {
 
-    protected val scope = CoroutineScope(coroutineContext)
+    protected val scope: CoroutineScope = CoroutineScope(coroutineContext)
 
     protected val state: State
         get() = actorScope.state
 
     private var actorScope: ActorScope<Intent, State, SideEffect> by Delegates.notNull()
 
-    abstract fun handleIntent(intent: Intent)
+    protected abstract fun handleIntent(intent: Intent)
 
-    open fun onInit() {}
+    protected open fun onInit() {}
 
     @MainThread
     final override fun init(

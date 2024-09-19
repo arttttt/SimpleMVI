@@ -3,7 +3,7 @@ package com.arttttt.simplemvi.store
 import com.arttttt.simplemvi.actor.Actor
 import com.arttttt.simplemvi.middleware.Middleware
 
-fun <Intent : Any, State : Any, SideEffect : Any> createStore(
+public fun <Intent : Any, State : Any, SideEffect : Any> createStore(
     initialize: Boolean = true,
     initialState: State,
     initialIntents: List<Intent> = emptyList(),
