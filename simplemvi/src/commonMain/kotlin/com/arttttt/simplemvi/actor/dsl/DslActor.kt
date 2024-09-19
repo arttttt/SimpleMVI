@@ -9,7 +9,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.properties.Delegates
 import kotlin.reflect.KClass
 
-class DslActor<Intent : Any, State : Any, SideEffect : Any>(
+public class DslActor<Intent : Any, State : Any, SideEffect : Any>(
     coroutineContext: CoroutineContext,
     private val initHandler: DslActorScope<Intent, State, SideEffect>.() -> Unit,
     private val intentHandlers: Map<KClass<out Intent>, DslActorScope<Intent, State, SideEffect>.(Intent) -> Unit>,

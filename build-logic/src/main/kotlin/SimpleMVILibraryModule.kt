@@ -28,6 +28,8 @@ class SimpleMVILibraryModule : Plugin<Project> {
             iosArm64()
             iosSimulatorArm64()
 
+            explicitApi()
+
             targets.configureEach {
                 when (this) {
                     is KotlinAndroidTarget ->

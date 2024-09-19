@@ -3,7 +3,7 @@ package com.arttttt.simplemvi.logging
 import com.arttttt.simplemvi.actor.Actor
 import com.arttttt.simplemvi.logging.logger.Logger
 
-class LoggingActor<Intent : Any, State : Any, SideEffect : Any>(
+public class LoggingActor<Intent : Any, State : Any, SideEffect : Any>(
     private val name: String,
     private val logger: Logger,
     private val delegate: Actor<Intent, State, SideEffect>,

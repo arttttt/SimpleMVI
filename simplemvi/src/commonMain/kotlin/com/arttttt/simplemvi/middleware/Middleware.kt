@@ -1,10 +1,10 @@
 package com.arttttt.simplemvi.middleware
 
-interface Middleware<Intent : Any, State : Any, SideEffect : Any> {
+public interface Middleware<Intent : Any, State : Any, SideEffect : Any> {
 
-    fun onIntent(intent: Intent, state: State)
+    public fun onIntent(intent: Intent, state: State)
 
-    fun onStateChanged(oldState: State, newState: State)
+    public fun onStateChanged(oldState: State, newState: State)
 
-    fun onSideEffect(sideEffect: SideEffect, state: State)
+    public fun onSideEffect(sideEffect: SideEffect, state: State)
 }

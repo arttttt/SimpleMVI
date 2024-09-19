@@ -1,10 +1,10 @@
 package com.arttttt.simplemvi.utils
 
 @MainThread
-fun assertOnMainThread() {
+public fun assertOnMainThread() {
     require(isMainThread()) {
         "This call must be made on the main thread"
     }
 }
 
-expect fun isMainThread(): Boolean
+public expect fun isMainThread(): Boolean

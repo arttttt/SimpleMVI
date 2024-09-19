@@ -4,18 +4,18 @@ import com.arttttt.simplemvi.utils.MainThread
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
-interface Store<in Intent : Any, out State : Any, out SideEffect : Any> {
+public interface Store<in Intent : Any, out State : Any, out SideEffect : Any> {
 
-    val states: StateFlow<State>
+    public val states: StateFlow<State>
 
-    val sideEffects: Flow<SideEffect>
-
-    @MainThread
-    fun init()
+    public val sideEffects: Flow<SideEffect>
 
     @MainThread
-    fun accept(intent: Intent)
+    public fun init()
 
     @MainThread
-    fun destroy()
+    public fun accept(intent: Intent)
+
+    @MainThread
+    public fun destroy()
 }

@@ -2,16 +2,16 @@ package com.arttttt.simplemvi.actor
 
 import com.arttttt.simplemvi.utils.MainThread
 
-interface ActorScope<in Intent : Any, State : Any, in SideEffect : Any> {
+public interface ActorScope<in Intent : Any, State : Any, in SideEffect : Any> {
 
-    val state: State
-
-    @MainThread
-    fun intent(intent: Intent)
+    public val state: State
 
     @MainThread
-    fun reduce(block: State.() -> State)
+    public fun intent(intent: Intent)
 
     @MainThread
-    fun sideEffect(sideEffect: SideEffect)
+    public fun reduce(block: State.() -> State)
+
+    @MainThread
+    public fun sideEffect(sideEffect: SideEffect)
 }

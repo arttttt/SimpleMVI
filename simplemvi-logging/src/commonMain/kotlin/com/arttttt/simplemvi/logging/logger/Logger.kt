@@ -1,6 +1,6 @@
 package com.arttttt.simplemvi.logging.logger
 
-fun interface Logger {
+public fun interface Logger {
 
-    fun log(message: String)
+    public fun log(message: String)
 }
