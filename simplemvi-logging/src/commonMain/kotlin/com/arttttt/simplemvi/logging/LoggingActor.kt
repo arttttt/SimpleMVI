@@ -4,10 +4,15 @@ import com.arttttt.simplemvi.actor.Actor
 import com.arttttt.simplemvi.logging.logger.Logger
 
 public class LoggingActor<Intent : Any, State : Any, SideEffect : Any>(
-    private val name: String,
+    private val name: String?,
     private val logger: Logger,
     private val delegate: Actor<Intent, State, SideEffect>,
 ) : Actor<Intent, State, SideEffect> {
+
+    public companion object {
+
+        private const val DEFAULT_STORE_NAME = "UnnamedStore"
+    }
 
     override fun init(
         getState: () -> State,
@@ -28,7 +33,8 @@ public class LoggingActor<Intent : Any, State : Any, SideEffect : Any>(
                 logger.log(
                     buildMessage(
                         tag = name,
-                        message = "State before reduce(${getState()})"
+                        event = "Old state",
+                        message = "${getState()}"
                     )
                 )
 
@@ -38,7 +44,8 @@ public class LoggingActor<Intent : Any, State : Any, SideEffect : Any>(
                     logger.log(
                         buildMessage(
                             tag = name,
-                            message = "State after reduce($newState)"
+                            event = "New state",
+                            message = "$newState"
                         )
                     )
 
@@ -50,7 +57,8 @@ public class LoggingActor<Intent : Any, State : Any, SideEffect : Any>(
                 logger.log(
                     buildMessage(
                         tag = name,
-                        message = "Side Effect($sideEffect)",
+                        event = "SideEffect",
+                        message = "$sideEffect",
                     )
                 )
 
@@ -63,7 +71,8 @@ public class LoggingActor<Intent : Any, State : Any, SideEffect : Any>(
         logger.log(
             buildMessage(
                 tag = name,
-                message = "Intent($intent)",
+                event = "Intent",
+                message = "$intent",
             )
         )
 
@@ -82,12 +91,19 @@ public class LoggingActor<Intent : Any, State : Any, SideEffect : Any>(
     }
 
     private fun buildMessage(
-        tag: String,
+        tag: String?,
+        event: String? = null,
         message: String,
     ): String {
         return buildString {
-            append(tag)
-            append(": ")
+            append(tag ?: DEFAULT_STORE_NAME)
+
+            if (event != null) {
+                append(" | ")
+                append(event)
+            }
+
+            append(" | ")
             append(message)
         }
     }

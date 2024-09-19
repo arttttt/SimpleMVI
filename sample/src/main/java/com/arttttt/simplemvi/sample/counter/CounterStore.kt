@@ -1,11 +1,10 @@
 package com.arttttt.simplemvi.sample.counter
 
-import android.util.Log
-import com.arttttt.simplemvi.store.Store
 import com.arttttt.simplemvi.actor.ActorScope
 import com.arttttt.simplemvi.actor.dsl.ActorBuilder
-import com.arttttt.simplemvi.logging.loggingActor
 import com.arttttt.simplemvi.actor.dsl.actorDsl
+import com.arttttt.simplemvi.logging.loggingActor
+import com.arttttt.simplemvi.store.Store
 import com.arttttt.simplemvi.store.createStore
 import kotlin.coroutines.CoroutineContext
 
@@ -18,8 +17,7 @@ class CounterStore(
     initialIntents = emptyList(),
     middlewares = emptyList(),
     actor = loggingActor(
-        name = "CounterStore",
-        logger = { message -> Log.e("CounterStore", message) },
+        name = CounterStore::class.simpleName,
         delegate = actorDsl(
             coroutineContext = coroutineContext,
         ) {
