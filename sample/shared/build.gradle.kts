@@ -11,16 +11,29 @@ plugins {
 
 kotlin {
     androidTarget()
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
+
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64(),
+    ).forEach { iosTarget ->
+        iosTarget.binaries.framework {
+            baseName = "Shared"
+            isStatic = true
+
+            export(project(":simplemvi"))
+            export(project(":simplemvi-logging"))
+
+            export(libs.kotlin.coroutines.core)
+        }
+    }
 
     sourceSets {
         commonMain.dependencies {
             api(project(":simplemvi"))
             api(project(":simplemvi-logging"))
 
-            implementation(libs.kotlin.coroutines.core)
+            api(libs.kotlin.coroutines.core)
         }
     }
 
