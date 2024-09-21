@@ -1,7 +1,7 @@
 package com.arttttt.simplemvi.sample.timer
 
 import androidx.lifecycle.ViewModel
-import com.arttttt.simplemvi.sample.timer.store.TimerStore
+import com.arttttt.simplemvi.sample.shared.timer.TimerStore
 import com.arttttt.simplemvi.viewmodel.attachStore
 import kotlinx.coroutines.Dispatchers
 

@@ -1,6 +1,5 @@
-package com.arttttt.simplemvi.sample.timer.store
+package com.arttttt.simplemvi.sample.shared.timer
 
-import android.util.Log
 import com.arttttt.simplemvi.middleware.Middleware
 
 class TimerMiddleware : Middleware<TimerStore.Intent, TimerStore.State, TimerStore.SideEffect> {
@@ -36,6 +35,6 @@ class TimerMiddleware : Middleware<TimerStore.Intent, TimerStore.State, TimerSto
     }
 
     private fun logV(message: String) {
-        Log.v(tag, message)
+        println("$tag: $message")
     }
 }

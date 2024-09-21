@@ -1,6 +1,7 @@
-package com.arttttt.simplemvi.sample.timer.store
+package com.arttttt.simplemvi.sample.shared.timer
 
 import com.arttttt.simplemvi.actor.DefaultActor
+import com.arttttt.simplemvi.sample.shared.timer.TimerStore
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive

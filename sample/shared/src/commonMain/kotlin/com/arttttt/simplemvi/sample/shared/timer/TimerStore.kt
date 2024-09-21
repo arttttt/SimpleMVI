@@ -1,4 +1,4 @@
-package com.arttttt.simplemvi.sample.timer.store
+package com.arttttt.simplemvi.sample.shared.timer
 
 import com.arttttt.simplemvi.store.Store
 import com.arttttt.simplemvi.store.createStore

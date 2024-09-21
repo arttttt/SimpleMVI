@@ -1,4 +1,4 @@
-package com.arttttt.simplemvi.sample.counter
+package com.arttttt.simplemvi.sample.shared.counter
 
 import com.arttttt.simplemvi.actor.ActorScope
 import com.arttttt.simplemvi.actor.dsl.ActorBuilder
