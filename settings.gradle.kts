@@ -24,7 +24,7 @@ rootProject.name = "SimpleMVI"
 
 includeBuild("build-logic")
 
-include(":sample")
+include(":sample:android")
 include(":simplemvi")
 include(":simplemvi-logging")
 include(":simplemvi-viewmodel")
