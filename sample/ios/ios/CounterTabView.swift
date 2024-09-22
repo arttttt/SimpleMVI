@@ -10,7 +10,7 @@ struct CounterTabView: View {
 
     init() {
         // todo: fix types
-        let flow = CommonFlowKt.kmmStates(counterStore) as! KmmFlow<CounterStore.State>
+        let flow = KmmFlowKt.kmmStates(counterStore) as! KmmFlow<CounterStore.State>
 
         _state = StateObject(wrappedValue: StateFlowWrapper<CounterStore.State>(flow: flow))
     }

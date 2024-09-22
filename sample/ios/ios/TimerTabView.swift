@@ -10,7 +10,7 @@ struct TimerTabView: View {
 
     init() {
         // todo: fix types
-        let flow = CommonFlowKt.kmmStates(timerStore) as! KmmFlow<TimerStore.State>
+        let flow = KmmFlowKt.kmmStates(timerStore) as! KmmFlow<TimerStore.State>
 
         _state = StateObject(wrappedValue: StateFlowWrapper<TimerStore.State>(flow: flow))
     }
