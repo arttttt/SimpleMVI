@@ -1,13 +1,7 @@
 package com.arttttt.simplemvi.sample.wasmjs.counter
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -15,11 +9,14 @@ import androidx.compose.ui.unit.dp
 import com.arttttt.simplemvi.sample.shared.counter.CounterStore
 import com.arttttt.simplemvi.store.plus
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CounterContent() {
     val store = remember { CounterStore(Dispatchers.Main.immediate) }
+    val snackbarState = remember { SnackbarHostState() }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -28,25 +25,24 @@ fun CounterContent() {
     ) {
         val state by store.states.collectAsState()
 
-/*        LaunchedEffect(Unit) {
-            viewModel
-                .store
+        LaunchedEffect(Unit) {
+            store
                 .sideEffects
                 .onEach { sideEffect ->
                     when (sideEffect) {
                         is CounterStore.SideEffect.CounterChanged -> {
-                            Toast.makeText(context, "Counter changed to ${sideEffect.counter}", Toast.LENGTH_SHORT).show()
+                            snackbarState.showSnackbar("Counter changed to ${sideEffect.counter}")
                         }
                         is CounterStore.SideEffect.CantResetCounter -> {
-                            Toast.makeText(context, "Can't reset counter", Toast.LENGTH_SHORT).show()
+                            snackbarState.showSnackbar("Can't reset counter")
                         }
                         is CounterStore.SideEffect.CounterReset -> {
-                            Toast.makeText(context, "Counter reset", Toast.LENGTH_SHORT).show()
+                            snackbarState.showSnackbar("Counter reset")
                         }
                     }
                 }
                 .launchIn(this)
-        }*/
+        }
 
         TopAppBar(
             title = {
@@ -92,4 +88,6 @@ fun CounterContent() {
             )
         }
     }
+
+    SnackbarHost(snackbarState)
 }
