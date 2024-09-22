@@ -10,6 +10,11 @@
 		058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557BA273AAA24004C7B11 /* Assets.xcassets */; };
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
+		58C7A0F9B9A126CDAC6E68B3 /* NotesTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C7A1B819EDE505BB5EBB37 /* NotesTabView.swift */; };
+		58C7A36CFBF0531FA0325B04 /* CounterTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C7AEA3A751D39CF9D7ACB8 /* CounterTabView.swift */; };
+		58C7A4F2D8E4723429D81C7F /* StateFlowWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C7A995251F5FBDF5D67F2E /* StateFlowWrapper.swift */; };
+		58C7A95581EA4CB285E66E81 /* StateFlowWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C7A1337DE2BFD0585E3025 /* StateFlowWrapper.swift */; };
+		58C7AB9F7B5B30FA12E97970 /* TimerTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C7A7053E7BF2227D186819 /* TimerTabView.swift */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
 /* End PBXBuildFile section */
 
@@ -17,6 +22,11 @@
 		058557BA273AAA24004C7B11 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		2152FB032600AC8F00CF470E /* iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSApp.swift; sourceTree = "<group>"; };
+		58C7A1337DE2BFD0585E3025 /* StateFlowWrapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StateFlowWrapper.swift; sourceTree = "<group>"; };
+		58C7A1B819EDE505BB5EBB37 /* NotesTabView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotesTabView.swift; sourceTree = "<group>"; };
+		58C7A7053E7BF2227D186819 /* TimerTabView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimerTabView.swift; sourceTree = "<group>"; };
+		58C7A995251F5FBDF5D67F2E /* StateFlowWrapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StateFlowWrapper.swift; sourceTree = "<group>"; };
+		58C7AEA3A751D39CF9D7ACB8 /* CounterTabView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CounterTabView.swift; sourceTree = "<group>"; };
 		7555FF7B242A565900829871 /* KotlinProject.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KotlinProject.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FF82242A565900829871 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -75,6 +85,11 @@
 				7555FF8C242A565B00829871 /* Info.plist */,
 				2152FB032600AC8F00CF470E /* iOSApp.swift */,
 				058557D7273AAEEB004C7B11 /* Preview Content */,
+				58C7AEA3A751D39CF9D7ACB8 /* CounterTabView.swift */,
+				58C7A995251F5FBDF5D67F2E /* StateFlowWrapper.swift */,
+				58C7A1337DE2BFD0585E3025 /* StateFlowWrapper.swift */,
+				58C7A1B819EDE505BB5EBB37 /* NotesTabView.swift */,
+				58C7A7053E7BF2227D186819 /* TimerTabView.swift */,
 			);
 			path = ios;
 			sourceTree = "<group>";
@@ -186,6 +201,11 @@
 			files = (
 				2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
+				58C7A36CFBF0531FA0325B04 /* CounterTabView.swift in Sources */,
+				58C7A4F2D8E4723429D81C7F /* StateFlowWrapper.swift in Sources */,
+				58C7A95581EA4CB285E66E81 /* StateFlowWrapper.swift in Sources */,
+				58C7A0F9B9A126CDAC6E68B3 /* NotesTabView.swift in Sources */,
+				58C7AB9F7B5B30FA12E97970 /* TimerTabView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
