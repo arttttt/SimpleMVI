@@ -7,6 +7,7 @@ import kotlin.coroutines.CoroutineContext
 class TimerStore(
     coroutineContext: CoroutineContext,
 ) : Store<TimerStore.Intent, TimerStore.State, TimerStore.SideEffect> by createStore(
+    coroutineContext = coroutineContext,
     initialState = State(
         isTimerRunning = false,
         value = 0,
@@ -15,7 +16,7 @@ class TimerStore(
     middlewares = listOf(
         TimerMiddleware(),
     ),
-    actor = TimerStoreActor(coroutineContext),
+    actor = TimerStoreActor(),
 ) {
 
     sealed interface Intent {

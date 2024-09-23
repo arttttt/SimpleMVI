@@ -7,6 +7,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(project(":simplemvi"))
+            implementation(libs.kotlin.coroutines.core)
         }
     }
 }

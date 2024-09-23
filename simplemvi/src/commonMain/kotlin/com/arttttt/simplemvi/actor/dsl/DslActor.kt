@@ -4,24 +4,20 @@ import com.arttttt.simplemvi.actor.Actor
 import com.arttttt.simplemvi.utils.MainThread
 import com.arttttt.simplemvi.utils.assertOnMainThread
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.cancel
-import kotlin.coroutines.CoroutineContext
 import kotlin.properties.Delegates
 import kotlin.reflect.KClass
 
 public class DslActor<Intent : Any, State : Any, SideEffect : Any>(
-    coroutineContext: CoroutineContext,
     private val initHandler: DslActorScope<Intent, State, SideEffect>.() -> Unit,
     private val intentHandlers: Map<KClass<out Intent>, DslActorScope<Intent, State, SideEffect>.(Intent) -> Unit>,
     private val destroyHandler: DslActorScope<Intent, State, SideEffect>.() -> Unit,
 ) : Actor<Intent, State, SideEffect> {
 
-    private val scope = CoroutineScope(coroutineContext)
-
     private var actorScope: DslActorScope<Intent, State, SideEffect> by Delegates.notNull()
 
     @MainThread
     override fun init(
+        scope: CoroutineScope,
         getState: () -> State,
         reduce: ((State) -> State) -> Unit,
         onNewIntent: (intent: Intent) -> Unit,
@@ -70,7 +66,5 @@ public class DslActor<Intent : Any, State : Any, SideEffect : Any>(
         assertOnMainThread()
 
         actorScope.apply(destroyHandler)
-
-        scope.cancel()
     }
 }

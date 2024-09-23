@@ -2,6 +2,7 @@ package com.arttttt.simplemvi.logging
 
 import com.arttttt.simplemvi.actor.Actor
 import com.arttttt.simplemvi.logging.logger.Logger
+import kotlinx.coroutines.CoroutineScope
 
 public class LoggingActor<Intent : Any, State : Any, SideEffect : Any>(
     private val name: String?,
@@ -15,6 +16,7 @@ public class LoggingActor<Intent : Any, State : Any, SideEffect : Any>(
     }
 
     override fun init(
+        scope: CoroutineScope,
         getState: () -> State,
         reduce: ((State) -> State) -> Unit,
         onNewIntent: (intent: Intent) -> Unit,
@@ -28,6 +30,7 @@ public class LoggingActor<Intent : Any, State : Any, SideEffect : Any>(
         )
 
         delegate.init(
+            scope = scope,
             getState = getState,
             reduce = { updateState ->
                 logger.log(

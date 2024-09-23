@@ -11,6 +11,7 @@ import kotlin.coroutines.CoroutineContext
 class CounterStore(
     coroutineContext: CoroutineContext,
 ) : Store<CounterStore.Intent, CounterStore.State, CounterStore.SideEffect> by createStore(
+    coroutineContext = coroutineContext,
     initialState = State(
         counter = 0,
     ),
@@ -18,9 +19,7 @@ class CounterStore(
     middlewares = emptyList(),
     actor = loggingActor(
         name = CounterStore::class.simpleName,
-        delegate = actorDsl(
-            coroutineContext = coroutineContext,
-        ) {
+        delegate = actorDsl {
             onIntent<Intent.Increment> {
                 handleIncrement()
             }
