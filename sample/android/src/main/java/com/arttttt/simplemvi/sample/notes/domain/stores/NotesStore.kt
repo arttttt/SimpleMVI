@@ -14,6 +14,7 @@ class NotesStore(
     coroutineContext: CoroutineContext,
     notesRepository: NotesRepository,
 ) : Store<NotesStore.Intent, NotesStore.State, NotesStore.SideEffect> by createStore(
+    coroutineContext = coroutineContext,
     initialState = State(
         currentMessage = "",
         isInProgress = false,
@@ -23,9 +24,7 @@ class NotesStore(
     middlewares = emptyList(),
     actor = loggingActor(
         name = NotesStore::class.simpleName,
-        delegate = actorDsl(
-            coroutineContext = coroutineContext,
-        ) {
+        delegate = actorDsl {
             onIntent<Intent.LoadNotes> {
                 launch {
                     reduce {

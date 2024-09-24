@@ -7,16 +7,13 @@ import kotlinx.coroutines.cancel
 import kotlin.coroutines.CoroutineContext
 import kotlin.properties.Delegates
 
-public abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any>(
-    coroutineContext: CoroutineContext,
-) : Actor<Intent, State, SideEffect> {
-
-    protected val scope: CoroutineScope = CoroutineScope(coroutineContext)
+public abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any> : Actor<Intent, State, SideEffect> {
 
     protected val state: State
         get() = actorScope.state
 
     private var actorScope: ActorScope<Intent, State, SideEffect> by Delegates.notNull()
+    protected var scope: CoroutineScope by Delegates.notNull()
 
     protected abstract fun handleIntent(intent: Intent)
 
@@ -24,6 +21,7 @@ public abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any>(
 
     @MainThread
     final override fun init(
+        scope: CoroutineScope,
         getState: () -> State,
         reduce: ((State) -> State) -> Unit,
         onNewIntent: (intent: Intent) -> Unit,
@@ -55,6 +53,8 @@ public abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any>(
             }
         }
 
+        this.scope = scope
+
         onInit()
     }
 
@@ -68,8 +68,6 @@ public abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any>(
     @MainThread
     override fun destroy() {
         assertOnMainThread()
-
-        scope.cancel()
     }
 
     @MainThread

@@ -8,9 +8,7 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
-class TimerStoreActor(
-    coroutineContext: CoroutineContext,
-) : DefaultActor<TimerStore.Intent, TimerStore.State, TimerStore.SideEffect>(coroutineContext) {
+class TimerStoreActor : DefaultActor<TimerStore.Intent, TimerStore.State, TimerStore.SideEffect>() {
 
     private var timerJob: Job? = null
 

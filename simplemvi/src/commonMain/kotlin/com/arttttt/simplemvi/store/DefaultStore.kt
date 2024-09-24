@@ -2,17 +2,18 @@ package com.arttttt.simplemvi.store
 
 import com.arttttt.simplemvi.actor.Actor
 import com.arttttt.simplemvi.middleware.Middleware
+import com.arttttt.simplemvi.utils.CachingChannelFlow
 import com.arttttt.simplemvi.utils.MainThread
 import com.arttttt.simplemvi.utils.assertOnMainThread
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.*
+import kotlin.coroutines.CoroutineContext
 
 public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any>(
+    coroutineContext: CoroutineContext,
     initialState: State,
     private val initialIntents: List<Intent>,
     private val middlewares: List<Middleware<Intent, State, SideEffect>>,
@@ -23,11 +24,15 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
 
     override val states: StateFlow<State> = _states.asStateFlow()
 
-    private val _sideEffects: MutableSharedFlow<SideEffect> = MutableSharedFlow(
-        extraBufferCapacity = 1,
+    private val scope: CoroutineScope = CoroutineScope(coroutineContext + Job())
+
+    private val _sideEffects: CachingChannelFlow<SideEffect> = CachingChannelFlow(
+        capacity = 64,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        scope = scope,
     )
 
-    override val sideEffects: Flow<SideEffect> = _sideEffects.asSharedFlow()
+    override val sideEffects: Flow<SideEffect> = _sideEffects
 
     private var isInitialized = false
 
@@ -40,6 +45,7 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
         isInitialized = true
 
         actor.init(
+            scope = scope,
             getState = this::state::get,
             reduce = { block ->
                 _states.update { state ->
@@ -69,6 +75,7 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
         assertOnMainThread()
 
         actor.destroy()
+        scope.cancel()
     }
 
     @MainThread
