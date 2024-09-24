@@ -15,14 +15,14 @@ import kotlin.coroutines.CoroutineContext
  * [CachingChannelFlow] emits all cached values when the first subscriber appears.
  *
  * @param T the type of elements contained in the flow.
- * @param coroutineContext in which context [CachingChannelFlow] works.
+ * @param scope in which [CachingChannelFlow] works.
  * @param onBufferOverflow configures an action on buffer overflow.
  * @param capacity the maximum capacity of the cache.
  */
 public class CachingChannelFlow<T>(
-    coroutineContext: CoroutineContext,
     onBufferOverflow: BufferOverflow,
     private val capacity: Int,
+    private val scope: CoroutineScope,
 ) : MutableSharedFlow<T> {
 
     private val channel: Channel<T> = Channel(
@@ -32,8 +32,6 @@ public class CachingChannelFlow<T>(
     private val cache: ArrayDeque<T> = ArrayDeque()
     private val mutex: Mutex = Mutex()
     private var activeSubscribers: Int = 0
-
-    private val scope: CoroutineScope = CoroutineScope(coroutineContext + Job())
 
     private val _sharedFlow: MutableSharedFlow<T> = MutableSharedFlow(
         extraBufferCapacity = capacity,

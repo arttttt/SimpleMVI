@@ -28,8 +28,8 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
 
     private val _sideEffects: CachingChannelFlow<SideEffect> = CachingChannelFlow(
         capacity = 64,
-        coroutineContext = coroutineContext,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        scope = scope,
     )
 
     override val sideEffects: Flow<SideEffect> = _sideEffects
