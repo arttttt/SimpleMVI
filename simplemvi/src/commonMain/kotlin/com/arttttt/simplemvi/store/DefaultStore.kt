@@ -12,6 +12,9 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import kotlin.coroutines.CoroutineContext
 
+/**
+ * Default [Store] implementation
+ */
 public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any>(
     coroutineContext: CoroutineContext,
     initialState: State,
