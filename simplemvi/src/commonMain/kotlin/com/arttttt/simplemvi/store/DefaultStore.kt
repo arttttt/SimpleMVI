@@ -12,6 +12,9 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import kotlin.coroutines.CoroutineContext
 
+/**
+ * Default [Store] implementation
+ */
 public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any>(
     coroutineContext: CoroutineContext,
     initialState: State,
@@ -21,6 +24,9 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
 ) : Store<Intent, State, SideEffect> {
 
     private val _states: MutableStateFlow<State> = MutableStateFlow(initialState)
+
+    override val state: State
+        get() = _states.value
 
     override val states: StateFlow<State> = _states.asStateFlow()
 

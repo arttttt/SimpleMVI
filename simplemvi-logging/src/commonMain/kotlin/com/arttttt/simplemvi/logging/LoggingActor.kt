@@ -4,6 +4,16 @@ import com.arttttt.simplemvi.actor.Actor
 import com.arttttt.simplemvi.logging.logger.Logger
 import kotlinx.coroutines.CoroutineScope
 
+/**
+ * This store logs everything that happens inside it
+ *
+ * @param name the name of the store in logs
+ * @param logger an object responsible for printing logs
+ * @param delegate the actual [Actor] to which the work is delegated
+ *
+ * @see Actor
+ * @see Logger
+ */
 public class LoggingActor<Intent : Any, State : Any, SideEffect : Any>(
     private val name: String?,
     private val logger: Logger,

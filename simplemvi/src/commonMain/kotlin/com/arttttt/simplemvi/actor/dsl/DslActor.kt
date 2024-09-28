@@ -7,6 +7,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlin.properties.Delegates
 import kotlin.reflect.KClass
 
+/**
+ * An [Actor] implementation to be used within dsl
+ */
 public class DslActor<Intent : Any, State : Any, SideEffect : Any>(
     private val initHandler: DslActorScope<Intent, State, SideEffect>.() -> Unit,
     private val intentHandlers: Map<KClass<out Intent>, DslActorScope<Intent, State, SideEffect>.(Intent) -> Unit>,

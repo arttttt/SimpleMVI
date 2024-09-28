@@ -7,7 +7,6 @@ import com.arttttt.simplemvi.sample.notes.domain.stores.NotesStore
 import com.arttttt.simplemvi.sample.notes.presentation.models.NoteListItem
 import com.arttttt.simplemvi.sample.ui.ListItem
 import com.arttttt.simplemvi.store.plus
-import com.arttttt.simplemvi.store.state
 import com.arttttt.simplemvi.viewmodel.attachStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted

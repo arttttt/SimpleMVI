@@ -3,10 +3,11 @@ package com.arttttt.simplemvi.actor
 import com.arttttt.simplemvi.utils.MainThread
 import com.arttttt.simplemvi.utils.assertOnMainThread
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.cancel
-import kotlin.coroutines.CoroutineContext
 import kotlin.properties.Delegates
 
+/**
+ * Default actor implementation
+ */
 public abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any> : Actor<Intent, State, SideEffect> {
 
     protected val state: State
