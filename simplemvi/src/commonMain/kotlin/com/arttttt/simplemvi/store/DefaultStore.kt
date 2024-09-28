@@ -22,6 +22,9 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
 
     private val _states: MutableStateFlow<State> = MutableStateFlow(initialState)
 
+    override val state: State
+        get() = _states.value
+
     override val states: StateFlow<State> = _states.asStateFlow()
 
     private val scope: CoroutineScope = CoroutineScope(coroutineContext + Job())

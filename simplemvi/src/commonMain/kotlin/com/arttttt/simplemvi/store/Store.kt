@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.StateFlow
 
 public interface Store<in Intent : Any, out State : Any, out SideEffect : Any> {
 
+    public val state: State
+
     public val states: StateFlow<State>
 
     public val sideEffects: Flow<SideEffect>
