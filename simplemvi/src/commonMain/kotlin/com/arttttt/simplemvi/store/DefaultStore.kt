@@ -2,7 +2,7 @@ package com.arttttt.simplemvi.store
 
 import com.arttttt.simplemvi.actor.Actor
 import com.arttttt.simplemvi.middleware.Middleware
-import com.arttttt.simplemvi.utils.CachingChannelFlow
+import com.arttttt.simplemvi.utils.CachingFlow
 import com.arttttt.simplemvi.utils.MainThread
 import com.arttttt.simplemvi.utils.assertOnMainThread
 import kotlinx.coroutines.CoroutineScope
@@ -32,10 +32,9 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
 
     private val scope: CoroutineScope = CoroutineScope(coroutineContext + Job())
 
-    private val _sideEffects: CachingChannelFlow<SideEffect> = CachingChannelFlow(
+    private val _sideEffects: CachingFlow<SideEffect> = CachingFlow(
         capacity = 64,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
-        scope = scope,
     )
 
     override val sideEffects: Flow<SideEffect> = _sideEffects
