@@ -2,33 +2,25 @@ package com.arttttt.simplemvi.utils
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlin.coroutines.CoroutineContext
 
 /**
- * Represents a Flow that buffers all values when there are no subscribers.
- * [CachingChannelFlow] emits all cached values when the first subscriber appears.
+ * Represents a Flow that buffers all values when there are no subscribers
+ * [CachingFlow] emits all cached values when the first subscriber appears
  *
  * @param T the type of elements contained in the flow.
- * @param scope in which [CachingChannelFlow] works.
  * @param onBufferOverflow configures an action on buffer overflow.
  * @param capacity the maximum capacity of the cache.
  */
-public class CachingChannelFlow<T>(
+public class CachingFlow<T>(
     onBufferOverflow: BufferOverflow,
     private val capacity: Int,
-    private val scope: CoroutineScope,
 ) : MutableSharedFlow<T> {
 
-    private val channel: Channel<T> = Channel(
-        capacity = capacity,
-        onBufferOverflow = onBufferOverflow,
-    )
     private val cache: ArrayDeque<T> = ArrayDeque()
     private val mutex: Mutex = Mutex()
     private var activeSubscribers: Int = 0
@@ -43,14 +35,6 @@ public class CachingChannelFlow<T>(
 
     override val subscriptionCount: StateFlow<Int>
         get() = _sharedFlow.subscriptionCount
-
-    init {
-        scope.launch {
-            for (value in channel) {
-                _sharedFlow.emit(value)
-            }
-        }
-    }
 
     override suspend fun emit(value: T) {
         mutex.withLock {
@@ -93,14 +77,9 @@ public class CachingChannelFlow<T>(
         _sharedFlow.resetReplayCache()
     }
 
-    public fun close() {
-        channel.close()
-        scope.cancel()
-    }
-
     private fun emitInternal(value: T): Boolean {
         return if (activeSubscribers > 0) {
-            channel.trySend(value).isSuccess
+            _sharedFlow.tryEmit(value)
         } else {
             if (cache.size >= capacity) {
                 cache.removeFirst()
