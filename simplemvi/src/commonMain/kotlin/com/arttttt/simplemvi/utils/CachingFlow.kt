@@ -11,13 +11,12 @@ import kotlinx.coroutines.sync.withLock
 /**
  * Represents a Flow that buffers all values when there are no subscribers
  * [CachingFlow] emits all cached values when the first subscriber appears
+ * [CachingFlow] always drops oldest events when the buffer size exceeded
  *
  * @param T the type of elements contained in the flow.
- * @param onBufferOverflow configures an action on buffer overflow.
  * @param capacity the maximum capacity of the cache.
  */
 public class CachingFlow<T>(
-    onBufferOverflow: BufferOverflow,
     private val capacity: Int,
 ) : MutableSharedFlow<T> {
 
@@ -27,7 +26,7 @@ public class CachingFlow<T>(
 
     private val _sharedFlow: MutableSharedFlow<T> = MutableSharedFlow(
         extraBufferCapacity = capacity,
-        onBufferOverflow = onBufferOverflow,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
 
     override val replayCache: List<T>
