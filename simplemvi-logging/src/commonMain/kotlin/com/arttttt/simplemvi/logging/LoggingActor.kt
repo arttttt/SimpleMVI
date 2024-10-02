@@ -28,7 +28,7 @@ public class LoggingActor<Intent : Any, State : Any, SideEffect : Any>(
     override fun init(
         scope: CoroutineScope,
         getState: () -> State,
-        reduce: ((State) -> State) -> Unit,
+        reduce: (State.() -> State) -> Unit,
         onNewIntent: (intent: Intent) -> Unit,
         postSideEffect: (sideEffect: SideEffect) -> Unit
     ) {
@@ -52,7 +52,7 @@ public class LoggingActor<Intent : Any, State : Any, SideEffect : Any>(
                 )
 
                 reduce {
-                    val newState = updateState(getState())
+                    val newState = updateState(this)
 
                     logger.log(
                         buildMessage(
