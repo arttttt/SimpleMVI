@@ -27,7 +27,7 @@ public class ActorBuilder<Intent : Any, State : Any, SideEffect: Any> {
      *
      * @param block a labmda to be called during [DslActor] initialization
      */
-    public fun init(
+    public fun onInit(
         block: DslActorScope<Intent, State, SideEffect>.() -> Unit,
     ) {
         require(initHandler === defaultInitHandler) {
