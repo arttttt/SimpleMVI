@@ -1,12 +1,10 @@
 package com.arttttt.simplemvi.sample.shared.timer
 
 import com.arttttt.simplemvi.actor.DefaultActor
-import com.arttttt.simplemvi.sample.shared.timer.TimerStore
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
-import kotlin.coroutines.CoroutineContext
 
 class TimerStoreActor : DefaultActor<TimerStore.Intent, TimerStore.State, TimerStore.SideEffect>() {
 
@@ -20,9 +18,7 @@ class TimerStoreActor : DefaultActor<TimerStore.Intent, TimerStore.State, TimerS
         }
     }
 
-    override fun destroy() {
-        super.destroy()
-
+    override fun onDestroy() {
         timerJob?.cancel()
         timerJob = null
     }
