@@ -54,7 +54,7 @@ There are only two mandatory parameters that need to be provided: `initialState`
 class MyCoolStore : Store</* omitted code */> by createStore(
     initialState = //Store initial state,
     actor = actorDsl {
-        init { /* code */ }
+        onInit { /* code */ }
 
         onIntent<Intent.DoCoolStuff> { intent -> /* code */ }
 
@@ -69,10 +69,10 @@ class MyCoolStore : Store</* omitted code */> by createStore(
 }
 ```
 
-`init` - called when the `Store` initialized
+`onInit` - called when the `Store` initialized
 
 `onIntent<T>` - called when a declared intent received
 
-`onDestroy` - called when store is about to be destroyed
+`onDestroy` - called when store is about to be destroyed, but `CoroutineScope` is still active
 
 That's basically it!
