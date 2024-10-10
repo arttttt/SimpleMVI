@@ -19,6 +19,7 @@ public abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any> 
     protected abstract fun handleIntent(intent: Intent)
 
     protected open fun onInit() {}
+    protected open fun onDestroy() {}
 
     @MainThread
     final override fun init(
@@ -67,8 +68,10 @@ public abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any> 
     }
 
     @MainThread
-    override fun destroy() {
+    final override fun destroy() {
         assertOnMainThread()
+
+        onDestroy()
     }
 
     @MainThread
