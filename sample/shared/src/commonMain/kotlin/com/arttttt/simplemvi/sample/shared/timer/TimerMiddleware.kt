@@ -6,6 +6,14 @@ class TimerMiddleware : Middleware<TimerStore.Intent, TimerStore.State, TimerSto
 
     private val tag = "TimerMiddleware"
 
+    override fun onInit(state: TimerStore.State) {
+        logV(
+            """
+                TimerStore initialized
+            """.trimIndent()
+        )
+    }
+
     override fun onIntent(intent: TimerStore.Intent, state: TimerStore.State) {
         logV(
             """
@@ -30,6 +38,14 @@ class TimerMiddleware : Middleware<TimerStore.Intent, TimerStore.State, TimerSto
             """
                 TimerStore emitted side effect: $sideEffect
                 current state: $state
+            """.trimIndent()
+        )
+    }
+
+    override fun onDestroy(state: TimerStore.State) {
+        logV(
+            """
+                TimerStore destroyed
             """.trimIndent()
         )
     }
