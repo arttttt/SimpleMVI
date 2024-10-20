@@ -37,7 +37,8 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
 
     override val sideEffects: Flow<SideEffect> = _sideEffects
 
-    private var isInitialized = false
+    private var isInitialized: Boolean = false
+    private var isDestroyed: Boolean = false
 
     @MainThread
     override fun init() {
@@ -79,6 +80,8 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
 
         actor.destroy()
         scope.cancel()
+
+        isDestroyed = true
     }
 
     @MainThread
