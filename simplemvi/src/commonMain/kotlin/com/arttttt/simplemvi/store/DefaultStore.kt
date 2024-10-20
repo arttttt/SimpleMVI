@@ -86,12 +86,14 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
 
     @MainThread
     override fun destroy() {
+        if (isDestroyed) return
+
+        isDestroyed = true
+
         assertOnMainThread()
 
         actor.destroy()
         scope.cancel()
-
-        isDestroyed = true
     }
 
     @MainThread
