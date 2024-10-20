@@ -5,6 +5,8 @@ import com.arttttt.simplemvi.middleware.Middleware
 import com.arttttt.simplemvi.utils.CachingFlow
 import com.arttttt.simplemvi.utils.MainThread
 import com.arttttt.simplemvi.utils.assertOnMainThread
+import com.arttttt.simplemvi.utils.exceptions.StoreIsAlreadyDestroyedException
+import com.arttttt.simplemvi.utils.exceptions.StoreIsNotInitializedException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
@@ -69,6 +71,14 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
     @MainThread
     override fun accept(intent: Intent) {
         assertOnMainThread()
+
+        if (!isInitialized) {
+            throw StoreIsNotInitializedException()
+        }
+
+        if (isDestroyed) {
+            throw StoreIsAlreadyDestroyedException()
+        }
 
         middlewares.forEach { it.onIntent(intent, _states.value) }
         actor.onIntent(intent)
