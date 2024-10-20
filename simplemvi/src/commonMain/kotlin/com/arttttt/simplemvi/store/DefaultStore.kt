@@ -65,6 +65,7 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
             postSideEffect = ::postSideEffect,
         )
 
+        middlewares.forEach { it.onInit(_states.value) }
         initialIntents.forEach(this::accept)
     }
 
@@ -91,6 +92,8 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
         isDestroyed = true
 
         assertOnMainThread()
+
+        middlewares.forEach { it.onDestroy(_states.value) }
 
         actor.destroy()
         scope.cancel()
