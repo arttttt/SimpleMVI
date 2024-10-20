@@ -5,6 +5,8 @@ import com.arttttt.simplemvi.middleware.Middleware
 import com.arttttt.simplemvi.utils.CachingFlow
 import com.arttttt.simplemvi.utils.MainThread
 import com.arttttt.simplemvi.utils.assertOnMainThread
+import com.arttttt.simplemvi.utils.exceptions.StoreIsAlreadyDestroyedException
+import com.arttttt.simplemvi.utils.exceptions.StoreIsNotInitializedException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
@@ -37,13 +39,14 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
 
     override val sideEffects: Flow<SideEffect> = _sideEffects
 
-    private var isInitialized = false
+    private var isInitialized: Boolean = false
+    private var isDestroyed: Boolean = false
 
     @MainThread
     override fun init() {
-        assertOnMainThread()
-
         if (isInitialized) return
+
+        assertOnMainThread()
 
         isInitialized = true
 
@@ -67,6 +70,14 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
 
     @MainThread
     override fun accept(intent: Intent) {
+        if (!isInitialized) {
+            throw StoreIsNotInitializedException()
+        }
+
+        if (isDestroyed) {
+            throw StoreIsAlreadyDestroyedException()
+        }
+
         assertOnMainThread()
 
         middlewares.forEach { it.onIntent(intent, _states.value) }
@@ -75,6 +86,10 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
 
     @MainThread
     override fun destroy() {
+        if (isDestroyed) return
+
+        isDestroyed = true
+
         assertOnMainThread()
 
         actor.destroy()
