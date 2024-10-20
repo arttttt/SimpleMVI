@@ -70,8 +70,6 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
 
     @MainThread
     override fun accept(intent: Intent) {
-        assertOnMainThread()
-
         if (!isInitialized) {
             throw StoreIsNotInitializedException()
         }
@@ -79,6 +77,8 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
         if (isDestroyed) {
             throw StoreIsAlreadyDestroyedException()
         }
+
+        assertOnMainThread()
 
         middlewares.forEach { it.onIntent(intent, _states.value) }
         actor.onIntent(intent)
