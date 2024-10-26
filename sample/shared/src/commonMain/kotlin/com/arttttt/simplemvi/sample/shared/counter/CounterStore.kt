@@ -3,23 +3,22 @@ package com.arttttt.simplemvi.sample.shared.counter
 import com.arttttt.simplemvi.actor.ActorScope
 import com.arttttt.simplemvi.actor.dsl.ActorBuilder
 import com.arttttt.simplemvi.actor.dsl.actorDsl
-import com.arttttt.simplemvi.logging.loggingActor
 import com.arttttt.simplemvi.store.Store
 import com.arttttt.simplemvi.store.createStore
+import com.arttttt.simplemvi.store.storeName
 import kotlin.coroutines.CoroutineContext
 
 class CounterStore(
     coroutineContext: CoroutineContext,
 ) : Store<CounterStore.Intent, CounterStore.State, CounterStore.SideEffect> by createStore(
+    name = storeName<CounterStore>(),
     coroutineContext = coroutineContext,
     initialState = State(
         counter = 0,
     ),
     initialIntents = emptyList(),
     middlewares = emptyList(),
-    actor = loggingActor(
-        name = CounterStore::class.simpleName,
-        delegate = actorDsl {
+    actor = actorDsl {
             onIntent<Intent.Increment> {
                 handleIncrement()
             }
@@ -40,7 +39,6 @@ class CounterStore(
                 }
             }
         },
-    )
 ) {
 
     sealed interface Intent {

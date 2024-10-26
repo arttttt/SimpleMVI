@@ -1,6 +1,8 @@
 package com.arttttt.simplemvi.store
 
 import com.arttttt.simplemvi.actor.Actor
+import com.arttttt.simplemvi.logging.LoggingMiddleware
+import com.arttttt.simplemvi.logging.defaultLogger
 import com.arttttt.simplemvi.middleware.Middleware
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
@@ -8,6 +10,7 @@ import kotlin.coroutines.CoroutineContext
 /**
  * Creates a new [Store] with given parameters
  *
+ * @param name is a name of the [Store]
  * @param initialize is responsible for [Store] auto initialization
  * @param coroutineContext [CoroutineContext] to be used inside the [Store] for launching coroutines
  * @param initialState initial [State] of the [Store]
@@ -20,6 +23,7 @@ import kotlin.coroutines.CoroutineContext
  * @see Middleware
  */
 public fun <Intent : Any, State : Any, SideEffect : Any> createStore(
+    name: StoreName?,
     initialize: Boolean = true,
     coroutineContext: CoroutineContext = Dispatchers.Main.immediate,
     initialState: State,
@@ -27,11 +31,24 @@ public fun <Intent : Any, State : Any, SideEffect : Any> createStore(
     middlewares: List<Middleware<Intent, State, SideEffect>> = emptyList(),
     actor: Actor<Intent, State, SideEffect>,
 ): Store<Intent, State, SideEffect> {
+    val realMiddlewares = buildList {
+        if (name != null && defaultLogger != null) {
+            add(
+                LoggingMiddleware(
+                    name = name.name,
+                    logger = defaultLogger!!,
+                )
+            )
+        }
+
+        addAll(middlewares)
+    }
+
     return DefaultStore(
         coroutineContext = coroutineContext,
         initialState = initialState,
         initialIntents = initialIntents,
-        middlewares = middlewares,
+        middlewares = realMiddlewares,
         actor = actor,
     ).apply {
         if (initialize) {

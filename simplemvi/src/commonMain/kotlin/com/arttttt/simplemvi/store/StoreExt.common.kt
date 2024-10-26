@@ -25,3 +25,7 @@ public operator fun <Intent : Any> Store<Intent, *, *>.plus(intent: Intent) {
 public operator fun <Intent : Any> Store<Intent, *, *>.plusAssign(intent: Intent) {
     accept(intent)
 }
+
+public inline fun <reified T : Store<*, *, *>> storeName(): StoreName? {
+    return T::class.simpleName?.let(::StoreName)
+}

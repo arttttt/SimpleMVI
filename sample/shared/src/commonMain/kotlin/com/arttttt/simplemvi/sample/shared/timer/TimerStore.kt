@@ -7,6 +7,7 @@ import kotlin.coroutines.CoroutineContext
 class TimerStore(
     coroutineContext: CoroutineContext,
 ) : Store<TimerStore.Intent, TimerStore.State, TimerStore.SideEffect> by createStore(
+    name = null,
     coroutineContext = coroutineContext,
     initialState = State(
         isTimerRunning = false,
