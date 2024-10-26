@@ -32,6 +32,7 @@ Now it's necessary to implement the `Store` interface itself. It can be done by 
 
 ```kotlin
 class MyCoolStore : Store</* omitted code */> by createStore(
+    name = storeName<MyCoolStore>(),
     initialState = //Store initial state,
     actor = //Store actor,
 ) {
@@ -40,7 +41,9 @@ class MyCoolStore : Store</* omitted code */> by createStore(
 }
 ```
 
-There are only two mandatory parameters that need to be provided: `initialState` and `actor`
+There are only three mandatory parameters that need to be provided: `name`, `initialState` and `actor`
+
+`name` - name of the `Store`. It's used for logging and debugging. It's possible to pass `null`
 
 `initialState` - initial state of the `Store`. A brand new instance of the `Store` is created with this provided state
 
@@ -52,6 +55,7 @@ There are only two mandatory parameters that need to be provided: `initialState`
 
 ```kotlin
 class MyCoolStore : Store</* omitted code */> by createStore(
+    name = //Store name
     initialState = //Store initial state,
     actor = actorDsl {
         onInit { /* code */ }
