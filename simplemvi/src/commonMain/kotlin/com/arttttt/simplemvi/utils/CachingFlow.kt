@@ -16,6 +16,7 @@ import kotlinx.coroutines.sync.withLock
  * @param T the type of elements contained in the flow.
  * @param capacity the maximum capacity of the cache.
  */
+@OptIn(ExperimentalForInheritanceCoroutinesApi::class)
 public class CachingFlow<T>(
     private val capacity: Int,
 ) : MutableSharedFlow<T> {
