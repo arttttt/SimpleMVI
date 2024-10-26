@@ -22,7 +22,6 @@ kotlin {
             isStatic = true
 
             export(project(":simplemvi"))
-            export(project(":simplemvi-logging"))
 
             export(libs.kotlin.coroutines.core)
         }
@@ -35,7 +34,6 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             api(project(":simplemvi"))
-            api(project(":simplemvi-logging"))
 
             api(libs.kotlin.coroutines.core)
         }
