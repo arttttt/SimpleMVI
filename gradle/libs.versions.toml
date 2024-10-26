@@ -16,6 +16,7 @@ room = "2.7.0-alpha08"
 mavenPublish = "0.29.0"
 jetbrainsCompose = "1.7.0-beta02"
 androidxLifecycle = "2.8.2"
+atomicfu = "0.26.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -54,6 +55,7 @@ kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref 
 google-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 vanniktech-maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
 jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "jetbrainsCompose" }
+kotlin-atomicfu = { id = "org.jetbrains.kotlinx.atomicfu", version.ref = "atomicfu" }
 
 #local plugins
 simplemvi-library-module = { id = "simplemvi-library-module", version = "1.0.0" }
