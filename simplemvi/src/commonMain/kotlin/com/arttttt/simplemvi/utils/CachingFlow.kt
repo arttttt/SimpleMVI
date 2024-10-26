@@ -1,5 +1,6 @@
 package com.arttttt.simplemvi.utils
 
+import kotlinx.atomicfu.AtomicInt
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.FlowCollector
@@ -7,23 +8,24 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.atomicfu.atomic
 
 /**
- * Represents a Flow that buffers all values when there are no subscribers
+ * Represents a Flow that buffers all values when there are no subscribers.
  * [CachingFlow] emits all cached values when the first subscriber appears
- * [CachingFlow] always drops oldest events when the buffer size exceeded
+ * and always drops oldest events when the buffer size is exceeded.
  *
- * @param T the type of elements contained in the flow.
- * @param capacity the maximum capacity of the cache.
+ * @param T the type of elements contained in the flow
+ * @param capacity the maximum capacity of the cache
  */
 @OptIn(ExperimentalForInheritanceCoroutinesApi::class)
 public class CachingFlow<T>(
     private val capacity: Int,
 ) : MutableSharedFlow<T> {
 
-    private val cache: ArrayDeque<T> = ArrayDeque()
+    private val cache: ArrayDeque<T> = ArrayDeque(capacity)
     private val mutex: Mutex = Mutex()
-    private var activeSubscribers: Int = 0
+    private val activeSubscribers: AtomicInt = atomic(0)
 
     private val _sharedFlow: MutableSharedFlow<T> = MutableSharedFlow(
         extraBufferCapacity = capacity,
@@ -36,38 +38,59 @@ public class CachingFlow<T>(
     override val subscriptionCount: StateFlow<Int>
         get() = _sharedFlow.subscriptionCount
 
+    override suspend fun collect(collector: FlowCollector<T>): Nothing {
+        val isFirstSubscriber = activeSubscribers.incrementAndGet() == 1
+
+        if (isFirstSubscriber) {
+            val tmp = mutex.withLock {
+                ArrayDeque(cache).apply {
+                    cache.clear()
+                }
+            }
+
+            while (tmp.isNotEmpty()) {
+                collector.emit(tmp.removeFirst())
+            }
+        }
+
+        try {
+            _sharedFlow.collect(collector)
+        } finally {
+            activeSubscribers.decrementAndGet()
+        }
+    }
+
     override suspend fun emit(value: T) {
-        mutex.withLock {
-            emitInternal(value)
+        val currentSubscribers = activeSubscribers.value
+        if (currentSubscribers > 0) {
+            _sharedFlow.emit(value)
+        } else {
+            mutex.withLock {
+                if (cache.size >= capacity) {
+                    cache.removeFirst()
+                }
+                cache.addLast(value)
+            }
         }
     }
 
     override fun tryEmit(value: T): Boolean {
-        return if (mutex.tryLock()) {
-            try {
-                emitInternal(value)
-            } finally {
-                mutex.unlock()
-            }
+        val currentSubscribers = activeSubscribers.value
+        return if (currentSubscribers > 0) {
+            _sharedFlow.tryEmit(value)
         } else {
-            false
-        }
-    }
-
-    override suspend fun collect(collector: FlowCollector<T>): Nothing {
-        mutex.withLock {
-            activeSubscribers += 1
-            if (activeSubscribers == 1) {
-                while (cache.isNotEmpty()) {
-                    collector.emit(cache.removeFirst())
+            if (mutex.tryLock()) {
+                try {
+                    if (cache.size >= capacity) {
+                        cache.removeFirst()
+                    }
+                    cache.addLast(value)
+                    true
+                } finally {
+                    mutex.unlock()
                 }
-            }
-        }
-        try {
-            _sharedFlow.collect(collector)
-        } finally {
-            mutex.withLock {
-                activeSubscribers -= 1
+            } else {
+                false
             }
         }
     }
@@ -75,17 +98,5 @@ public class CachingFlow<T>(
     @ExperimentalCoroutinesApi
     override fun resetReplayCache() {
         _sharedFlow.resetReplayCache()
-    }
-
-    private fun emitInternal(value: T): Boolean {
-        return if (activeSubscribers > 0) {
-            _sharedFlow.tryEmit(value)
-        } else {
-            if (cache.size >= capacity) {
-                cache.removeFirst()
-            }
-            cache.addLast(value)
-            true
-        }
     }
 }
