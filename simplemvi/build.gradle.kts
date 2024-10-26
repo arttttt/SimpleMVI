@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.simplemvi.library.module)
     alias(libs.plugins.simplemvi.publishing)
+    alias(libs.plugins.kotlin.atomicfu)
 }
 
 kotlin {

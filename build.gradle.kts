@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.google.ksp) apply false
     alias(libs.plugins.vanniktech.maven.publish) apply false
     alias(libs.plugins.jetbrains.compose) apply false
+    alias(libs.plugins.kotlin.atomicfu) apply false
 
     alias(libs.plugins.simplemvi.library.module) apply false
     alias(libs.plugins.simplemvi.publishing) apply false
