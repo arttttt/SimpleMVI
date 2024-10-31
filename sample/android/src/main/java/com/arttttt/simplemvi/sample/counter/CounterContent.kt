@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.arttttt.simplemvi.sample.shared.counter.CounterStore
 import com.arttttt.simplemvi.store.plus
+import com.arttttt.simplemvi.timetravel.enableTimeTravel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -97,6 +98,68 @@ fun CounterContent() {
             Text(
                 text = "counter: ${state.counter}"
             )
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+            ) {
+                Button(
+                    onClick = {
+                        viewModel.store.enableTimeTravel()
+                    },
+                ) {
+                    Text(
+                        text = "Time travel"
+                    )
+                }
+
+                Button(
+                    onClick = {
+                        viewModel.store.resumeLive()
+                    },
+                ) {
+                    Text(
+                        text = "Resume live"
+                    )
+                }
+            }
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+            ) {
+                Button(
+                    onClick = {
+                        viewModel.store.stepBackward()
+                    },
+                ) {
+                    Text(
+                        text = "step back"
+                    )
+                }
+
+                Button(
+                    onClick = {
+                        viewModel.store.stepForward()
+                    },
+                ) {
+                    Text(
+                        text = "step forward"
+                    )
+                }
+            }
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+            ) {
+                Text(
+                    text = "TimeTravel enabled: ${viewModel.store.isTimeTravel}"
+                )
+
+                val currentPosition by viewModel.store.currentPosition.collectAsState()
+
+                Text(
+                    text = "current position: $currentPosition"
+                )
+            }
         }
     }
 }
