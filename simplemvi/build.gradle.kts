@@ -8,6 +8,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(libs.kotlin.coroutines.core)
+            implementation(libs.kotlin.atomicfu)
         }
     }
 }
