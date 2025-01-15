@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace = "com.arttttt.simplemvi.sample"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.arttttt.simplemvi"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
