@@ -1,6 +1,6 @@
 plugins {
-    alias(libs.plugins.simplemvi.library.module)
-    alias(libs.plugins.simplemvi.publishing)
+    id(libs.plugins.simplemvi.library.module.get().pluginId)
+    id(libs.plugins.simplemvi.publishing.get().pluginId)
 }
 
 kotlin {
