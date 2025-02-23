@@ -15,6 +15,7 @@ public abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any> 
 
     private var actorScope: ActorScope<Intent, State, SideEffect> by Delegates.notNull()
     protected var scope: CoroutineScope by Delegates.notNull()
+        private set
 
     protected abstract fun handleIntent(intent: Intent)
 

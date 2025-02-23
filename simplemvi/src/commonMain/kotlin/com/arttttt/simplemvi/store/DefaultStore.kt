@@ -50,6 +50,8 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
 
         isInitialized = true
 
+        middlewares.forEach { it.onInit(_states.value) }
+
         actor.init(
             scope = scope,
             getState = this::state::get,
@@ -65,7 +67,6 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
             postSideEffect = ::postSideEffect,
         )
 
-        middlewares.forEach { it.onInit(_states.value) }
         initialIntents.forEach(this::accept)
     }
 
