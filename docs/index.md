@@ -1,6 +1,6 @@
 # Overview
 
-SimpleMVI is an easy to go, flexible and powerful MVI library<br>
+A lightweight, flexible, and powerful MVI library for Kotlin Multiplatform applications.<br>
 It's built on top of the KMM techlology
 
 Supported platfroms
