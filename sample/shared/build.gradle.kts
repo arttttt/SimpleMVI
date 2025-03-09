@@ -43,12 +43,12 @@ kotlin {
         when (this) {
             is KotlinAndroidTarget ->
                 compilerOptions {
-                    jvmTarget.set(JvmTarget.JVM_1_8)
+                    jvmTarget.set(JvmTarget.JVM_17)
                 }
 
             is KotlinJvmTarget ->
                 compilerOptions {
-                    jvmTarget.set(JvmTarget.JVM_11)
+                    jvmTarget.set(JvmTarget.JVM_17)
                 }
         }
     }
