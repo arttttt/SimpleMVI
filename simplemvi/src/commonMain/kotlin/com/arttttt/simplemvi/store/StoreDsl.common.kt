@@ -1,8 +1,8 @@
 package com.arttttt.simplemvi.store
 
 import com.arttttt.simplemvi.actor.Actor
+import com.arttttt.simplemvi.config.simpleMVIConfig
 import com.arttttt.simplemvi.logging.LoggingMiddleware
-import com.arttttt.simplemvi.logging.defaultLogger
 import com.arttttt.simplemvi.middleware.Middleware
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
@@ -32,11 +32,11 @@ public fun <Intent : Any, State : Any, SideEffect : Any> createStore(
     actor: Actor<Intent, State, SideEffect>,
 ): Store<Intent, State, SideEffect> {
     val realMiddlewares = buildList {
-        if (name != null && defaultLogger != null) {
+        if (name != null && simpleMVIConfig.logger != null) {
             add(
                 LoggingMiddleware(
                     name = name.name,
-                    logger = defaultLogger!!,
+                    logger = simpleMVIConfig.logger!!,
                 )
             )
         }

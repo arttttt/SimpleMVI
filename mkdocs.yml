@@ -14,21 +14,19 @@ repo_name: arttttt/SimpleMVI
 repo_url: https://github.com/arttttt/SimpleMVI
 
 # Copyright
-copyright: Copyright &copy; 2024 Artem Bambalov aka arttttt
+copyright: Copyright &copy; 2025 Artem Bambalov aka arttttt
 
 nav:
   - SimpleMVI:
     - Overview: index.md
     - Quick start: overview/quickstart.md
+    - Configuration: overview/configuration.md
   - Store:
       - Overview: store/store.md
   - Actor:
       - Overview: actor/actor.md
   - Middleware:
       - Overview: middleware/middleware.md
-# todo: add later
-#  - Logging:
-#      - Overview: logging/logging.md
 
 extra:
   social:

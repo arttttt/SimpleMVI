@@ -1,6 +1,7 @@
 package com.arttttt.simplemvi.store
 
 import com.arttttt.simplemvi.actor.Actor
+import com.arttttt.simplemvi.config.simpleMVIConfig
 import com.arttttt.simplemvi.middleware.Middleware
 import com.arttttt.simplemvi.utils.CachingFlow
 import com.arttttt.simplemvi.utils.MainThread
@@ -73,11 +74,23 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
     @MainThread
     override fun accept(intent: Intent) {
         if (!isInitialized) {
-            throw StoreIsNotInitializedException()
+            val message = "Attempting to use an uninitialized Store"
+            if (simpleMVIConfig.strictMode) {
+                throw StoreIsNotInitializedException()
+            } else {
+                simpleMVIConfig.logger?.log(message)
+                return
+            }
         }
 
         if (isDestroyed) {
-            throw StoreIsAlreadyDestroyedException()
+            val message = "Attempting to use a destroyed Store"
+            if (simpleMVIConfig.strictMode) {
+                throw StoreIsAlreadyDestroyedException()
+            } else {
+                simpleMVIConfig.logger?.log(message)
+                return
+            }
         }
 
         assertOnMainThread()
