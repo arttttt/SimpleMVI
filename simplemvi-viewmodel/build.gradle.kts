@@ -3,15 +3,17 @@ plugins {
     id(libs.plugins.simplemvi.publishing.get().pluginId)
 }
 
+simpleMVI {
+    enableWasmJs = false
+}
+
 kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(project(":simplemvi"))
-        }
 
-        androidMain.dependencies {
             implementation(libs.kotlin.coroutines.core)
-            implementation(libs.androidx.lifecycle.viewmodel.ktx)
+            implementation(libs.androidx.lifecycle.viewmodel.lib)
         }
     }
 }
