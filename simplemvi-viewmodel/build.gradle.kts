@@ -14,6 +14,7 @@ kotlin {
 
             implementation(libs.kotlin.coroutines.core)
             implementation(libs.androidx.lifecycle.viewmodel.lib)
+            implementation(libs.androidx.savestate)
         }
     }
 }

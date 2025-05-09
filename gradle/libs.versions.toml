@@ -17,6 +17,7 @@ mavenPublish = "0.30.0"
 jetbrainsCompose = "1.7.3"
 atomicfu = "0.27.0"
 androidxLifecycle = "2.8.4"
+saveState = "1.3.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -46,6 +47,7 @@ jetbrains-kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotli
 maven-publish-gradle-plugin = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "mavenPublish" }
 androidx-lifecycle-runtime-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidxLifecycle" }
 kotlin-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
+androidx-savestate = { module = "androidx.savedstate:savedstate", version.ref = "saveState" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
