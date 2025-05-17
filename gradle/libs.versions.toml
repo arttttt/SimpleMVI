@@ -5,7 +5,7 @@ coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-lifecycleKtx = "2.8.7"
+lifecycleKtx = "2.9.0"
 activityCompose = "1.10.0"
 composeBom = "2025.02.00"
 coroutines = "1.10.1"
@@ -17,7 +17,6 @@ mavenPublish = "0.30.0"
 jetbrainsCompose = "1.7.3"
 atomicfu = "0.27.0"
 androidxLifecycle = "2.8.4"
-saveState = "1.3.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -27,6 +26,7 @@ androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-co
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleKtx" }
 androidx-lifecycle-viewmodel-lib = { group = "androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "lifecycleKtx" }
 androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleKtx" }
+androidx-lifecycle-viewmodel-savedstate = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-savedstate", version.ref = "lifecycleKtx" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
@@ -47,7 +47,6 @@ jetbrains-kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotli
 maven-publish-gradle-plugin = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "mavenPublish" }
 androidx-lifecycle-runtime-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidxLifecycle" }
 kotlin-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
-androidx-savestate = { module = "androidx.savedstate:savedstate", version.ref = "saveState" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

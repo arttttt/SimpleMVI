@@ -7,6 +7,7 @@ import utils.MIN_SDK_VERSION
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 kotlin {
@@ -24,6 +25,9 @@ kotlin {
             export(project(":simplemvi"))
 
             export(libs.kotlin.coroutines.core)
+
+
+            export(libs.kotlin.serialization.json)
         }
     }
 
@@ -36,6 +40,8 @@ kotlin {
             api(project(":simplemvi"))
 
             api(libs.kotlin.coroutines.core)
+
+            api(libs.kotlin.serialization.json)
         }
     }
 

@@ -8,13 +8,27 @@ simpleMVI {
 }
 
 kotlin {
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64(),
+    ).forEach { iosTarget ->
+        iosTarget.binaries.framework {
+            isStatic = true
+
+            export(libs.androidx.lifecycle.viewmodel.lib)
+            export(libs.androidx.lifecycle.viewmodel.savedstate)
+        }
+    }
+
     sourceSets {
         commonMain.dependencies {
             implementation(project(":simplemvi"))
 
             implementation(libs.kotlin.coroutines.core)
-            implementation(libs.androidx.lifecycle.viewmodel.lib)
-            implementation(libs.androidx.savestate)
+
+            api(libs.androidx.lifecycle.viewmodel.lib)
+            api(libs.androidx.lifecycle.viewmodel.savedstate)
         }
     }
 }

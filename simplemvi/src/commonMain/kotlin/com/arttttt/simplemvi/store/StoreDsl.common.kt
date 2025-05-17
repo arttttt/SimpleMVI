@@ -4,6 +4,8 @@ import com.arttttt.simplemvi.actor.Actor
 import com.arttttt.simplemvi.config.simpleMVIConfig
 import com.arttttt.simplemvi.logging.LoggingMiddleware
 import com.arttttt.simplemvi.middleware.Middleware
+import com.arttttt.simplemvi.state.StateSaver
+import com.arttttt.simplemvi.state.StateSaverMiddleware
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
 
@@ -27,10 +29,14 @@ public fun <Intent : Any, State : Any, SideEffect : Any> createStore(
     initialize: Boolean = true,
     coroutineContext: CoroutineContext = Dispatchers.Main.immediate,
     initialState: State,
+    stateSaverFactory: ((StoreName) -> StateSaver<State>)? = null,
     initialIntents: List<Intent> = emptyList(),
     middlewares: List<Middleware<Intent, State, SideEffect>> = emptyList(),
     actor: Actor<Intent, State, SideEffect>,
 ): Store<Intent, State, SideEffect> {
+
+    val stateSaver = stateSaverFactory?.let { factory -> name?.let(factory::invoke) }
+
     val realMiddlewares = buildList {
         if (name != null && simpleMVIConfig.logger != null) {
             add(
@@ -41,12 +47,16 @@ public fun <Intent : Any, State : Any, SideEffect : Any> createStore(
             )
         }
 
+        if (stateSaver != null) {
+            add(StateSaverMiddleware(stateSaver))
+        }
+
         addAll(middlewares)
     }
 
     return DefaultStore(
         coroutineContext = coroutineContext,
-        initialState = initialState,
+        initialState = stateSaver?.restoreState() ?: initialState,
         initialIntents = initialIntents,
         middlewares = realMiddlewares,
         actor = actor,

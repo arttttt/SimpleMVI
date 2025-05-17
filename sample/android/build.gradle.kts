@@ -2,8 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.google.ksp)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -74,7 +74,6 @@ dependencies {
 
     implementation(libs.androidx.compose.navigation)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.kotlin.serialization.json)
 
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
