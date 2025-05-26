@@ -30,6 +30,7 @@ class SimpleMVILibraryModule : Plugin<Project> {
             wasmJs {
                 browser()
             }
+            jvm()
 
             explicitApi()
 
