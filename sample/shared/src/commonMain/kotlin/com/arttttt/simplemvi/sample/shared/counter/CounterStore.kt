@@ -3,19 +3,24 @@ package com.arttttt.simplemvi.sample.shared.counter
 import com.arttttt.simplemvi.actor.ActorScope
 import com.arttttt.simplemvi.actor.dsl.ActorBuilder
 import com.arttttt.simplemvi.actor.dsl.actorDsl
+import com.arttttt.simplemvi.state.StateSaver
 import com.arttttt.simplemvi.store.Store
+import com.arttttt.simplemvi.store.StoreName
 import com.arttttt.simplemvi.store.createStore
 import com.arttttt.simplemvi.store.storeName
+import kotlinx.serialization.Serializable
 import kotlin.coroutines.CoroutineContext
 
 class CounterStore(
     coroutineContext: CoroutineContext,
+    stateSaverFactory: ((StoreName) -> StateSaver<State>),
 ) : Store<CounterStore.Intent, CounterStore.State, CounterStore.SideEffect> by createStore(
     name = storeName<CounterStore>(),
     coroutineContext = coroutineContext,
     initialState = State(
         counter = 0,
     ),
+    stateSaverFactory = stateSaverFactory,
     initialIntents = emptyList(),
     middlewares = emptyList(),
     actor = actorDsl {
@@ -48,6 +53,7 @@ class CounterStore(
         data object Reset : Intent
     }
 
+    @Serializable
     data class State(
         val counter: Int,
     )

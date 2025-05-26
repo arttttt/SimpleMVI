@@ -3,15 +3,32 @@ plugins {
     id(libs.plugins.simplemvi.publishing.get().pluginId)
 }
 
+simpleMVI {
+    enableWasmJs = false
+}
+
 kotlin {
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64(),
+    ).forEach { iosTarget ->
+        iosTarget.binaries.framework {
+            isStatic = true
+
+            export(libs.androidx.lifecycle.viewmodel.lib)
+            export(libs.androidx.lifecycle.viewmodel.savedstate)
+        }
+    }
+
     sourceSets {
         commonMain.dependencies {
             implementation(project(":simplemvi"))
-        }
 
-        androidMain.dependencies {
             implementation(libs.kotlin.coroutines.core)
-            implementation(libs.androidx.lifecycle.viewmodel.ktx)
+
+            api(libs.androidx.lifecycle.viewmodel.lib)
+            api(libs.androidx.lifecycle.viewmodel.savedstate)
         }
     }
 }
