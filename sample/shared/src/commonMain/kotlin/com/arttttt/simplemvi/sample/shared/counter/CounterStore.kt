@@ -3,7 +3,9 @@ package com.arttttt.simplemvi.sample.shared.counter
 import com.arttttt.simplemvi.actor.ActorScope
 import com.arttttt.simplemvi.actor.dsl.ActorBuilder
 import com.arttttt.simplemvi.actor.dsl.actorDsl
+import com.arttttt.simplemvi.logging.installLoggignPlugin
 import com.arttttt.simplemvi.state.StateSaver
+import com.arttttt.simplemvi.state.installStateSaverPlugin
 import com.arttttt.simplemvi.store.Store
 import com.arttttt.simplemvi.store.StoreName
 import com.arttttt.simplemvi.store.createStore
@@ -20,9 +22,12 @@ class CounterStore(
     initialState = State(
         counter = 0,
     ),
-    stateSaverFactory = stateSaverFactory,
     initialIntents = emptyList(),
     middlewares = emptyList(),
+    plugins = {
+        installLoggignPlugin()
+        installStateSaverPlugin(stateSaverFactory)
+    },
     actor = actorDsl {
             onIntent<Intent.Increment> {
                 handleIncrement()

@@ -1,11 +1,9 @@
 package com.arttttt.simplemvi.store
 
 import com.arttttt.simplemvi.actor.Actor
-import com.arttttt.simplemvi.config.simpleMVIConfig
-import com.arttttt.simplemvi.logging.LoggingMiddleware
 import com.arttttt.simplemvi.middleware.Middleware
-import com.arttttt.simplemvi.state.StateSaver
-import com.arttttt.simplemvi.state.StateSaverMiddleware
+import com.arttttt.simplemvi.plugin.PluginContext
+import com.arttttt.simplemvi.plugin.PluginsConfigurator
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
 
@@ -29,34 +27,34 @@ public fun <Intent : Any, State : Any, SideEffect : Any> createStore(
     initialize: Boolean = true,
     coroutineContext: CoroutineContext = Dispatchers.Main.immediate,
     initialState: State,
-    stateSaverFactory: ((StoreName) -> StateSaver<State>)? = null,
     initialIntents: List<Intent> = emptyList(),
     middlewares: List<Middleware<Intent, State, SideEffect>> = emptyList(),
+    plugins: (PluginsConfigurator<Intent, State, SideEffect>.() -> Unit)? = null,
     actor: Actor<Intent, State, SideEffect>,
 ): Store<Intent, State, SideEffect> {
 
-    val stateSaver = stateSaverFactory?.let { factory -> name?.let(factory::invoke) }
+    val pluginContext = PluginContext<Intent, State, SideEffect>(initialState)
+    val configurator = PluginsConfigurator<Intent, State, SideEffect>()
+
+    plugins?.invoke(configurator)
+
+    configurator.installedPlugins.forEach { plugin ->
+        plugin.install(
+            name = name,
+            context = pluginContext,
+        )
+    }
+
+    val finalInitialState = pluginContext.initialState
 
     val realMiddlewares = buildList {
-        if (name != null && simpleMVIConfig.logger != null) {
-            add(
-                LoggingMiddleware(
-                    name = name.name,
-                    logger = simpleMVIConfig.logger!!,
-                )
-            )
-        }
-
-        if (stateSaver != null) {
-            add(StateSaverMiddleware(stateSaver))
-        }
-
+        addAll(pluginContext.middlewares)
         addAll(middlewares)
     }
 
     return DefaultStore(
         coroutineContext = coroutineContext,
-        initialState = stateSaver?.restoreState() ?: initialState,
+        initialState = finalInitialState,
         initialIntents = initialIntents,
         middlewares = realMiddlewares,
         actor = actor,

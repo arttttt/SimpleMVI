@@ -3,6 +3,7 @@ package com.arttttt.simplemvi.logging
 import com.arttttt.simplemvi.config.configureSimpleMVI
 import com.arttttt.simplemvi.config.simpleMVIConfig
 import com.arttttt.simplemvi.logging.logger.Logger
+import com.arttttt.simplemvi.plugin.PluginsConfigurator
 
 /**
  * @deprecated Use SimpleMVI configuration to set logger instead.
@@ -27,4 +28,12 @@ public fun setDefaultLogger(logger: Logger?) {
         // Preserve the current strictMode setting
         strictMode = simpleMVIConfig.strictMode
     }
+}
+
+public fun <Intent : Any, State : Any, SideEffect : Any> PluginsConfigurator<Intent, State, SideEffect>.installLoggignPlugin(
+    logger: Logger? = simpleMVIConfig.logger,
+) {
+    logger ?: return
+
+    install(LoggingPlugin(logger = logger))
 }
