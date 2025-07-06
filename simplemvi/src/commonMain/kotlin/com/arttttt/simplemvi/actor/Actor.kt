@@ -1,7 +1,6 @@
 package com.arttttt.simplemvi.actor
 
 import com.arttttt.simplemvi.store.Store
-import com.arttttt.simplemvi.utils.MainThread
 import kotlinx.coroutines.CoroutineScope
 
 /**
@@ -20,7 +19,6 @@ public interface Actor<Intent : Any, State : Any, out SideEffect : Any> {
      *
      * Called by the [Store]
      */
-    @MainThread
     public fun init(
         scope: CoroutineScope,
         getState: () -> State,
@@ -34,7 +32,6 @@ public interface Actor<Intent : Any, State : Any, out SideEffect : Any> {
      *
      * Called by the [Store]
      */
-    @MainThread
     public fun onIntent(intent: Intent)
 
     /**
@@ -42,6 +39,5 @@ public interface Actor<Intent : Any, State : Any, out SideEffect : Any> {
      *
      * Called by the [Store]
      */
-    @MainThread
     public fun destroy()
 }

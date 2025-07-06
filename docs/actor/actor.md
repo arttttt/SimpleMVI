@@ -21,7 +21,6 @@ public interface Actor<Intent : Any, State : Any, out SideEffect : Any> {
      * Initializes the Actor
      * Called by the Store
      */
-    @MainThread
     public fun init(
         scope: CoroutineScope,
         getState: () -> State,
@@ -34,14 +33,12 @@ public interface Actor<Intent : Any, State : Any, out SideEffect : Any> {
      * Called when the Store receives a new Intent
      * Called by the Store
      */
-    @MainThread
     public fun onIntent(intent: Intent)
 
     /**
      * Destroys the Actor
      * Called by the Store
      */
-    @MainThread
     public fun destroy()
 }
 ```
@@ -51,7 +48,6 @@ public interface Actor<Intent : Any, State : Any, out SideEffect : Any> {
 ### init
 
 ```kotlin
-@MainThread
 public fun init(
     scope: CoroutineScope,
     getState: () -> State,
@@ -72,7 +68,6 @@ This function initializes the `Actor`. It is called by the `Store` and provides 
 ### onIntent
 
 ```kotlin
-@MainThread
 public fun onIntent(intent: Intent)
 ```
 
@@ -81,7 +76,6 @@ This function is called when the `Store` receives a new `Intent`. It's where the
 ### destroy
 
 ```kotlin
-@MainThread
 public fun destroy()
 ```
 
@@ -89,7 +83,6 @@ This function is called to destroy the `Actor`. It should be used to clean up an
 
 ## Important Notes
 
-- All methods in the `Actor` interface are annotated with `@MainThread`, indicating that they should only be called on the main thread.
 - The `Actor` is tightly coupled with the `Store` and should not be used independently.
 - Implementations of `Actor` should handle all business logic, state updates, and side effect production based on received intents.
 

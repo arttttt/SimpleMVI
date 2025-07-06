@@ -19,7 +19,6 @@ SimpleMVI follows these core principles:
 
 - **Single Source of Truth**: State is managed in a centralized Store
 - **Immutable State**: All state changes are performed through pure functions
-- **Thread Safety**: Main thread execution with background processing support
 - **Clear Boundaries**: Strict separation between UI and domain logic
 
 ### Core Components
@@ -37,9 +36,7 @@ For detailed documentation, examples and best practices, please visit: [Document
 
 ## Threading Model
 
-- All Store operations must be performed on the main thread
 - Background processing should be handled within Actors using coroutines
-- State updates are always delivered on the main thread
 
 ## Contributing
 

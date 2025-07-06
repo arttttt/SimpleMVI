@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -8,12 +10,12 @@ plugins {
 
 android {
     namespace = "com.arttttt.simplemvi.sample"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.arttttt.simplemvi"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -35,11 +37,13 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
+    kotlin {
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_17
 
-        freeCompilerArgs += "-opt-in=kotlin.uuid.ExperimentalUuidApi"
-        freeCompilerArgs += "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api"
+            freeCompilerArgs.add("-opt-in=kotlin.uuid.ExperimentalUuidApi")
+            freeCompilerArgs.add("-opt-in=androidx.compose.material3.ExperimentalMaterial3Api")
+        }
     }
 
     buildFeatures {

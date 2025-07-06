@@ -2,7 +2,6 @@ package com.arttttt.simplemvi.store
 
 import com.arttttt.simplemvi.actor.Actor
 import com.arttttt.simplemvi.middleware.Middleware
-import com.arttttt.simplemvi.utils.MainThread
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -47,28 +46,19 @@ public interface Store<in Intent : Any, out State : Any, out SideEffect : Any> {
 
     /**
      * This function initializes [Store]
-     *
-     * Must be called on the main thread only
      */
-    @MainThread
     public fun init()
 
     /**
      * This function accepts an [Intent] and passes it to the [Actor]
      *
      * [Intent] is also available inside the [Middleware]
-     *
-     * Must be called on the main thread only
      */
-    @MainThread
     public fun accept(intent: Intent)
 
     /**
      * This function destroyes the [Store]
      * [Store] can not be used after it was destroyed
-     *
-     * Must be called on the main thread only
      */
-    @MainThread
     public fun destroy()
 }
