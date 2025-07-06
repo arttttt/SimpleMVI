@@ -12,6 +12,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -101,6 +102,8 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
 
     private fun postSideEffect(sideEffect: SideEffect) {
         middlewares.forEach { it.onSideEffect(sideEffect, _states.value) }
-        _sideEffects.tryEmit(sideEffect)
+        scope.launch {
+            _sideEffects.emit(sideEffect)
+        }
     }
 }
