@@ -6,9 +6,7 @@ SimpleMVI provides a flexible configuration system that allows you to customize 
 
 ### Error Handling
 
-In SimpleMVI, all main thread checks are mandatory and cannot be disabled, as this is a fundamental architectural constraint.
-
-However, you can configure how the library behaves when it encounters errors such as:
+You can configure how the library behaves when it encounters errors such as:
 
 - Using an uninitialized Store
 - Using a destroyed Store
@@ -106,8 +104,7 @@ if (BuildConfig.DEBUG) {
 ## Notes
 
 1. Configuration is set globally for all Store instances.
-2. Main thread checks are always mandatory and cannot be disabled.
-3. In lenient mode (strictMode = false), errors will be logged if a logger is configured.
-4. The name `strictMode` follows common practice in Android and other platforms, where this term describes a mode with stricter checks.
-5. If you need to create your own logger, implement the `Logger` interface with a single `log(message: String)` method.
-6. All configuration settings are applied immediately and affect all future operations.
+2. In lenient mode (strictMode = false), errors will be logged if a logger is configured.
+3. The name `strictMode` follows common practice in Android and other platforms, where this term describes a mode with stricter checks.
+4. If you need to create your own logger, implement the `Logger` interface with a single `log(message: String)` method.
+5. All configuration settings are applied immediately and affect all future operations.
