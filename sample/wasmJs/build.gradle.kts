@@ -11,7 +11,7 @@ kotlin {
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        moduleName = "wasmJs"
+        outputModuleName = "wasmJs"
         browser {
             val projectDirPath = project.projectDir.path
             commonWebpackConfig {
