@@ -4,10 +4,10 @@ import com.arttttt.simplemvi.actor.Actor
 import com.arttttt.simplemvi.config.simpleMVIConfig
 import com.arttttt.simplemvi.middleware.Middleware
 import com.arttttt.simplemvi.utils.CachingFlow
-import com.arttttt.simplemvi.utils.MainThread
-import com.arttttt.simplemvi.utils.assertOnMainThread
 import com.arttttt.simplemvi.utils.exceptions.StoreIsAlreadyDestroyedException
 import com.arttttt.simplemvi.utils.exceptions.StoreIsNotInitializedException
+import kotlinx.atomicfu.AtomicBoolean
+import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
@@ -40,16 +40,11 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
 
     override val sideEffects: Flow<SideEffect> = _sideEffects
 
-    private var isInitialized: Boolean = false
-    private var isDestroyed: Boolean = false
+    private var isInitialized: AtomicBoolean = atomic(false)
+    private var isDestroyed: AtomicBoolean = atomic(false)
 
-    @MainThread
     override fun init() {
-        if (isInitialized) return
-
-        assertOnMainThread()
-
-        isInitialized = true
+        if (isInitialized.getAndSet(true)) return
 
         middlewares.forEach { it.onInit(_states.value) }
 
@@ -61,7 +56,6 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
                     block(state).also { newState ->
                         middlewares.forEach { it.onStateChanged(state, newState) }
                     }
-
                 }
             },
             onNewIntent = this::accept,
@@ -71,9 +65,8 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
         initialIntents.forEach(this::accept)
     }
 
-    @MainThread
     override fun accept(intent: Intent) {
-        if (!isInitialized) {
+        if (!isInitialized.value) {
             val message = "Attempting to use an uninitialized Store"
             if (simpleMVIConfig.strictMode) {
                 throw StoreIsNotInitializedException()
@@ -83,7 +76,7 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
             }
         }
 
-        if (isDestroyed) {
+        if (isDestroyed.value) {
             val message = "Attempting to use a destroyed Store"
             if (simpleMVIConfig.strictMode) {
                 throw StoreIsAlreadyDestroyedException()
@@ -93,19 +86,12 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
             }
         }
 
-        assertOnMainThread()
-
         middlewares.forEach { it.onIntent(intent, _states.value) }
         actor.onIntent(intent)
     }
 
-    @MainThread
     override fun destroy() {
-        if (isDestroyed) return
-
-        isDestroyed = true
-
-        assertOnMainThread()
+        if (isDestroyed.getAndSet(true)) return
 
         middlewares.forEach { it.onDestroy(_states.value) }
 
@@ -113,10 +99,7 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
         scope.cancel()
     }
 
-    @MainThread
     private fun postSideEffect(sideEffect: SideEffect) {
-        assertOnMainThread()
-
         middlewares.forEach { it.onSideEffect(sideEffect, _states.value) }
         _sideEffects.tryEmit(sideEffect)
     }

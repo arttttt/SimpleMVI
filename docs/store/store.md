@@ -39,31 +39,24 @@ public interface Store<in Intent : Any, out State : Any, out SideEffect : Any> {
 
     /**
      * Initializes the Store
-     * Must be called on the main thread only
      */
-    @MainThread
     public fun init()
 
     /**
      * Accepts an Intent and passes it to the Actor
      * Intent is also available inside the Middleware
-     * Must be called on the main thread only
      */
-    @MainThread
     public fun accept(intent: Intent)
 
     /**
      * Destroys the Store. Store cannot be used after it was destroyed
-     * Must be called on the main thread only
      */
-    @MainThread
     public fun destroy()
 }
 ```
 
 ## Important Notes
 
-- All methods marked with `@MainThread` must be called on the main thread only.
 - After calling `destroy()`, the Store cannot be used anymore.
 - When a new State is emitted, it's available inside the Middleware.
 - When a SideEffect is emitted, it's available inside the Middleware.

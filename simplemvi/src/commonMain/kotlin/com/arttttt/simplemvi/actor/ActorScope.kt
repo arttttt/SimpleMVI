@@ -1,7 +1,6 @@
 package com.arttttt.simplemvi.actor
 
 import com.arttttt.simplemvi.store.Store
-import com.arttttt.simplemvi.utils.MainThread
 
 /**
  * a set of properties and functions to be used inside the [Actor]
@@ -21,7 +20,6 @@ public interface ActorScope<in Intent : Any, State : Any, in SideEffect : Any> {
      *
      * @param intent [Intent] to be handled by the [Actor]
      */
-    @MainThread
     public fun intent(intent: Intent)
 
     /**
@@ -29,7 +27,6 @@ public interface ActorScope<in Intent : Any, State : Any, in SideEffect : Any> {
      *
      * @param block a lambda that receives the current [State] and returns a new [State]
      */
-    @MainThread
     public fun reduce(block: State.() -> State)
 
     /**
@@ -37,6 +34,5 @@ public interface ActorScope<in Intent : Any, State : Any, in SideEffect : Any> {
      *
      * @param sideEffect [SideEffect] to be emitted
      */
-    @MainThread
     public fun sideEffect(sideEffect: SideEffect)
 }

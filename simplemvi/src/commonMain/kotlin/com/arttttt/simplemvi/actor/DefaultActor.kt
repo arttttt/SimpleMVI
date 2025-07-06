@@ -1,7 +1,5 @@
 package com.arttttt.simplemvi.actor
 
-import com.arttttt.simplemvi.utils.MainThread
-import com.arttttt.simplemvi.utils.assertOnMainThread
 import kotlinx.coroutines.CoroutineScope
 import kotlin.properties.Delegates
 
@@ -22,7 +20,6 @@ public abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any> 
     protected open fun onInit() {}
     protected open fun onDestroy() {}
 
-    @MainThread
     final override fun init(
         scope: CoroutineScope,
         getState: () -> State,
@@ -30,8 +27,6 @@ public abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any> 
         onNewIntent: (intent: Intent) -> Unit,
         postSideEffect: (sideEffect: SideEffect) -> Unit
     ) {
-        assertOnMainThread()
-
         actorScope = object : ActorScope<Intent, State, SideEffect> {
 
             override val state: State
@@ -41,17 +36,11 @@ public abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any> 
                 postSideEffect(sideEffect)
             }
 
-            @MainThread
             override fun intent(intent: Intent) {
-                assertOnMainThread()
-
                 onNewIntent(intent)
             }
 
-            @MainThread
             override fun reduce(block: State.() -> State) {
-                assertOnMainThread()
-
                 reduce(block)
             }
         }
@@ -61,38 +50,23 @@ public abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any> 
         onInit()
     }
 
-    @MainThread
     final override fun onIntent(intent: Intent) {
-        assertOnMainThread()
-
         handleIntent(intent)
     }
 
-    @MainThread
     final override fun destroy() {
-        assertOnMainThread()
-
         onDestroy()
     }
 
-    @MainThread
     protected fun intent(intent: Intent) {
-        assertOnMainThread()
-
         actorScope.intent(intent)
     }
 
-    @MainThread
     protected fun reduce(block: State.() -> State) {
-        assertOnMainThread()
-
         actorScope.reduce(block)
     }
 
-    @MainThread
     protected fun sideEffect(sideEffect: SideEffect) {
-        assertOnMainThread()
-
         actorScope.sideEffect(sideEffect)
     }
 }
