@@ -47,7 +47,7 @@ public class ActorBuilder<Intent : Any, State : Any, SideEffect: Any> {
         crossinline handler: DslActorScope<Intent, State, SideEffect>.(intent: T) -> Unit,
     ) {
         require(!intentHandlers.containsKey(T::class)) {
-            "intent handler already registered for ${T::class.qualifiedName}"
+            "intent handler already registered for ${T::class.simpleName}"
         }
 
         intentHandlers[T::class] = { intent ->
