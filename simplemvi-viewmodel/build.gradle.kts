@@ -7,11 +7,9 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(project(":simplemvi"))
-        }
 
-        androidMain.dependencies {
             implementation(libs.kotlin.coroutines.core)
-            implementation(libs.androidx.lifecycle.viewmodel.ktx)
+            implementation(libs.jetbrains.androidx.lifecycle.viewmodel.compose)
         }
     }
 }

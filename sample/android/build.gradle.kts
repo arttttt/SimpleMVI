@@ -77,7 +77,7 @@ dependencies {
     implementation(libs.kotlin.coroutines.android)
 
     implementation(libs.androidx.compose.navigation)
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.jetbrains.androidx.lifecycle.viewmodel.compose)
     implementation(libs.kotlin.serialization.json)
 
     implementation(libs.androidx.room.runtime)
