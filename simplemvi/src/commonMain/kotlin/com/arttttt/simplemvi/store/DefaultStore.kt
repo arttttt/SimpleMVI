@@ -41,8 +41,8 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
 
     override val sideEffects: Flow<SideEffect> = _sideEffects
 
-    private var isInitialized: AtomicBoolean = atomic(false)
-    private var isDestroyed: AtomicBoolean = atomic(false)
+    private val isInitialized: AtomicBoolean = atomic(false)
+    private val isDestroyed: AtomicBoolean = atomic(false)
 
     override fun init() {
         if (isInitialized.getAndSet(true)) return
