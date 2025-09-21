@@ -9,7 +9,7 @@ import com.arttttt.simplemvi.actor.delegated.IntentHandler
 import kotlin.reflect.KClass
 
 /**
- * Creates a new [com.arttttt.simplemvi.actor.delegated.DelegatedActor]
+ * Creates a new [DelegatedActor]
  *
  * @param block a lambda to be called within [ActorBuilder]
  *
