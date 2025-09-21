@@ -1,8 +1,6 @@
 package com.arttttt.simplemvi.sample.shared.counter
 
-import com.arttttt.simplemvi.actor.ActorScope
-import com.arttttt.simplemvi.actor.dsl.ActorBuilder
-import com.arttttt.simplemvi.actor.dsl.actorDsl
+import com.arttttt.simplemvi.actor.dsl.delegatedActor
 import com.arttttt.simplemvi.store.Store
 import com.arttttt.simplemvi.store.createStore
 import com.arttttt.simplemvi.store.storeName
@@ -18,27 +16,13 @@ class CounterStore(
     ),
     initialIntents = emptyList(),
     middlewares = emptyList(),
-    actor = actorDsl {
-            onIntent<Intent.Increment> {
-                handleIncrement()
-            }
-
-            handleDecrement()
-
-            onIntent<Intent.Reset> {
-                if (state.counter == 0) {
-                    sideEffect(SideEffect.CantResetCounter)
-                } else {
-                    reduce {
-                        copy(
-                            counter = 0
-                        )
-                    }
-
-                    sideEffect(SideEffect.CounterReset)
-                }
-            }
-        },
+    actor = delegatedActor(
+        intentHandlers = listOf(
+            IncrementHandler(),
+            DecrementHandler(),
+            ResetHandler(),
+        ),
+    )
 ) {
 
     sealed interface Intent {
@@ -57,27 +41,5 @@ class CounterStore(
         data class CounterChanged(val counter: Int) : SideEffect
         data object CantResetCounter : SideEffect
         data object CounterReset : SideEffect
-    }
-}
-
-private fun ActorScope<CounterStore.Intent, CounterStore.State, CounterStore.SideEffect>.handleIncrement() {
-    reduce {
-        copy(
-            counter = counter + 1
-        )
-    }
-
-    sideEffect(CounterStore.SideEffect.CounterChanged(counter = state.counter))
-}
-
-private fun ActorBuilder<CounterStore.Intent, CounterStore.State, CounterStore.SideEffect>.handleDecrement() {
-    onIntent<CounterStore.Intent.Decrement> {
-        reduce {
-            copy(
-                counter = counter - 1
-            )
-        }
-
-        sideEffect(CounterStore.SideEffect.CounterChanged(counter = state.counter))
     }
 }

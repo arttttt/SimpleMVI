@@ -1,6 +1,7 @@
 package com.arttttt.simplemvi.actor
 
 import com.arttttt.simplemvi.store.Store
+import kotlinx.coroutines.CoroutineScope
 
 /**
  * a set of properties and functions to be used inside the [Actor]
@@ -13,6 +14,11 @@ public interface ActorScope<in Intent : Any, State : Any, in SideEffect : Any> {
      * Returns current [State] of the [Store]
      */
     public val state: State
+
+    /**
+     * The [CoroutineScope] of the [Store]
+     */
+    public val scope: CoroutineScope
 
     /**
      * Sometimes it's necessary to fire a new intent within an [Actor]

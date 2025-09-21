@@ -25,7 +25,7 @@ class NotesStore(
     middlewares = emptyList(),
     actor = actorDsl {
         onIntent<Intent.LoadNotes> {
-            launch {
+            scope.launch {
                 reduce {
                     copy(
                         isInProgress = true,
@@ -50,7 +50,7 @@ class NotesStore(
         }
 
         onIntent<Intent.AddNote> {
-            launch {
+            scope.launch {
                 val note = Note(
                     id = Uuid.random().toString(),
                     message = state.currentMessage,
@@ -70,7 +70,7 @@ class NotesStore(
         }
 
         onIntent<Intent.RemoveNote> { intent ->
-            launch {
+            scope.launch {
                 notesRepository.removeNote(intent.id)
 
                 reduce {
