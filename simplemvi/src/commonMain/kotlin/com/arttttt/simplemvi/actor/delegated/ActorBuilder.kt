@@ -18,7 +18,7 @@ public class ActorBuilder<Intent : Any, State : Any, SideEffect: Any> {
     internal var initHandler: ActorScope<Intent, State, SideEffect>.() -> Unit = defaultInitHandler
 
     @PublishedApi
-    internal val intentHandlers: MutableMap<KClass<out Intent>, ActorScope<Intent, State, SideEffect>.(Intent) -> Unit> = mutableMapOf()
+    internal val intentHandlers: MutableMap<KClass<out Intent>, IntentHandler<Intent, State, SideEffect, Intent>> = mutableMapOf()
 
     @PublishedApi
     internal var destroyHandler: ActorScope<Intent, State, SideEffect>.() -> Unit = defaultDestroyHandler
@@ -45,16 +45,19 @@ public class ActorBuilder<Intent : Any, State : Any, SideEffect: Any> {
      * @param handler a handler lambda to be called for a specific [Intent]
      */
     public inline fun <reified T : Intent> onIntent(
-        crossinline handler: ActorScope<Intent, State, SideEffect>.(intent: T) -> Unit,
+        crossinline handler: ActorScope<Intent, State, SideEffect>.(T) -> Unit,
     ) {
         require(!intentHandlers.containsKey(T::class)) {
             "intent handler already registered for ${T::class.simpleName}"
         }
 
-        intentHandlers[T::class] = { intent ->
-            if (intent is T) {
-                handler(intent)
-             }
+        intentHandlers[T::class] = object : IntentHandler<Intent, State, SideEffect, Intent> {
+
+            override fun ActorScope<Intent, State, SideEffect>.handle(intent: Intent) {
+                if (intent is T) {
+                    handler.invoke(this, intent)
+                }
+            }
         }
     }
 

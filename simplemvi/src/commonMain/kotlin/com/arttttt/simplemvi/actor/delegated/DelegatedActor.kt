@@ -11,7 +11,7 @@ import kotlin.reflect.KClass
  */
 public class DelegatedActor<Intent : Any, State : Any, SideEffect : Any>(
     private val initHandler: ActorScope<Intent, State, SideEffect>.() -> Unit,
-    private val intentHandlers: Map<KClass<out Intent>, ActorScope<Intent, State, SideEffect>.(Intent) -> Unit>,
+    private val intentHandlers: Map<KClass<out Intent>, IntentHandler<Intent, State, SideEffect, in Intent>>,
     private val destroyHandler: ActorScope<Intent, State, SideEffect>.() -> Unit,
 ) : Actor<Intent, State, SideEffect> {
 
@@ -51,7 +51,9 @@ public class DelegatedActor<Intent : Any, State : Any, SideEffect : Any>(
     override fun onIntent(intent: Intent) {
         val handler = intentHandlers[intent::class] ?: throw IllegalArgumentException("intent handler not found for $intent")
 
-        handler.invoke(actorScope, intent)
+        with(handler) {
+            actorScope.handle(intent)
+        }
     }
 
     override fun destroy() {
