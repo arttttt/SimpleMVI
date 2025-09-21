@@ -1,14 +1,13 @@
-package com.arttttt.simplemvi.actor.dsl
+package com.arttttt.simplemvi.actor.delegated
 
 import com.arttttt.simplemvi.actor.Actor
-import kotlin.coroutines.CoroutineContext
 
 /**
- * Creates a new [DslActor]
+ * Creates a new [DelegatedActor]
  *
  * @param block a lambda to be called within [ActorBuilder]
  *
- * @see DslActor
+ * @see DelegatedActor
  * @see ActorBuilder
  */
 public inline fun <Intent : Any, State : Any, SideEffect : Any> actorDsl(
@@ -17,7 +16,7 @@ public inline fun <Intent : Any, State : Any, SideEffect : Any> actorDsl(
     val builder = ActorBuilder<Intent, State, SideEffect>()
     builder.block()
 
-    return DslActor(
+    return DelegatedActor(
         initHandler = builder.initHandler,
         intentHandlers = builder.intentHandlers,
         destroyHandler = builder.destroyHandler,

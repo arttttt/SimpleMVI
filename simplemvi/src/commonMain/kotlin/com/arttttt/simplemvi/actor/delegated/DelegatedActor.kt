@@ -1,6 +1,7 @@
-package com.arttttt.simplemvi.actor.dsl
+package com.arttttt.simplemvi.actor.delegated
 
 import com.arttttt.simplemvi.actor.Actor
+import com.arttttt.simplemvi.actor.ActorScope
 import kotlinx.coroutines.CoroutineScope
 import kotlin.properties.Delegates
 import kotlin.reflect.KClass
@@ -8,13 +9,13 @@ import kotlin.reflect.KClass
 /**
  * An [Actor] implementation to be used within dsl
  */
-public class DslActor<Intent : Any, State : Any, SideEffect : Any>(
-    private val initHandler: DslActorScope<Intent, State, SideEffect>.() -> Unit,
-    private val intentHandlers: Map<KClass<out Intent>, DslActorScope<Intent, State, SideEffect>.(Intent) -> Unit>,
-    private val destroyHandler: DslActorScope<Intent, State, SideEffect>.() -> Unit,
+public class DelegatedActor<Intent : Any, State : Any, SideEffect : Any>(
+    private val initHandler: ActorScope<Intent, State, SideEffect>.() -> Unit,
+    private val intentHandlers: Map<KClass<out Intent>, ActorScope<Intent, State, SideEffect>.(Intent) -> Unit>,
+    private val destroyHandler: ActorScope<Intent, State, SideEffect>.() -> Unit,
 ) : Actor<Intent, State, SideEffect> {
 
-    private var actorScope: DslActorScope<Intent, State, SideEffect> by Delegates.notNull()
+    private var actorScope: ActorScope<Intent, State, SideEffect> by Delegates.notNull()
 
     override fun init(
         scope: CoroutineScope,
@@ -23,10 +24,13 @@ public class DslActor<Intent : Any, State : Any, SideEffect : Any>(
         onNewIntent: (intent: Intent) -> Unit,
         postSideEffect: (sideEffect: SideEffect) -> Unit
     ) {
-        actorScope = object : DslActorScope<Intent, State, SideEffect>, CoroutineScope by scope {
+        actorScope = object : ActorScope<Intent, State, SideEffect> {
 
             override val state: State
                 get() = getState()
+
+            override val scope: CoroutineScope
+                get() = scope
 
             override fun sideEffect(sideEffect: SideEffect) {
                 postSideEffect(sideEffect)

@@ -1,6 +1,6 @@
 package com.arttttt.simplemvi.sample.notes.domain.stores
 
-import com.arttttt.simplemvi.actor.dsl.actorDsl
+import com.arttttt.simplemvi.actor.delegated.actorDsl
 import com.arttttt.simplemvi.sample.notes.domain.models.Note
 import com.arttttt.simplemvi.sample.notes.domain.repository.NotesRepository
 import com.arttttt.simplemvi.store.Store
@@ -25,7 +25,7 @@ class NotesStore(
     middlewares = emptyList(),
     actor = actorDsl {
         onIntent<Intent.LoadNotes> {
-            launch {
+            scope.launch {
                 reduce {
                     copy(
                         isInProgress = true,
@@ -50,7 +50,7 @@ class NotesStore(
         }
 
         onIntent<Intent.AddNote> {
-            launch {
+            scope.launch {
                 val note = Note(
                     id = Uuid.random().toString(),
                     message = state.currentMessage,
@@ -70,7 +70,7 @@ class NotesStore(
         }
 
         onIntent<Intent.RemoveNote> { intent ->
-            launch {
+            scope.launch {
                 notesRepository.removeNote(intent.id)
 
                 reduce {

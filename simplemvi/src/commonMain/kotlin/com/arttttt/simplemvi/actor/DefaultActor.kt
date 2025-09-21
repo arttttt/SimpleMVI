@@ -12,8 +12,11 @@ public abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any> 
         get() = actorScope.state
 
     private var actorScope: ActorScope<Intent, State, SideEffect> by Delegates.notNull()
-    protected var scope: CoroutineScope by Delegates.notNull()
-        private set
+
+    protected val scope: CoroutineScope
+        get() {
+            return actorScope.scope
+        }
 
     protected abstract fun handleIntent(intent: Intent)
 
@@ -32,6 +35,9 @@ public abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any> 
             override val state: State
                 get() = getState()
 
+            override val scope: CoroutineScope
+                get() = scope
+
             override fun sideEffect(sideEffect: SideEffect) {
                 postSideEffect(sideEffect)
             }
@@ -44,8 +50,6 @@ public abstract class DefaultActor<Intent : Any, State : Any, SideEffect : Any> 
                 reduce(block)
             }
         }
-
-        this.scope = scope
 
         onInit()
     }
