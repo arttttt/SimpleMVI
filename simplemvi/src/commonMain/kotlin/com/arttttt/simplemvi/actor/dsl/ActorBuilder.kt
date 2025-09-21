@@ -2,6 +2,8 @@ package com.arttttt.simplemvi.actor.dsl
 
 import com.arttttt.simplemvi.actor.ActorScope
 import com.arttttt.simplemvi.actor.delegated.DelegatedActor
+import com.arttttt.simplemvi.actor.delegated.DestroyHandler
+import com.arttttt.simplemvi.actor.delegated.InitHandler
 import com.arttttt.simplemvi.actor.delegated.IntentHandler
 import kotlin.reflect.KClass
 
@@ -13,17 +15,17 @@ import kotlin.reflect.KClass
 @ActorDslMarker
 public class ActorBuilder<Intent : Any, State : Any, SideEffect: Any> {
 
-    private val defaultInitHandler: ActorScope<Intent, State, SideEffect>.() -> Unit = {}
-    private val defaultDestroyHandler: ActorScope<Intent, State, SideEffect>.() -> Unit = {}
+    private val defaultInitHandler: InitHandler<Intent, State, SideEffect> = InitHandler {}
+    private val defaultDestroyHandler: DestroyHandler<Intent, State, SideEffect> = DestroyHandler {}
 
     @PublishedApi
-    internal var initHandler: ActorScope<Intent, State, SideEffect>.() -> Unit = defaultInitHandler
+    internal var initHandler: InitHandler<Intent, State, SideEffect> = defaultInitHandler
 
     @PublishedApi
     internal val intentHandlers: MutableMap<KClass<out Intent>, IntentHandler<Intent, State, SideEffect, Intent>> = mutableMapOf()
 
     @PublishedApi
-    internal var destroyHandler: ActorScope<Intent, State, SideEffect>.() -> Unit = defaultDestroyHandler
+    internal var destroyHandler: DestroyHandler<Intent, State, SideEffect> = defaultDestroyHandler
 
     /**
      * This function registers a lambda that is called during [DelegatedActor] initialization
@@ -37,7 +39,7 @@ public class ActorBuilder<Intent : Any, State : Any, SideEffect: Any> {
             "init handler already registered"
         }
 
-        initHandler = block
+        initHandler = InitHandler(block)
     }
 
     /**
@@ -53,14 +55,15 @@ public class ActorBuilder<Intent : Any, State : Any, SideEffect: Any> {
             "intent handler already registered for ${T::class.simpleName}"
         }
 
-        intentHandlers[T::class] = object : IntentHandler<Intent, State, SideEffect, Intent> {
+        @Suppress("UNCHECKED_CAST")
+        intentHandlers[T::class] = object : IntentHandler<Intent, State, SideEffect, T> {
 
-            override fun ActorScope<Intent, State, SideEffect>.handle(intent: Intent) {
-                if (intent is T) {
-                    handler.invoke(this, intent)
-                }
+            override val intentClass: KClass<T> = T::class
+
+            override fun ActorScope<Intent, State, SideEffect>.handle(intent: T) {
+                handler.invoke(this, intent)
             }
-        }
+        } as IntentHandler<Intent, State, SideEffect, Intent>
     }
 
     /**
@@ -76,6 +79,6 @@ public class ActorBuilder<Intent : Any, State : Any, SideEffect: Any> {
             "destroy handler already registered"
         }
 
-        destroyHandler = block
+        destroyHandler = DestroyHandler(block)
     }
 }

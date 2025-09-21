@@ -10,9 +10,9 @@ import kotlin.reflect.KClass
  * An [Actor] implementation to be used within dsl
  */
 public class DelegatedActor<Intent : Any, State : Any, SideEffect : Any>(
-    private val initHandler: ActorScope<Intent, State, SideEffect>.() -> Unit,
-    private val intentHandlers: Map<KClass<out Intent>, IntentHandler<Intent, State, SideEffect, in Intent>>,
-    private val destroyHandler: ActorScope<Intent, State, SideEffect>.() -> Unit,
+    private val initHandler: InitHandler<Intent, State, SideEffect>,
+    private val intentHandlers: Map<KClass<out Intent>, IntentHandler<Intent, State, SideEffect, out Intent>>,
+    private val destroyHandler: DestroyHandler<Intent, State, SideEffect>,
 ) : Actor<Intent, State, SideEffect> {
 
     private var actorScope: ActorScope<Intent, State, SideEffect> by Delegates.notNull()
@@ -45,18 +45,23 @@ public class DelegatedActor<Intent : Any, State : Any, SideEffect : Any>(
             }
         }
 
-        actorScope.apply(initHandler)
+        with(initHandler) {
+            actorScope.onInit()
+        }
     }
 
     override fun onIntent(intent: Intent) {
         val handler = intentHandlers[intent::class] ?: throw IllegalArgumentException("intent handler not found for $intent")
 
-        with(handler) {
+        @Suppress("UNCHECKED_CAST")
+        with(handler as IntentHandler<Intent, State, SideEffect, Any>) {
             actorScope.handle(intent)
         }
     }
 
     override fun destroy() {
-        actorScope.apply(destroyHandler)
+        with(destroyHandler) {
+            actorScope.onDestroy()
+        }
     }
 }
