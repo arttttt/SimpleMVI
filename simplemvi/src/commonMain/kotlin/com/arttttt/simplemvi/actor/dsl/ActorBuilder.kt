@@ -1,6 +1,8 @@
-package com.arttttt.simplemvi.actor.delegated
+package com.arttttt.simplemvi.actor.dsl
 
 import com.arttttt.simplemvi.actor.ActorScope
+import com.arttttt.simplemvi.actor.delegated.DelegatedActor
+import com.arttttt.simplemvi.actor.delegated.IntentHandler
 import kotlin.reflect.KClass
 
 /**

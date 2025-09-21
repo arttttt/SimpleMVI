@@ -1,4 +1,4 @@
-package com.arttttt.simplemvi.actor.delegated
+package com.arttttt.simplemvi.actor.dsl
 
 import com.arttttt.simplemvi.actor.Actor
 

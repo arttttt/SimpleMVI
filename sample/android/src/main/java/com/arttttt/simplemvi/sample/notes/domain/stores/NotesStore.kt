@@ -1,6 +1,6 @@
 package com.arttttt.simplemvi.sample.notes.domain.stores
 
-import com.arttttt.simplemvi.actor.delegated.actorDsl
+import com.arttttt.simplemvi.actor.dsl.actorDsl
 import com.arttttt.simplemvi.sample.notes.domain.models.Note
 import com.arttttt.simplemvi.sample.notes.domain.repository.NotesRepository
 import com.arttttt.simplemvi.store.Store

@@ -1,8 +1,8 @@
 package com.arttttt.simplemvi.sample.shared.counter
 
 import com.arttttt.simplemvi.actor.ActorScope
-import com.arttttt.simplemvi.actor.delegated.ActorBuilder
-import com.arttttt.simplemvi.actor.delegated.actorDsl
+import com.arttttt.simplemvi.actor.dsl.ActorBuilder
+import com.arttttt.simplemvi.actor.dsl.actorDsl
 import com.arttttt.simplemvi.store.Store
 import com.arttttt.simplemvi.store.createStore
 import com.arttttt.simplemvi.store.storeName
