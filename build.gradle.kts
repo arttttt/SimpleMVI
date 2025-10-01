@@ -11,6 +11,6 @@ plugins {
     alias(libs.plugins.jetbrains.compose) apply false
     alias(libs.plugins.kotlin.atomicfu) apply false
 
-    id(libs.plugins.simplemvi.library.module.get().pluginId) apply false
-    id(libs.plugins.simplemvi.publishing.get().pluginId) apply false
+    alias(libs.plugins.simplemvi.library.module) apply false
+    alias(libs.plugins.simplemvi.publishing) apply false
 }
