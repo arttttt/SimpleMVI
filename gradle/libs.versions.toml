@@ -18,6 +18,7 @@ jetbrainsCompose = "1.9.0"
 atomicfu = "0.29.0"
 androidxLifecycle = "2.9.4"
 kotlinpoet = "2.2.0"
+materialIcons = "1.7.8"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -49,6 +50,7 @@ kotlin-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "at
 google-ksp-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }
 square-kotlinpoet-lib = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
 square-kotlinpoet-ksp = { module = "com.squareup:kotlinpoet-ksp", version.ref = "kotlinpoet" }
+androidx-material-icons = { module = "androidx.compose.material:material-icons-core", version.ref = "materialIcons" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
