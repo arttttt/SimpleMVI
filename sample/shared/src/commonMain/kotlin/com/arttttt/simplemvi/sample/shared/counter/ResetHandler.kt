@@ -1,11 +1,9 @@
 package com.arttttt.simplemvi.sample.shared.counter
 
 import com.arttttt.simplemvi.actor.ActorScope
-import com.arttttt.simplemvi.actor.delegated.IntentHandler
-import com.arttttt.simplemvi.sample.shared.counter.CounterStore.SideEffect
 import kotlin.reflect.KClass
 
-class ResetHandler : IntentHandler<CounterStore.Intent, CounterStore.State, CounterStore.SideEffect, CounterStore.Intent.Reset> {
+class ResetHandler : CounterStoreIntentHandler<CounterStore.Intent.Reset> {
 
     override val intentClass: KClass<CounterStore.Intent.Reset> = CounterStore.Intent.Reset::class
 
@@ -13,7 +11,7 @@ class ResetHandler : IntentHandler<CounterStore.Intent, CounterStore.State, Coun
         intent: CounterStore.Intent.Reset
     ) {
         if (state.counter == 0) {
-            sideEffect(SideEffect.CantResetCounter)
+            sideEffect(CounterStore.SideEffect.CantResetCounter)
         } else {
             reduce {
                 copy(
@@ -21,7 +19,7 @@ class ResetHandler : IntentHandler<CounterStore.Intent, CounterStore.State, Coun
                 )
             }
 
-            sideEffect(SideEffect.CounterReset)
+            sideEffect(CounterStore.SideEffect.CounterReset)
         }
     }
 }

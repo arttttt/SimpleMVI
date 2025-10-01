@@ -1,10 +1,9 @@
 package com.arttttt.simplemvi.sample.shared.counter
 
 import com.arttttt.simplemvi.actor.ActorScope
-import com.arttttt.simplemvi.actor.delegated.IntentHandler
 import kotlin.reflect.KClass
 
-class DecrementHandler : IntentHandler<CounterStore.Intent, CounterStore.State, CounterStore.SideEffect, CounterStore.Intent.Decrement> {
+class DecrementHandler : CounterStoreIntentHandler<CounterStore.Intent.Decrement> {
 
     override val intentClass: KClass<CounterStore.Intent.Decrement> = CounterStore.Intent.Decrement::class
 

@@ -1,10 +1,9 @@
 package com.arttttt.simplemvi.sample.shared.counter
 
 import com.arttttt.simplemvi.actor.ActorScope
-import com.arttttt.simplemvi.actor.delegated.IntentHandler
 import kotlin.reflect.KClass
 
-class IncrementHandler : IntentHandler<CounterStore.Intent, CounterStore.State, CounterStore.SideEffect, CounterStore.Intent.Increment> {
+class IncrementHandler : CounterStoreIntentHandler<CounterStore.Intent.Increment> {
 
     override val intentClass: KClass<CounterStore.Intent.Increment> = CounterStore.Intent.Increment::class
 
