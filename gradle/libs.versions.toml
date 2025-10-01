@@ -17,6 +17,7 @@ mavenPublish = "0.34.0"
 jetbrainsCompose = "1.8.2"
 atomicfu = "0.29.0"
 androidxLifecycle = "2.9.3"
+kotlinpoet = "2.2.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -45,6 +46,9 @@ jetbrains-kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotli
 maven-publish-gradle-plugin = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "mavenPublish" }
 androidx-lifecycle-runtime-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidxLifecycle" }
 kotlin-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
+google-ksp-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }
+square-kotlinpoet-lib = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
+square-kotlinpoet-ksp = { module = "com.squareup:kotlinpoet-ksp", version.ref = "kotlinpoet" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
