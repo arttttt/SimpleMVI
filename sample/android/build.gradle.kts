@@ -56,6 +56,8 @@ dependencies {
 
     implementation(project(":sample:shared"))
     implementation(project(":simplemvi-viewmodel"))
+    implementation(project(":simplemvi-annotations"))
+    ksp(project(":simplemvi-codegen"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

@@ -1,9 +1,9 @@
 package com.arttttt.simplemvi.sample.shared.counter
 
-fun incrementHandler() = counterStoreIntentHandler<CounterStore.Intent.Increment> { intent ->
+fun decrementIntentHandler() = counterStoreIntentHandler<CounterStore.Intent.Decrement> { intent ->
     reduce {
         copy(
-            counter = counter + 1
+            counter = counter - 1
         )
     }
 
