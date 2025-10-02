@@ -56,6 +56,8 @@ dependencies {
 
     implementation(project(":sample:shared"))
     implementation(project(":simplemvi-viewmodel"))
+    implementation(project(":simplemvi-annotations"))
+    ksp(project(":simplemvi-codegen"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -72,6 +74,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation(libs.androidx.material.icons)
 
     implementation(libs.kotlin.coroutines.core)
     implementation(libs.kotlin.coroutines.android)

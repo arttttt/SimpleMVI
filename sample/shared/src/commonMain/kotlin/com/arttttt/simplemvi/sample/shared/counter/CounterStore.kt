@@ -1,11 +1,13 @@
 package com.arttttt.simplemvi.sample.shared.counter
 
 import com.arttttt.simplemvi.actor.dsl.delegatedActor
+import com.arttttt.simplemvi.annotations.DelegatedStore
 import com.arttttt.simplemvi.store.Store
 import com.arttttt.simplemvi.store.createStore
 import com.arttttt.simplemvi.store.storeName
 import kotlin.coroutines.CoroutineContext
 
+@DelegatedStore
 class CounterStore(
     coroutineContext: CoroutineContext,
 ) : Store<CounterStore.Intent, CounterStore.State, CounterStore.SideEffect> by createStore(
@@ -18,9 +20,9 @@ class CounterStore(
     middlewares = emptyList(),
     actor = delegatedActor(
         intentHandlers = listOf(
-            IncrementHandler(),
-            DecrementHandler(),
-            ResetHandler(),
+            incrementIntentHandler(),
+            decrementIntentHandler(),
+            resetIntentHandler(),
         ),
     )
 ) {

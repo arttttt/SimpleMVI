@@ -1,12 +1,14 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import utils.COMPILE_SDK_VERSION
 import utils.MIN_SDK_VERSION
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.library)
+    alias(libs.plugins.google.ksp)
 }
 
 kotlin {
@@ -32,10 +34,15 @@ kotlin {
     }
 
     sourceSets {
-        commonMain.dependencies {
-            api(project(":simplemvi"))
+        commonMain {
+            kotlin.srcDir("build/generated/ksp/metadata/commonMain/kotlin")
 
-            api(libs.kotlin.coroutines.core)
+            dependencies {
+                api(project(":simplemvi"))
+                implementation(project(":simplemvi-annotations"))
+
+                api(libs.kotlin.coroutines.core)
+            }
         }
     }
 
@@ -66,5 +73,15 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    kspCommonMainMetadata(project(":simplemvi-codegen"))
+}
+
+tasks.withType<KotlinCompile>().configureEach {
+    if (name != "kspCommonMainKotlinMetadata") {
+        dependsOn("kspCommonMainKotlinMetadata")
     }
 }

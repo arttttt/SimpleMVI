@@ -5,18 +5,20 @@ coreKtx = "1.17.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
-lifecycleKtx = "2.9.3"
+lifecycleKtx = "2.9.4"
 activityCompose = "1.11.0"
-composeBom = "2025.09.00"
+composeBom = "2025.09.01"
 coroutines = "1.10.2"
-composeNavigation = "2.9.4"
+composeNavigation = "2.9.5"
 serialization = "1.9.0"
 ksp = "2.2.20-2.0.3"
-room = "2.8.0"
+room = "2.8.1"
 mavenPublish = "0.34.0"
-jetbrainsCompose = "1.8.2"
+jetbrainsCompose = "1.9.0"
 atomicfu = "0.29.0"
-androidxLifecycle = "2.9.3"
+androidxLifecycle = "2.9.4"
+kotlinpoet = "2.2.0"
+materialIcons = "1.7.8"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -45,11 +47,16 @@ jetbrains-kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotli
 maven-publish-gradle-plugin = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "mavenPublish" }
 androidx-lifecycle-runtime-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidxLifecycle" }
 kotlin-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
+google-ksp-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }
+square-kotlinpoet-lib = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
+square-kotlinpoet-ksp = { module = "com.squareup:kotlinpoet-ksp", version.ref = "kotlinpoet" }
+androidx-material-icons = { module = "androidx.compose.material:material-icons-core", version.ref = "materialIcons" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -59,5 +66,5 @@ jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "jetbrainsComp
 kotlin-atomicfu = { id = "org.jetbrains.kotlinx.atomicfu", version.ref = "atomicfu" }
 
 #local plugins
-simplemvi-library-module = { id = "simplemvi-library-module", version = "1.0.0" }
-simplemvi-publishing = { id = "simplemvi-publishing", version = "1.0.0" }
+simplemvi-library-module = { id = "simplemvi-library-module" }
+simplemvi-publishing = { id = "simplemvi-publishing" }

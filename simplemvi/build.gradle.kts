@@ -1,6 +1,6 @@
 plugins {
-    id(libs.plugins.simplemvi.library.module.get().pluginId)
-    id(libs.plugins.simplemvi.publishing.get().pluginId)
+    alias(libs.plugins.simplemvi.library.module)
+    alias(libs.plugins.simplemvi.publishing)
     alias(libs.plugins.kotlin.atomicfu)
 }
 

@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.android.library) apply false
     alias(libs.plugins.kotlin.multiplatform) apply false
     alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.kotlin.compose) apply false
     alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.google.ksp) apply false
@@ -11,6 +12,6 @@ plugins {
     alias(libs.plugins.jetbrains.compose) apply false
     alias(libs.plugins.kotlin.atomicfu) apply false
 
-    id(libs.plugins.simplemvi.library.module.get().pluginId) apply false
-    id(libs.plugins.simplemvi.publishing.get().pluginId) apply false
+    alias(libs.plugins.simplemvi.library.module) apply false
+    alias(libs.plugins.simplemvi.publishing) apply false
 }
