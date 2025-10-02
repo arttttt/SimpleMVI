@@ -20,9 +20,9 @@ class CounterStore(
     middlewares = emptyList(),
     actor = delegatedActor(
         intentHandlers = listOf(
-            IncrementHandler(),
-            DecrementHandler(),
-            ResetHandler(),
+            incrementHandler(),
+            decrementHandler(),
+            resetHandler(),
         ),
     )
 ) {
