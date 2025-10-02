@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.google.ksp)
+    alias(libs.plugins.simplemvi.publishing)
 }
 
 java {
@@ -21,4 +22,9 @@ dependencies {
     implementation(libs.google.ksp.api)
     implementation(libs.square.kotlinpoet.lib)
     implementation(libs.square.kotlinpoet.ksp)
+}
+
+libraryPublishing {
+    artifactId = "simplemvi-codegen"
+    description = "KSP processors for SimpleMVI"
 }
