@@ -46,7 +46,7 @@ class DelegatedStoreProcessor(
             val pkg = classDeclaration.packageName.asString()
 
             val ifaceName = "${storeName}IntentHandler"
-            val funName = storeName.replaceFirstChar(Char::lowercase) + "Handler"
+            val funName = storeName.replaceFirstChar(Char::lowercase) + "IntentHandler"
             val ifaceClass = ClassName(pkg, ifaceName)
 
             val intentGeneric = TypeVariableName(
