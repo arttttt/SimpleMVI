@@ -39,7 +39,7 @@ class SimpleMVIPublishing : Plugin<Project> {
     private fun Project.configureVanniktech(publication: Platform) {
         pluginManager.apply(libs.pluginId("vanniktech-maven-publish"))
 
-        configureCommonPomAndCoordinates()
+        afterEvaluate { configureCommonPomAndCoordinates() }
 
         extensions.configure<MavenPublishBaseExtension> {
             publishToMavenCentral()
