@@ -35,7 +35,7 @@ public interface Actor<Intent : Any, State : Any, out SideEffect : Any> {
     public fun onIntent(intent: Intent)
 
     /**
-     * This fuction destroyes the [Actor]
+     * This function destroys the [Actor]
      *
      * Called by the [Store]
      */
