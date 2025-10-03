@@ -2,12 +2,28 @@ package com.arttttt.simplemvi.actor.delegated
 
 import com.arttttt.simplemvi.actor.Actor
 import com.arttttt.simplemvi.actor.ActorScope
+import com.arttttt.simplemvi.actor.dsl.actorDsl
+import com.arttttt.simplemvi.actor.dsl.delegatedActor
 import kotlinx.coroutines.CoroutineScope
 import kotlin.properties.Delegates
 import kotlin.reflect.KClass
 
 /**
- * An [Actor] implementation to be used within dsl
+ * An [Actor] implementation designed for use with DSL-based actor creation
+ *
+ * This class delegates intent handling to registered [IntentHandler] instances
+ * and executes initialization and destruction logic through provided handlers.
+ *
+ * This implementation is primarily used internally by [actorDsl] and [delegatedActor] functions
+ *
+ * @param initHandler Handler for actor initialization logic
+ * @param intentHandlers Map of intent classes to their corresponding handlers
+ * @param destroyHandler Handler for actor destruction logic
+ *
+ * @see actorDsl
+ * @see IntentHandler
+ * @see InitHandler
+ * @see DestroyHandler
  */
 public class DelegatedActor<Intent : Any, State : Any, SideEffect : Any>(
     private val initHandler: InitHandler<Intent, State, SideEffect>,

@@ -1,8 +1,40 @@
 package com.arttttt.simplemvi.logging
 
+import com.arttttt.simplemvi.store.Store
+import com.arttttt.simplemvi.store.StoreName
 import com.arttttt.simplemvi.logging.logger.Logger
 import com.arttttt.simplemvi.middleware.Middleware
 
+/**
+ * [Middleware] implementation that logs all [Store] events
+ *
+ * This middleware provides comprehensive logging of store lifecycle and operations:
+ * - Store initialization
+ * - Intent reception
+ * - State changes (both old and new states)
+ * - Side effect emission
+ * - Store destruction
+ *
+ * The log format is: `[StoreName] | [EventType] | [Message]`
+ *
+ * Example log output:
+ * ```
+ * MyStore | Initialization
+ * MyStore | Intent | MyIntent.LoadData
+ * MyStore | Old state | MyState(loading=false, data=null)
+ * MyStore | New state | MyState(loading=true, data=null)
+ * MyStore | SideEffect | MySideEffect.DataLoaded
+ * MyStore | Destroying
+ * ```
+ *
+ * If no name is provided, "UnnamedStore" is used as the tag.
+ *
+ * @param name Optional name of the [Store] for logging. If null, uses default name
+ * @param logger [Logger] implementation to use for logging
+ *
+ * @see Middleware
+ * @see Logger
+ */
 public class LoggingMiddleware<Intent : Any, State : Any, SideEffect : Any>(
     private val name: String?,
     private val logger: Logger,

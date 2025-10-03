@@ -10,13 +10,52 @@ internal var simpleMVIConfig: SimpleMVIConfig = DefaultSimpleMVIConfig()
     private set
 
 /**
- * DSL marker for SimpleMVI configuration
+ * DSL marker annotation for SimpleMVI configuration
+ *
+ * This annotation ensures proper scoping of the configuration DSL
+ * and prevents nested configuration blocks.
  */
 @DslMarker
 public annotation class SimpleMVIConfigDsl
 
 /**
- * Configures SimpleMVI behavior
+ * Configures SimpleMVI global behavior
+ *
+ * This function provides a DSL for configuring library-wide settings.
+ * All stores created after calling this function will use the new configuration.
+ *
+ * Example:
+ * ```
+ * configureSimpleMVI {
+ *     strictMode = true  // Enable strict mode for development
+ *     logger = CustomLogger()  // Use custom logger
+ * }
+ * ```
+ *
+ * Common patterns:
+ * ```
+ * // Development configuration
+ * configureSimpleMVI {
+ *     strictMode = true
+ *     logger = DebugLogger()
+ * }
+ *
+ * // Production configuration
+ * configureSimpleMVI {
+ *     strictMode = false
+ *     logger = AnalyticsLogger()
+ * }
+ *
+ * // Disable all logging
+ * configureSimpleMVI {
+ *     logger = null
+ * }
+ * ```
+ *
+ * @param block Configuration lambda executed in the context of [SimpleMVIConfigBuilder]
+ *
+ * @see SimpleMVIConfig
+ * @see SimpleMVIConfigBuilder
  */
 @SimpleMVIConfigDsl
 public fun configureSimpleMVI(block: SimpleMVIConfigBuilder.() -> Unit) {
@@ -26,7 +65,13 @@ public fun configureSimpleMVI(block: SimpleMVIConfigBuilder.() -> Unit) {
 }
 
 /**
- * Builder for SimpleMVI configuration
+ * Builder class for SimpleMVI configuration
+ *
+ * This builder is used internally by [configureSimpleMVI] to construct
+ * the configuration instance.
+ *
+ * @see configureSimpleMVI
+ * @see SimpleMVIConfig
  */
 @SimpleMVIConfigDsl
 public class SimpleMVIConfigBuilder {
@@ -47,6 +92,11 @@ public class SimpleMVIConfigBuilder {
      */
     public var logger: Logger? = DefaultLogger
 
+    /**
+     * Builds the [SimpleMVIConfig] instance from the current builder state
+     *
+     * @return Configured [SimpleMVIConfig] instance
+     */
     internal fun build(): SimpleMVIConfig {
         return DefaultSimpleMVIConfig(
             strictMode = strictMode,

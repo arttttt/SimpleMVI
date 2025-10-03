@@ -3,30 +3,57 @@ package com.arttttt.simplemvi.utils
 import kotlinx.atomicfu.AtomicInt
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.FlowCollector
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.atomicfu.atomic
 
 /**
- * Represents a Flow that buffers all values when there are no subscribers.
- * [CachingFlow] emits all cached values when the first subscriber appears
- * and always drops oldest events when the buffer size is exceeded.
+ * A [Flow] implementation that buffers values when there are no active collectors
  *
- * @param T the type of elements contained in the flow
- * @param capacity the maximum capacity of the cache
+ * This flow behaves differently depending on whether there are active collectors:
+ * - **No collectors**: Values are cached in memory up to the specified [capacity]
+ * - **Has collectors**: Values are emitted immediately without caching
+ *
+ * When the first collector subscribes, all cached values are emitted first,
+ * followed by new values as they arrive.
+ *
+ * Buffer overflow behavior:
+ * - When the cache reaches [capacity], the oldest values are dropped
+ * - Uses [BufferOverflow.DROP_OLDEST] strategy
+ *
+ * Thread-safety:
+ * - Internally uses [Mutex] for thread-safe access to the cache
+ * - Safe to emit from multiple coroutines
+ *
+ * @param T The type of elements contained in the flow
+ * @param capacity The maximum number of elements to cache (must be > 0)
+ *
+ * @see MutableSharedFlow
  */
 @OptIn(ExperimentalForInheritanceCoroutinesApi::class)
 public class CachingFlow<T>(
     private val capacity: Int,
 ) : MutableSharedFlow<T> {
 
+    /**
+     * Cached values waiting to be emitted to the first subscriber
+     */
     private val cache: ArrayDeque<T> = ArrayDeque(capacity)
+
+    /**
+     * Mutex for protecting access to the cache
+     */
     private val mutex: Mutex = Mutex()
+
+    /**
+     * Counter tracking the number of active subscribers
+     */
     private val activeSubscribers: AtomicInt = atomic(0)
 
+    /**
+     * Underlying shared flow used when there are active subscribers
+     */
     private val _sharedFlow: MutableSharedFlow<T> = MutableSharedFlow(
         extraBufferCapacity = capacity,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
