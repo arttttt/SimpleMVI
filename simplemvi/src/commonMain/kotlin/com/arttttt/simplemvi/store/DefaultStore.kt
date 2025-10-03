@@ -17,6 +17,26 @@ import kotlin.coroutines.CoroutineContext
 
 /**
  * Default [Store] implementation
+ *
+ * This class provides the core functionality for managing state, processing intents,
+ * and emitting side effects.
+ *
+ * The implementation ensures:
+ * - Thread-safe state updates using [MutableStateFlow]
+ * - Proper initialization and destruction lifecycle
+ * - Intent processing through the [Actor]
+ * - State change notifications to middleware
+ * - Side effect caching when there are no active collectors
+ *
+ * @param coroutineContext [CoroutineContext] for the [Store]'s [CoroutineScope]
+ * @param initialState The initial [State] value
+ * @param initialIntents List of [Intent]s to be processed after initialization
+ * @param middlewares List of [Middleware] instances to observe store events
+ * @param actor The [Actor] responsible for business logic
+ *
+ * @see Store
+ * @see Actor
+ * @see Middleware
  */
 public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any>(
     coroutineContext: CoroutineContext,

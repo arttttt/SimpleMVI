@@ -57,7 +57,7 @@ public interface Store<in Intent : Any, out State : Any, out SideEffect : Any> {
     public fun accept(intent: Intent)
 
     /**
-     * This function destroyes the [Store]
+     * This function destroys the [Store]
      * [Store] can not be used after it was destroyed
      */
     public fun destroy()

@@ -8,9 +8,17 @@ import com.arttttt.simplemvi.actor.delegated.IntentHandler
 import kotlin.reflect.KClass
 
 /**
- * A helper class for the [DelegatedActor]
+ * Builder class for configuring [DelegatedActor] using DSL
+ *
+ * This class provides methods to register handlers for various actor events:
+ * - [onInit]: Called when the actor is initialized
+ * - [onIntent]: Called when a specific intent type is received
+ * - [onDestroy]: Called when the actor is destroyed
+ *
+ * The [ActorDslMarker] annotation ensures proper DSL scoping.
  *
  * @see DelegatedActor
+ * @see actorDsl
  */
 @ActorDslMarker
 public class ActorBuilder<Intent : Any, State : Any, SideEffect: Any> {
@@ -43,10 +51,25 @@ public class ActorBuilder<Intent : Any, State : Any, SideEffect: Any> {
     }
 
     /**
-     * This functions registers an [Intent] handler for each [Intent]
-     * Each [Intent] can have only one handler
+     * Registers an [Intent] handler for a specific intent type
      *
-     * @param handler a handler lambda to be called for a specific [Intent]
+     * Each [Intent] type can have only one handler. Attempting to register
+     * multiple handlers for the same intent type will throw an exception.
+     *
+     * The handler executes in the context of [ActorScope], providing access
+     * to state management, side effect emission, and intent dispatching.
+     *
+     * Example:
+     * ```
+     * onIntent<MyIntent.LoadData> { intent ->
+     *     reduce { copy(loading = true) }
+     *     // ... handle the intent
+     * }
+     * ```
+     *
+     * @param T The specific intent type to handle
+     * @param handler Lambda that handles the intent in the context of [ActorScope]
+     * @throws IllegalArgumentException if a handler for this intent type is already registered
      */
     public inline fun <reified T : Intent> onIntent(
         crossinline handler: ActorScope<Intent, State, SideEffect>.(T) -> Unit,
