@@ -23,10 +23,14 @@ nav:
     - Configuration: overview/configuration.md
   - Store:
       - Overview: store/store.md
+      - Creating Stores: store/createstore.md
   - Actor:
       - Overview: actor/actor.md
+      - ActorScope: actor/actorscope.md
   - Middleware:
       - Overview: middleware/middleware.md
+  - Guides:
+      - Best Practices: guides/bestpractices.md
 
 extra:
   social:

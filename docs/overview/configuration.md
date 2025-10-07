@@ -12,21 +12,23 @@ You can configure how the library behaves when it encounters errors such as:
 - Using a destroyed Store
 
 ```kotlin
-// Configuration for production environment
-configureSimpleMVI {
-    // Lenient mode: only log errors without throwing exceptions
-    strictMode = false
-}
-
 // Configuration for development environment
 configureSimpleMVI {
-    // Strict mode: throw exceptions when errors occur (default)
+    // Strict mode: throw exceptions when errors occur
     strictMode = true
+}
+
+// Configuration for production environment (default)
+configureSimpleMVI {
+    // Lenient mode: only log errors without throwing exceptions (default)
+    strictMode = false
 }
 ```
 
-When `strictMode = true`, the library operates in strict mode and throws exceptions when errors are detected.
-When `strictMode = false` (default), the library operates in lenient mode and only logs errors without throwing exceptions.
+**Error handling modes:**
+
+- `strictMode = true` - The library operates in strict mode and throws exceptions when errors are detected. Recommended for development to catch issues early.
+- `strictMode = false` (default) - The library operates in lenient mode and only logs errors without throwing exceptions. Recommended for production to prevent crashes from store misuse.
 
 ### Logging
 
@@ -67,9 +69,9 @@ configureSimpleMVI {
 ```kotlin
 // Complete configuration
 configureSimpleMVI {
-    // Use lenient mode for production
+    // Use lenient mode for production (default)
     strictMode = false
-    
+
     // Set custom logger
     logger = object : Logger {
         override fun log(message: String) {
