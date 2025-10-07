@@ -60,5 +60,6 @@ public interface Store<in Intent : Any, out State : Any, out SideEffect : Any> {
 - After calling `destroy()`, the Store cannot be used anymore.
 - When a new State is emitted, it's available inside the Middleware.
 - When a SideEffect is emitted, it's available inside the Middleware.
+- Background work should be handled inside Actors using coroutines with the provided `CoroutineScope`.
 
 For more information, refer to the documentation for `Actor` and `Middleware`.

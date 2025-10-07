@@ -81,7 +81,7 @@ public class SimpleMVIConfigBuilder {
      * When true (strict mode) - errors will throw exceptions.
      * When false (lenient mode) - errors will only be logged without interrupting execution.
      *
-     * Default is true (strict mode).
+     * Default is false
      */
     public var strictMode: Boolean = false
 
