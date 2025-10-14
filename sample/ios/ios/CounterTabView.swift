@@ -4,15 +4,21 @@ import Shared
 
 struct CounterTabView: View {
 
-    private let counterStore = CounterStore(coroutineContext: Dispatchers.shared.Main.immediate)
+    private let counterStore = CounterStore(coroutineContext: Dispatchers.shared.Main.immediate).asIosStore()
 
     @StateObject private var state: StateFlowWrapper<CounterStore.State>
 
     init() {
-        // todo: fix types
-        let flow = KmmFlowKt.kmmStates(counterStore) as! KmmFlow<CounterStore.State>
+        let states = counterStore.states
+        
+        _state = StateObject(wrappedValue: StateFlowWrapper<CounterStore.State>(flow: states))
+        
+        let sideEffects = counterStore.sideEffects
+        
+        sideEffects.subscribe { sideEffect in
+            print("received side effect: \(sideEffect)")
+        } onCompletion: { error in }
 
-        _state = StateObject(wrappedValue: StateFlowWrapper<CounterStore.State>(flow: flow))
     }
 
     var body: some View {
