@@ -1,7 +1,10 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinCommonCompilation
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinMetadataTarget
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import utils.COMPILE_SDK_VERSION
 import utils.MIN_SDK_VERSION
 
@@ -80,8 +83,10 @@ dependencies {
     kspCommonMainMetadata(project(":simplemvi-codegen"))
 }
 
-tasks.withType<KotlinCompile>().configureEach {
-    if (name != "kspCommonMainKotlinMetadata") {
-        dependsOn("kspCommonMainKotlinMetadata")
+kotlin.targets.configureEach {
+    compilations.configureEach {
+        compileTaskProvider.configure {
+            dependsOn(tasks.named("kspCommonMainKotlinMetadata"))
+        }
     }
 }
