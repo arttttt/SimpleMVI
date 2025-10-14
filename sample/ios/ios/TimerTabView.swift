@@ -4,15 +4,14 @@ import Shared
 
 struct TimerTabView: View {
 
-    private let timerStore = TimerStore(coroutineContext: Dispatchers.shared.Main.immediate)
+    private let timerStore = TimerStore(coroutineContext: Dispatchers.shared.Main.immediate).asIosStore()
 
     @StateObject private var state: StateFlowWrapper<TimerStore.State>
 
     init() {
-        // todo: fix types
-        let flow = KmmFlowKt.kmmStates(timerStore) as! KmmFlow<TimerStore.State>
-
-        _state = StateObject(wrappedValue: StateFlowWrapper<TimerStore.State>(flow: flow))
+        let states = timerStore.states
+        
+        _state = StateObject(wrappedValue: StateFlowWrapper<TimerStore.State>(flow: states))
     }
 
     var body: some View {
