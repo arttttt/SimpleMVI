@@ -432,6 +432,13 @@ class TCAFeatureProcessor(
         } else {
             when (simpleName) {
                 "Int", "Long" -> "Int"
+                "Byte" -> "Int8"
+                "Short" -> "Int16"
+                "UByte" -> "UInt8"
+                "UShort" -> "UInt16"
+                "UInt" -> "UInt32"
+                "ULong" -> "UInt64"
+                "Char" -> "Character"
                 "String" -> "String"
                 "Boolean" -> "Bool"
                 "Double" -> "Double"
