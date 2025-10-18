@@ -1,1 +1,2 @@
 com.arttttt.simplemvi.codegen.DelegatedStoreProcessorProvider
+com.arttttt.simplemvi.codegen.TCAFeatureProcessorProvider
