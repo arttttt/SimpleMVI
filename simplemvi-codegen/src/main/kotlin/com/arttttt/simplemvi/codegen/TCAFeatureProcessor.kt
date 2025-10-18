@@ -16,6 +16,17 @@ class TCAFeatureProcessor(
     private val logger: KSPLogger,
 ) : SymbolProcessor {
 
+    private data class StoreGenericTypes(
+        val intentDeclaration: KSClassDeclaration,
+        val stateDeclaration: KSClassDeclaration,
+        val sideEffectDeclaration: KSClassDeclaration,
+    )
+
+    private data class StateProperty(
+        val name: String,
+        val type: KSType,
+    )
+
     private companion object {
         const val STORE_FQN = "com.arttttt.simplemvi.store.Store"
     }
@@ -112,7 +123,7 @@ class TCAFeatureProcessor(
             .map { prop ->
                 StateProperty(
                     name = prop.simpleName.asString(),
-                    kotlinType = prop.type.resolve().declaration.simpleName.asString()
+                    type = prop.type.resolve(),
                 )
             }
             .toList()
@@ -199,7 +210,7 @@ class TCAFeatureProcessor(
             appendLine("    @ObservableState")
             appendLine("    struct State: Equatable {")
             for (prop in stateProperties) {
-                val swiftType = prop.kotlinType.toSwiftType()
+                val swiftType = prop.type.toSwiftTypeString()
                 appendLine("        var ${prop.name}: $swiftType")
             }
             appendLine("        var _bridge = ${storeName}BridgeReducer.State()")
@@ -251,7 +262,7 @@ class TCAFeatureProcessor(
             appendLine("extension ${featureName}Feature.State {")
             appendLine("    mutating func apply(from domain: ${storeName}.State) {")
             for (prop in stateProperties) {
-                val conversion = if (prop.kotlinType in listOf("Int", "Long")) {
+                val conversion = if (prop.type.declaration.simpleName.asString() in listOf("Int", "Long"))  {
                     "Int(domain.${prop.name})"
                 } else {
                     "domain.${prop.name}"
@@ -344,7 +355,7 @@ class TCAFeatureProcessor(
             appendLine("        Store(")
             appendLine("            initialState: State(")
             for (prop in stateProperties) {
-                val conversion = if (prop.kotlinType in listOf("Int", "Long")) {
+                val conversion = if (prop.type.declaration.simpleName.asString() in listOf("Int", "Long"))  {
                     "Int(store.state.${prop.name})"
                 } else {
                     "store.state.${prop.name}"
@@ -364,30 +375,36 @@ class TCAFeatureProcessor(
         }
     }
 
-    private data class StoreGenericTypes(
-        val intentDeclaration: KSClassDeclaration,
-        val stateDeclaration: KSClassDeclaration,
-        val sideEffectDeclaration: KSClassDeclaration,
-    )
-
-    private data class StateProperty(
-        val name: String,
-        val kotlinType: String,
-    )
-
     private fun String.toCamelCase(): String {
         return replaceFirstChar { it.lowercase() }
     }
 
-    private fun String.toSwiftType(): String {
-        return when (this) {
-            "Int" -> "Int"
-            "Long" -> "Int"
+    private fun KSType.toSwiftTypeString(): String {
+        val decl = declaration
+        val simpleName = decl.simpleName.asString()
+
+        val typeArgs = arguments
+        if (typeArgs.isNotEmpty()) {
+            val mappedArgs = typeArgs.mapNotNull { arg ->
+                arg.type?.resolve()?.toSwiftTypeString()
+            }
+
+            return when (simpleName) {
+                "List", "MutableList" -> "[${mappedArgs.first()}]"
+                "Set", "MutableSet" -> "Set<${mappedArgs.first()}>"
+                "Map", "MutableMap" -> "[${mappedArgs[0]}: ${mappedArgs[1]}]"
+                "Array" -> "[${mappedArgs.first()}]"
+                else -> "$simpleName<${mappedArgs.joinToString(", ")}>"
+            }
+        }
+
+        return when (simpleName) {
+            "Int", "Long" -> "Int"
             "String" -> "String"
             "Boolean" -> "Bool"
             "Double" -> "Double"
             "Float" -> "Float"
-            else -> this
+            else -> simpleName
         }
     }
 }
