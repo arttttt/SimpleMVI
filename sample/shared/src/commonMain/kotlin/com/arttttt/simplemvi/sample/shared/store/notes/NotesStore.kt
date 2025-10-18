@@ -1,9 +1,9 @@
-package com.arttttt.simplemvi.sample.notes.domain.stores
+package com.arttttt.simplemvi.sample.shared.store.notes
 
 import com.arttttt.simplemvi.actor.dsl.delegatedActor
 import com.arttttt.simplemvi.annotations.DelegatedStore
-import com.arttttt.simplemvi.sample.notes.domain.models.Note
-import com.arttttt.simplemvi.sample.notes.domain.repository.NotesRepository
+import com.arttttt.simplemvi.sample.shared.model.Note
+import com.arttttt.simplemvi.sample.shared.repository.NotesRepository
 import com.arttttt.simplemvi.store.Store
 import com.arttttt.simplemvi.store.createStore
 import com.arttttt.simplemvi.store.storeName

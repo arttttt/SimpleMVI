@@ -1,4 +1,4 @@
-package com.arttttt.simplemvi.sample.notes.domain.stores
+package com.arttttt.simplemvi.sample.shared.store.notes
 
 fun currentMessageChangedIntentHandler() = notesStoreIntentHandler<NotesStore.Intent.CurrentMessageChanged> { intent ->
     reduce {

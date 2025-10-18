@@ -1,6 +1,6 @@
-package com.arttttt.simplemvi.sample.notes.domain.stores
+package com.arttttt.simplemvi.sample.shared.store.notes
 
-import com.arttttt.simplemvi.sample.notes.domain.repository.NotesRepository
+import com.arttttt.simplemvi.sample.shared.repository.NotesRepository
 import kotlinx.coroutines.launch
 
 fun loadNotesIntentHandler(

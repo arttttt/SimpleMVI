@@ -1,9 +1,11 @@
-package com.arttttt.simplemvi.sample.shared.timer
+package com.arttttt.simplemvi.sample.shared.store.timer
 
+import com.arttttt.simplemvi.annotations.TCAFeature
 import com.arttttt.simplemvi.store.Store
 import com.arttttt.simplemvi.store.createStore
 import kotlin.coroutines.CoroutineContext
 
+@TCAFeature
 class TimerStore(
     coroutineContext: CoroutineContext,
 ) : Store<TimerStore.Intent, TimerStore.State, TimerStore.SideEffect> by createStore(

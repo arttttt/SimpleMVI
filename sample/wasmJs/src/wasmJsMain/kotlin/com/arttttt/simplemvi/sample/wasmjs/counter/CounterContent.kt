@@ -6,7 +6,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.arttttt.simplemvi.sample.shared.counter.CounterStore
+import com.arttttt.simplemvi.sample.shared.store.counter.CounterStore
 import com.arttttt.simplemvi.store.plus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn

@@ -1,10 +1,12 @@
-package com.arttttt.simplemvi.sample.notes.domain.stores
+package com.arttttt.simplemvi.sample.shared.store.notes
 
-import com.arttttt.simplemvi.sample.notes.domain.models.Note
-import com.arttttt.simplemvi.sample.notes.domain.repository.NotesRepository
+import com.arttttt.simplemvi.sample.shared.model.Note
+import com.arttttt.simplemvi.sample.shared.repository.NotesRepository
 import kotlinx.coroutines.launch
+import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
+@OptIn(ExperimentalUuidApi::class)
 fun addNoteIntentHandler(
     notesRepository: NotesRepository,
 ) = notesStoreIntentHandler<NotesStore.Intent.AddNote> { intent ->

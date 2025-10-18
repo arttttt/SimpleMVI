@@ -14,7 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.arttttt.simplemvi.sample.shared.timer.TimerStore
+import com.arttttt.simplemvi.sample.shared.store.timer.TimerStore
 import com.arttttt.simplemvi.store.plus
 
 @Composable

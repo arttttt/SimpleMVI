@@ -1,64 +1,70 @@
 import SwiftUICore
 import SwiftUI
 import Shared
+import ComposableArchitecture
 
 struct TimerTabView: View {
 
-    private let timerStore = TimerStore(coroutineContext: Dispatchers.shared.Main.immediate).asIosStore()
-
-    @StateObject private var state: StateFlowWrapper<TimerStore.State>
+    private let store: StoreOf<TimerFeature>
 
     init() {
-        let states = timerStore.states
-        
-        _state = StateObject(wrappedValue: StateFlowWrapper<TimerStore.State>(flow: states))
+        store = TimerFeature.from(
+            store: TimerStore(coroutineContext: Dispatchers.shared.Main.immediate),
+            withDependencies: {
+                $0.timerStoreSideEffectHandler = DefaultTimerStoreSideEffectHandler()
+            },
+        )
     }
 
     var body: some View {
-        VStack(spacing: 16) {
-            HStack {
-                Button(
-                    action: {
-                        timerStore.accept(intent: TimerStoreIntentStartTimer())
+        WithPerceptionTracking {
+            VStack(spacing: 16) {
+                HStack {
+                    Button(
+                        action: {
+                            store.send(.startTimer)
+                        }
+                    ) {
+                        let isTimerStarted = store.state.value != 0 && !store.state.isTimerRunning
+                        
+                        Text(isTimerStarted ? "Resume timer" : "Start timer")
+                            .padding()
+                            .background(store.state.isTimerRunning ? Color.gray : Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
                     }
-                ) {
-                    let isTimerStarted = state.state.value != 0 && !state.state.isTimerRunning
-
-                    Text(isTimerStarted ? "Resume timer" : "Start timer")
-                        .padding()
-                        .background(state.state.isTimerRunning ? Color.gray : Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                }
-                    .disabled(state.state.isTimerRunning)
-
-                Button(
-                    action: {
-                        timerStore.accept(intent: TimerStoreIntentStopTimer())
+                    .disabled(store.state.isTimerRunning)
+                    
+                    Button(
+                        action: {
+                            store.send(.stopTimer)
+                        }
+                    ) {
+                        Text("Stop timer")
+                            .padding()
+                            .background(!store.state.isTimerRunning ? Color.gray : Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
                     }
-                ) {
-                    Text("Stop timer")
-                        .padding()
-                        .background(!state.state.isTimerRunning ? Color.gray : Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                }
-                    .disabled(!state.state.isTimerRunning)
-
-                Button(
-                    action: {
-                        timerStore.accept(intent: TimerStoreIntentResetTimer())
+                    .disabled(!store.state.isTimerRunning)
+                    
+                    Button(
+                        action: {
+                            store.send(.resetTimer)
+                        }
+                    ) {
+                        Text("Reset timer")
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
                     }
-                ) {
-                    Text("Reset timer")
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
                 }
+                
+                Text("timer: " + String(store.state.value))
             }
-
-            Text("timer: " + String(state.state.value))
+            .onAppear { store.send(._bridge(.startObserving)) }
+            .onDisappear { store.send(._bridge(.stopObserving)) }
         }
     }
 }

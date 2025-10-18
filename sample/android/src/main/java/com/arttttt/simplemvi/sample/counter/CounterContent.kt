@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.arttttt.simplemvi.sample.shared.counter.CounterStore
+import com.arttttt.simplemvi.sample.shared.store.counter.CounterStore
 import com.arttttt.simplemvi.store.plus
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
