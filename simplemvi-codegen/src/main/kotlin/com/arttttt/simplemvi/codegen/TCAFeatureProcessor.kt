@@ -2,11 +2,9 @@ package com.arttttt.simplemvi.codegen
 
 import com.arttttt.simplemvi.annotations.TCAFeature
 import com.google.devtools.ksp.KspExperimental
-import com.google.devtools.ksp.getClassDeclarationByName
 import com.google.devtools.ksp.processing.*
 import com.google.devtools.ksp.symbol.*
 import com.google.devtools.ksp.validate
-import java.io.OutputStream
 
 /**
  * KSP processor for generating TCA (The Composable Architecture) wrappers over SimpleMVI Store
@@ -23,6 +21,16 @@ class TCAFeatureProcessor(
     )
 
     private data class StateProperty(
+        val name: String,
+        val type: KSType,
+    )
+
+    private data class SealedTypeInfo(
+        val name: String,
+        val parameters: List<ConstructorParameter>,
+    )
+
+    private data class ConstructorParameter(
         val name: String,
         val type: KSType,
     )
@@ -56,16 +64,15 @@ class TCAFeatureProcessor(
         val stateType = storeTypes.stateDeclaration
         val sideEffectType = storeTypes.sideEffectDeclaration
 
-        val intentSubtypes = extractSealedSubtypes(intentType)
-
-        val sideEffectSubtypes = extractSealedSubtypes(sideEffectType)
+        val intentInfos = extractSealedTypeInfo(intentType)
+        val sideEffectInfos = extractSealedTypeInfo(sideEffectType)
 
         val stateProperties = extractStateProperties(stateType)
 
         val swiftCode = generateSwiftCode(
             storeName = storeName,
-            intentSubtypes = intentSubtypes,
-            sideEffectSubtypes = sideEffectSubtypes,
+            sealedTypeInfos = intentInfos,
+            sideEffectInfos = sideEffectInfos,
             stateProperties = stateProperties
         )
 
@@ -105,12 +112,23 @@ class TCAFeatureProcessor(
         )
     }
 
-    /**
-     * Extracts sealed interface subtypes via getSealedSubclasses()
-     */
-    private fun extractSealedSubtypes(declaration: KSClassDeclaration): List<String> {
+    private fun extractSealedTypeInfo(declaration: KSClassDeclaration): List<SealedTypeInfo> {
         return declaration.getSealedSubclasses()
-            .map { it.simpleName.asString() }
+            .map { subclass ->
+                val params = subclass.primaryConstructor?.parameters
+                    ?.map { param ->
+                        ConstructorParameter(
+                            name = param.name?.asString() ?: "",
+                            type = param.type.resolve(),
+                        )
+                    }
+                    ?: emptyList()
+
+                SealedTypeInfo(
+                    name = subclass.simpleName.asString(),
+                    parameters = params,
+                )
+            }
             .toList()
     }
 
@@ -134,8 +152,8 @@ class TCAFeatureProcessor(
      */
     private fun generateSwiftCode(
         storeName: String,
-        intentSubtypes: List<String>,
-        sideEffectSubtypes: List<String>,
+        sealedTypeInfos: List<SealedTypeInfo>,
+        sideEffectInfos: List<SealedTypeInfo>,
         stateProperties: List<StateProperty>
     ): String {
         val featureName = storeName.removeSuffix("Store")
@@ -163,7 +181,7 @@ class TCAFeatureProcessor(
             appendLine("struct Default${storeName}SideEffectHandler: ${storeName}SideEffectHandler {")
             appendLine("    func handle(_ effect: ${storeName}SideEffect) -> Effect<${featureName}Feature.Action>{")
             appendLine("        switch effect {")
-            for (subtype in sideEffectSubtypes) {
+            for (subtype in sideEffectInfos) {
                 appendLine("        case is ${storeName}SideEffect${subtype}:")
                 appendLine("            return .none")
             }
@@ -218,8 +236,15 @@ class TCAFeatureProcessor(
             appendLine()
             appendLine("    @CasePathable")
             appendLine("    enum Action: Equatable {")
-            for (intent in intentSubtypes) {
-                appendLine("        case ${intent.toCamelCase()}")
+            for (intent in sealedTypeInfos) {
+                if (intent.parameters.isEmpty()) {
+                    appendLine("        case ${intent.name.toCamelCase()}")
+                } else {
+                    val params = intent.parameters.joinToString(", ") { param ->
+                        "${param.name}: ${param.type.toSwiftTypeString()}"
+                    }
+                    appendLine("        case ${intent.name.toCamelCase()}($params)")
+                }
             }
             appendLine()
             appendLine("        case _bridge(${storeName}BridgeReducer.Action)")
@@ -235,9 +260,17 @@ class TCAFeatureProcessor(
             appendLine("        ")
             appendLine("        Reduce { state, action in")
             appendLine("            switch action {")
-            for (intent in intentSubtypes) {
-                appendLine("            case .${intent.toCamelCase()}:")
-                appendLine("                store.accept(intent: ${storeName}Intent${intent}())")
+            for (intent in sealedTypeInfos) {
+                val caseName = intent.name.toCamelCase()
+                if (intent.parameters.isEmpty()) {
+                    appendLine("            case .$caseName:")
+                    appendLine("                store.accept(intent: ${storeName}Intent${intent.name}())")
+                } else {
+                    val bindParams = intent.parameters.joinToString(", ") { "let ${it.name}" }
+                    val passParams = intent.parameters.joinToString(", ") { "${it.name}: ${it.name}" }
+                    appendLine("            case .$caseName($bindParams):")
+                    appendLine("                store.accept(intent: ${storeName}Intent${intent.name}($passParams))")
+                }
                 appendLine("                return .none")
                 appendLine("                ")
             }
@@ -384,27 +417,28 @@ class TCAFeatureProcessor(
         val simpleName = decl.simpleName.asString()
 
         val typeArgs = arguments
-        if (typeArgs.isNotEmpty()) {
+        val baseType = if (typeArgs.isNotEmpty()) {
             val mappedArgs = typeArgs.mapNotNull { arg ->
                 arg.type?.resolve()?.toSwiftTypeString()
             }
 
-            return when (simpleName) {
+            when (simpleName) {
                 "List", "MutableList" -> "[${mappedArgs.first()}]"
                 "Set", "MutableSet" -> "Set<${mappedArgs.first()}>"
                 "Map", "MutableMap" -> "[${mappedArgs[0]}: ${mappedArgs[1]}]"
                 "Array" -> "[${mappedArgs.first()}]"
                 else -> "$simpleName<${mappedArgs.joinToString(", ")}>"
             }
+        } else {
+            when (simpleName) {
+                "Int", "Long" -> "Int"
+                "String" -> "String"
+                "Boolean" -> "Bool"
+                "Double" -> "Double"
+                "Float" -> "Float"
+                else -> simpleName
+            }
         }
-
-        return when (simpleName) {
-            "Int", "Long" -> "Int"
-            "String" -> "String"
-            "Boolean" -> "Bool"
-            "Double" -> "Double"
-            "Float" -> "Float"
-            else -> simpleName
-        }
+        return if (isMarkedNullable) "$baseType?" else baseType
     }
 }
