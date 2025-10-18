@@ -1,4 +1,4 @@
-package com.arttttt.simplemvi.sample.notes.domain.models
+package com.arttttt.simplemvi.sample.shared.model
 
 data class Note(
     val id: String,

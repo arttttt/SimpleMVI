@@ -1,6 +1,6 @@
-package com.arttttt.simplemvi.sample.notes.domain.repository
+package com.arttttt.simplemvi.sample.shared.repository
 
-import com.arttttt.simplemvi.sample.notes.domain.models.Note
+import com.arttttt.simplemvi.sample.shared.model.Note
 
 interface NotesRepository {
 

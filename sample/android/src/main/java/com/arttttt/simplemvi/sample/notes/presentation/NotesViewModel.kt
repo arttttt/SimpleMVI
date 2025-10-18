@@ -2,8 +2,8 @@ package com.arttttt.simplemvi.sample.notes.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.arttttt.simplemvi.sample.notes.domain.repository.NotesRepository
-import com.arttttt.simplemvi.sample.notes.domain.stores.NotesStore
+import com.arttttt.simplemvi.sample.shared.repository.NotesRepository
+import com.arttttt.simplemvi.sample.shared.store.notes.NotesStore
 import com.arttttt.simplemvi.sample.notes.presentation.models.NoteListItem
 import com.arttttt.simplemvi.sample.ui.ListItem
 import com.arttttt.simplemvi.store.plus

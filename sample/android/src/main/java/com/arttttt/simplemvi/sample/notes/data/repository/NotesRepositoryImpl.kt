@@ -2,8 +2,8 @@ package com.arttttt.simplemvi.sample.notes.data.repository
 
 import com.arttttt.simplemvi.sample.notes.data.database.dao.NotesDao
 import com.arttttt.simplemvi.sample.notes.data.database.models.NoteDbModel
-import com.arttttt.simplemvi.sample.notes.domain.models.Note
-import com.arttttt.simplemvi.sample.notes.domain.repository.NotesRepository
+import com.arttttt.simplemvi.sample.shared.model.Note
+import com.arttttt.simplemvi.sample.shared.repository.NotesRepository
 
 class NotesRepositoryImpl(
     private val notesDao: NotesDao,

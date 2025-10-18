@@ -10,12 +10,6 @@ import java.io.OutputStream
 
 /**
  * KSP processor for generating TCA (The Composable Architecture) wrappers over SimpleMVI Store
- *
- * Generates Swift file with:
- * - SideEffectHandler protocol
- * - @Reducer struct for TCA integration
- * - Bridge reducer for subscribing to Store.states/sideEffects
- * - State mapper
  */
 class TCAFeatureProcessor(
     private val codeGenerator: CodeGenerator,

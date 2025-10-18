@@ -1,4 +1,4 @@
-package com.arttttt.simplemvi.sample.shared.counter
+package com.arttttt.simplemvi.sample.shared.store.counter
 
 import com.arttttt.simplemvi.actor.dsl.delegatedActor
 import com.arttttt.simplemvi.annotations.DelegatedStore

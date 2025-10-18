@@ -1,6 +1,6 @@
-package com.arttttt.simplemvi.sample.notes.domain.stores
+package com.arttttt.simplemvi.sample.shared.store.notes
 
-import com.arttttt.simplemvi.sample.notes.domain.repository.NotesRepository
+import com.arttttt.simplemvi.sample.shared.repository.NotesRepository
 import kotlinx.coroutines.launch
 
 fun removeNoteIntentHandler(
@@ -9,7 +9,7 @@ fun removeNoteIntentHandler(
     scope.launch {
         notesRepository.removeNote(intent.id)
 
-        reduce {
+    reduce {
             copy(
                 notes = state.notes.filter { it.id != intent.id },
             )
