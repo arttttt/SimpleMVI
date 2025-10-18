@@ -2,11 +2,13 @@ package com.arttttt.simplemvi.sample.shared.counter
 
 import com.arttttt.simplemvi.actor.dsl.delegatedActor
 import com.arttttt.simplemvi.annotations.DelegatedStore
+import com.arttttt.simplemvi.annotations.TCAFeature
 import com.arttttt.simplemvi.store.Store
 import com.arttttt.simplemvi.store.createStore
 import com.arttttt.simplemvi.store.storeName
 import kotlin.coroutines.CoroutineContext
 
+@TCAFeature
 @DelegatedStore
 class CounterStore(
     coroutineContext: CoroutineContext,

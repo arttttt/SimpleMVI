@@ -1,23 +1,19 @@
 import SwiftUICore
 import SwiftUI
 import Shared
+import ComposableArchitecture
 
 struct CounterTabView: View {
-
-    private let counterStore = CounterStore(coroutineContext: Dispatchers.shared.Main.immediate).asIosStore()
-
-    @StateObject private var state: StateFlowWrapper<CounterStore.State>
+    
+    let store: StoreOf<CounterFeature>
 
     init() {
-        let states = counterStore.states
-        
-        _state = StateObject(wrappedValue: StateFlowWrapper<CounterStore.State>(flow: states))
-        
-        let sideEffects = counterStore.sideEffects
-        
-        sideEffects.subscribe { sideEffect in
-            print("received side effect: \(sideEffect)")
-        } onCompletion: { error in }
+        store = Store(initialState: CounterFeature.State(counter: 0)) {
+            CounterFeature()
+        } withDependencies: {
+            $0.counterStore = CounterStore(coroutineContext: Dispatchers.shared.Main.immediate)
+            $0.counterStoreSideEffectHandler = DefaultCounterStoreSideEffectHandler()
+        }
 
     }
 
@@ -26,7 +22,7 @@ struct CounterTabView: View {
             HStack {
                 Button(
                     action: {
-                        counterStore.accept(intent: CounterStoreIntentIncrement())
+                        store.send(.increment)
                     }
                 ) {
                     Text("Increment")
@@ -38,7 +34,7 @@ struct CounterTabView: View {
 
                 Button(
                     action: {
-                        counterStore.accept(intent: CounterStoreIntentDecrement())
+                        store.send(.decrement)
                     }
                 ) {
                     Text("Decrement")
@@ -50,7 +46,7 @@ struct CounterTabView: View {
 
                 Button(
                     action: {
-                        counterStore.accept(intent: CounterStoreIntentReset())
+                        store.send(.reset)
                     }
                 ) {
                     Text("Reset")
@@ -61,7 +57,11 @@ struct CounterTabView: View {
                 }
             }
 
-            Text("counter " + String(state.state.counter))
+            WithPerceptionTracking {
+                Text("counter \(store.counter)")
+            }
         }
+        .onAppear { store.send(._bridge(.startObserving)) }
+        .onDisappear { store.send(._bridge(.stopObserving)) }
     }
 }
