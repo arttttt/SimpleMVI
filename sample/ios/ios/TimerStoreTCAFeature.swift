@@ -57,15 +57,17 @@ struct TimerFeature {
         var isTimerRunning: Bool
         var value: Int
         var _bridge = TimerStoreBridgeReducer.State()
+        var _lifecycle: _TimerStoreLifecycle?
     }
 
     @CasePathable
-    enum Action: Equatable {
+    enum Action {
         case resetTimer
         case startTimer
         case stopTimer
 
         case _bridge(TimerStoreBridgeReducer.Action)
+        case _setLifecycle(_TimerStoreLifecycle?)
     }
 
     @Dependency(\.timerStore) var store
@@ -99,6 +101,10 @@ struct TimerFeature {
 
             case ._bridge(.startObserving), ._bridge(.stopObserving):
               return .none
+            case let ._setLifecycle(lifecycle):
+                state._lifecycle = lifecycle
+                return .none
+                
             }
         }
     }
@@ -187,11 +193,12 @@ extension TimerFeature {
         store: TimerStore,
         withDependencies configureDependencies: @escaping (inout DependencyValues) -> Void = { _ in }
     ) -> StoreOf<Self> {
-        Store(
+        let tcaStore = Store(
             initialState: State(
                 isTimerRunning: store.state.isTimerRunning,
                 value: Int(store.state.value),
-                _bridge: TimerStoreBridgeReducer.State()
+                _bridge: TimerStoreBridgeReducer.State(),
+                _lifecycle: nil
             )
         ) {
             TimerFeature()
@@ -199,5 +206,58 @@ extension TimerFeature {
             deps.timerStore = store
             configureDependencies(&deps)
         }
+
+        let lifecycle = _TimerStoreLifecycle(store: store) { action in
+            await tcaStore.send(action)
+        }
+        Task { await tcaStore.send(._setLifecycle(lifecycle)) }
+
+        return tcaStore
     }
 }
+
+// MARK: - Equatable
+extension TimerFeature.State {
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        guard lhs.isTimerRunning == rhs.isTimerRunning else { return false }
+        guard lhs.value == rhs.value else { return false }
+        return lhs._bridge == rhs._bridge
+    }
+}
+
+// MARK: - Lifecycle Token
+final class _TimerStoreLifecycle {
+    private let store: TimerStore
+    private var observerTask: Task<Void, Never>?
+
+    init(store: TimerStore, send: @escaping (TimerFeature.Action) async -> Void) {
+        self.store = store
+        store.doInit()
+
+        observerTask = Task {
+            await withTaskGroup(of: Void.self) { group in
+                group.addTask {
+                    do {
+                        for try await state in asAsyncThrowingStream(CStateFlow<TimerStore.State>(source: store.states)) {
+                            await send(._bridge(.stateUpdated(state)))
+                        }
+                    } catch {}
+                }
+
+                group.addTask {
+                    do {
+                        for try await effect in asAsyncThrowingStream(CFlow<TimerStoreSideEffect>(source: store.sideEffects)) {
+                            await send(._bridge(.sideEffect(StoreSideEffectWrapper(wrapped: effect))))
+                        }
+                    } catch {}
+                }
+            }
+        }
+    }
+
+    deinit {
+        observerTask?.cancel()
+        store.destroy()
+    }
+}
+

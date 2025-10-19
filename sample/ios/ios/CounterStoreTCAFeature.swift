@@ -62,15 +62,17 @@ struct CounterFeature {
     struct State: Equatable {
         var counter: Int
         var _bridge = CounterStoreBridgeReducer.State()
+        var _lifecycle: _CounterStoreLifecycle?
     }
 
     @CasePathable
-    enum Action: Equatable {
+    enum Action {
         case decrement
         case increment
         case reset
 
         case _bridge(CounterStoreBridgeReducer.Action)
+        case _setLifecycle(_CounterStoreLifecycle?)
     }
 
     @Dependency(\.counterStore) var store
@@ -104,6 +106,10 @@ struct CounterFeature {
 
             case ._bridge(.startObserving), ._bridge(.stopObserving):
               return .none
+            case let ._setLifecycle(lifecycle):
+                state._lifecycle = lifecycle
+                return .none
+                
             }
         }
     }
@@ -182,3 +188,77 @@ extension CounterStoreBridgeReducer {
         .cancellable(id: CancelID.sideEffects, cancelInFlight: false)
     }
 }
+
+
+// MARK: - Factory
+extension CounterFeature {
+    
+    static func from(
+        store: CounterStore,
+        withDependencies configureDependencies: @escaping (inout DependencyValues) -> Void = { _ in }
+    ) -> StoreOf<Self> {
+        let tcaStore = Store(
+            initialState: State(
+                counter: Int(store.state.counter),
+                _bridge: CounterStoreBridgeReducer.State(),
+                _lifecycle: nil
+            )
+        ) {
+            CounterFeature()
+        } withDependencies: { deps in
+            deps.counterStore = store
+            configureDependencies(&deps)
+        }
+
+        let lifecycle = _CounterStoreLifecycle(store: store) { action in
+            await tcaStore.send(action)
+        }
+        Task { await tcaStore.send(._setLifecycle(lifecycle)) }
+
+        return tcaStore
+    }
+}
+
+// MARK: - Equatable
+extension CounterFeature.State {
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        return lhs.counter == rhs.counter
+    }
+}
+
+// MARK: - Lifecycle Token
+final class _CounterStoreLifecycle {
+    private let store: CounterStore
+    private var observerTask: Task<Void, Never>?
+
+    init(store: CounterStore, send: @escaping (CounterFeature.Action) async -> Void) {
+        self.store = store
+        store.doInit()
+
+        observerTask = Task {
+            await withTaskGroup(of: Void.self) { group in
+                group.addTask {
+                    do {
+                        for try await state in asAsyncThrowingStream(CStateFlow<CounterStore.State>(source: store.states)) {
+                            await send(._bridge(.stateUpdated(state)))
+                        }
+                    } catch {}
+                }
+
+                group.addTask {
+                    do {
+                        for try await effect in asAsyncThrowingStream(CFlow<CounterStoreSideEffect>(source: store.sideEffects)) {
+                            await send(._bridge(.sideEffect(StoreSideEffectWrapper(wrapped: effect))))
+                        }
+                    } catch {}
+                }
+            }
+        }
+    }
+
+    deinit {
+        observerTask?.cancel()
+        store.destroy()
+    }
+}
+

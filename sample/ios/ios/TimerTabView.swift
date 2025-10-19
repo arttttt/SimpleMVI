@@ -63,8 +63,6 @@ struct TimerTabView: View {
                 
                 Text("timer: " + String(store.state.value))
             }
-            .onAppear { store.send(._bridge(.startObserving)) }
-            .onDisappear { store.send(._bridge(.stopObserving)) }
         }
     }
 }

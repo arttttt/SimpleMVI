@@ -8,12 +8,12 @@ struct CounterTabView: View {
     let store: StoreOf<CounterFeature>
 
     init() {
-        store = Store(initialState: CounterFeature.State(counter: 0)) {
-            CounterFeature()
-        } withDependencies: {
-            $0.counterStore = CounterStore(coroutineContext: Dispatchers.shared.Main.immediate)
-            $0.counterStoreSideEffectHandler = DefaultCounterStoreSideEffectHandler()
-        }
+        store = CounterFeature.from(
+            store: CounterStore(coroutineContext: Dispatchers.shared.Main.immediate),
+            withDependencies: { deps in
+                deps.counterStoreSideEffectHandler = DefaultCounterStoreSideEffectHandler()
+            },
+        )
 
     }
 
@@ -61,7 +61,5 @@ struct CounterTabView: View {
                 Text("counter \(store.counter)")
             }
         }
-        .onAppear { store.send(._bridge(.startObserving)) }
-        .onDisappear { store.send(._bridge(.stopObserving)) }
     }
 }

@@ -19,6 +19,7 @@
 		AC9C23882EA3964F0091FA2D /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9C23872EA396440091FA2D /* Helpers.swift */; };
 		AC9C238A2EA3D2570091FA2D /* CounterStoreTCAFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9C23892EA3D2570091FA2D /* CounterStoreTCAFeature.swift */; };
 		AC9C238C2EA3D3300091FA2D /* TimerStoreTCAFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9C238B2EA3D3300091FA2D /* TimerStoreTCAFeature.swift */; };
+		AC9C238E2EA4539B0091FA2D /* NotesStoreTCAFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9C238D2EA4539B0091FA2D /* NotesStoreTCAFeature.swift */; };
 		ACFDD5BA2E9D9D05004F1096 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = ACFDD5B92E9D9D05004F1096 /* ComposableArchitecture */; };
 /* End PBXBuildFile section */
 
@@ -38,6 +39,7 @@
 		AC9C23872EA396440091FA2D /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		AC9C23892EA3D2570091FA2D /* CounterStoreTCAFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CounterStoreTCAFeature.swift; sourceTree = "<group>"; };
 		AC9C238B2EA3D3300091FA2D /* TimerStoreTCAFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerStoreTCAFeature.swift; sourceTree = "<group>"; };
+		AC9C238D2EA4539B0091FA2D /* NotesStoreTCAFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesStoreTCAFeature.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -88,6 +90,7 @@
 		7555FF7D242A565900829871 /* ios */ = {
 			isa = PBXGroup;
 			children = (
+				AC9C238D2EA4539B0091FA2D /* NotesStoreTCAFeature.swift */,
 				AC9C238B2EA3D3300091FA2D /* TimerStoreTCAFeature.swift */,
 				AC9C23892EA3D2570091FA2D /* CounterStoreTCAFeature.swift */,
 				AC9C23872EA396440091FA2D /* Helpers.swift */,
@@ -219,6 +222,7 @@
 				AC9C23882EA3964F0091FA2D /* Helpers.swift in Sources */,
 				58C7A4F2D8E4723429D81C7F /* StateFlowWrapper.swift in Sources */,
 				58C7A95581EA4CB285E66E81 /* StateFlowWrapper.swift in Sources */,
+				AC9C238E2EA4539B0091FA2D /* NotesStoreTCAFeature.swift in Sources */,
 				58C7A0F9B9A126CDAC6E68B3 /* NotesTabView.swift in Sources */,
 				AC9C238C2EA3D3300091FA2D /* TimerStoreTCAFeature.swift in Sources */,
 				AC9C238A2EA3D2570091FA2D /* CounterStoreTCAFeature.swift in Sources */,
