@@ -405,6 +405,24 @@ class TCAFeatureProcessor(
             appendLine("        }")
             appendLine("    }")
             appendLine("}")
+            appendLine()
+            appendLine("// MARK: - Equatable")
+            appendLine("extension ${featureName}Feature.State {")
+            appendLine("    static func == (lhs: Self, rhs: Self) -> Bool {")
+            for (prop in stateProperties) {
+                val typeName = prop.type.declaration.simpleName.asString()
+                val isKotlinType = typeName in listOf(
+                    "Array", "MutableList", "ArrayList",
+                    "MutableSet", "HashSet", "LinkedHashSet",
+                    "MutableMap", "HashMap", "LinkedHashMap"
+                )
+
+                val operator = if (isKotlinType) "===" else "=="
+                appendLine("        guard lhs.${prop.name} $operator rhs.${prop.name} else { return false }")
+            }
+            appendLine("        return lhs._bridge == rhs._bridge")
+            appendLine("    }")
+            appendLine("}")
         }
     }
 
@@ -418,34 +436,85 @@ class TCAFeatureProcessor(
 
         val typeArgs = arguments
         val baseType = if (typeArgs.isNotEmpty()) {
-            val mappedArgs = typeArgs.mapNotNull { arg ->
-                arg.type?.resolve()?.toSwiftTypeString()
-            }
-
             when (simpleName) {
-                "List", "MutableList" -> "[${mappedArgs.first()}]"
-                "Set", "MutableSet" -> "Set<${mappedArgs.first()}>"
-                "Map", "MutableMap" -> "[${mappedArgs[0]}: ${mappedArgs[1]}]"
-                "Array" -> "[${mappedArgs.first()}]"
-                else -> "$simpleName<${mappedArgs.joinToString(", ")}>"
+                "List" -> {
+                    val arg = typeArgs[0].type?.resolve()?.toSwiftTypeString(wrapPrimitives = false) ?: "Any"
+                    "[$arg]"
+                }
+                "Set" -> {
+                    val arg = typeArgs[0].type?.resolve()?.toSwiftTypeString(wrapPrimitives = false) ?: "Any"
+                    "Set<$arg>"
+                }
+                "Map" -> {
+                    val keyArg = typeArgs[0].type?.resolve()?.toSwiftTypeString(wrapPrimitives = false) ?: "Any"
+                    val valueArg = typeArgs[1].type?.resolve()?.toSwiftTypeString(wrapPrimitives = false) ?: "Any"
+                    "Dictionary<$keyArg, $valueArg>"
+                }
+
+                "Array" -> {
+                    val arg = typeArgs[0].type?.resolve()?.toSwiftTypeString(wrapPrimitives = false) ?: "Any"
+                    "KotlinArray<$arg>"
+                }
+                "MutableList", "ArrayList" -> {
+                    val arg = typeArgs[0].type?.resolve()?.toSwiftTypeString(wrapPrimitives = false) ?: "Any"
+                    "KotlinMutableArray<$arg>"
+                }
+                "MutableSet", "HashSet", "LinkedHashSet" -> {
+                    val arg = typeArgs[0].type?.resolve()?.toSwiftTypeString(wrapPrimitives = true) ?: "Any"
+                    "KotlinMutableSet<$arg>"
+                }
+                "MutableMap", "HashMap", "LinkedHashMap" -> {
+                    val keyArg = typeArgs[0].type?.resolve()?.toSwiftTypeString(wrapPrimitives = true) ?: "Any"
+                    val valueArg = typeArgs[1].type?.resolve()?.toSwiftTypeString(wrapPrimitives = true) ?: "Any"
+                    "KotlinMutableDictionary<$keyArg, $valueArg>"
+                }
+
+                else -> "$simpleName<${typeArgs.mapNotNull { it.type?.resolve()?.toSwiftTypeString() }.joinToString(", ")}>"
             }
         } else {
-            when (simpleName) {
-                "Int", "Long" -> "Int"
-                "Byte" -> "Int8"
-                "Short" -> "Int16"
-                "UByte" -> "UInt8"
-                "UShort" -> "UInt16"
-                "UInt" -> "UInt32"
-                "ULong" -> "UInt64"
-                "Char" -> "Character"
-                "String" -> "String"
-                "Boolean" -> "Bool"
-                "Double" -> "Double"
-                "Float" -> "Float"
+            primitiveMapping(simpleName, wrapForObjC = false)
+        }
+        return if (isMarkedNullable) "$baseType?" else baseType
+    }
+
+    private fun KSType.toSwiftTypeString(wrapPrimitives: Boolean): String {
+        val decl = declaration
+        val simpleName = decl.simpleName.asString()
+
+        return primitiveMapping(simpleName, wrapForObjC = wrapPrimitives)
+    }
+
+    private fun primitiveMapping(simpleName: String, wrapForObjC: Boolean): String {
+        if (wrapForObjC) {
+            return when (simpleName) {
+                "String" -> "NSString"
+                "Int" -> "KotlinInt"
+                "Long" -> "KotlinLong"
+                "Byte" -> "KotlinByte"
+                "Short" -> "KotlinShort"
+                "Boolean" -> "KotlinBoolean"
+                "Double" -> "KotlinDouble"
+                "Float" -> "KotlinFloat"
+                "UInt" -> "KotlinUInt"
+                "ULong" -> "KotlinULong"
                 else -> simpleName
             }
         }
-        return if (isMarkedNullable) "$baseType?" else baseType
+
+        return when (simpleName) {
+            "Int", "Long" -> "Int"
+            "Byte" -> "Int8"
+            "Short" -> "Int16"
+            "UByte" -> "UInt8"
+            "UShort" -> "UInt16"
+            "UInt" -> "UInt"
+            "ULong" -> "UInt64"
+            "Char" -> "Character"
+            "String" -> "String"
+            "Boolean" -> "Bool"
+            "Double" -> "Double"
+            "Float" -> "Float"
+            else -> simpleName
+        }
     }
 }
