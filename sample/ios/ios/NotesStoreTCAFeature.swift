@@ -56,16 +56,28 @@ struct NotesFeature {
     struct State: Equatable {
         var currentMessage: String
         var isInProgress: Bool
-        var notes: List
+        var notes: [Note]
+        var s1: KotlinArray<Note>
+        var s2: Dictionary<String, Note>
+        var s3: Set<Note>
+        var s4: KotlinMutableSet<NSString>
+        var s5: KotlinMutableDictionary<KotlinInt, Note>
+        var s7: KotlinMutableDictionary<KotlinUInt, KotlinByte>
+        var s8: KotlinMutableDictionary<KotlinLong, KotlinDouble>
+        var s9: KotlinMutableDictionary<NSString, KotlinDouble>
+        var s10: Set<String>
+        var s11: KotlinMutableSet<NSString>
+        var s12: MyEnum
+        var s13: Int
         var _bridge = NotesStoreBridgeReducer.State()
     }
 
     @CasePathable
     enum Action: Equatable {
         case addNote
-        case currentMessageChanged
+        case currentMessageChanged(message: String)
         case loadNotes
-        case removeNote
+        case removeNote(id: String)
 
         case _bridge(NotesStoreBridgeReducer.Action)
     }
@@ -84,16 +96,16 @@ struct NotesFeature {
                 store.accept(intent: NotesStoreIntentAddNote())
                 return .none
                 
-            case .currentMessageChanged:
-                store.accept(intent: NotesStoreIntentCurrentMessageChanged())
+            case .currentMessageChanged(let message):
+                store.accept(intent: NotesStoreIntentCurrentMessageChanged(message: message))
                 return .none
                 
             case .loadNotes:
                 store.accept(intent: NotesStoreIntentLoadNotes())
                 return .none
                 
-            case .removeNote:
-                store.accept(intent: NotesStoreIntentRemoveNote())
+            case .removeNote(let id):
+                store.accept(intent: NotesStoreIntentRemoveNote(id: id))
                 return .none
                 
             case let ._bridge(.stateUpdated(domain)):
@@ -117,6 +129,18 @@ extension NotesFeature.State {
         self.currentMessage = domain.currentMessage
         self.isInProgress = domain.isInProgress
         self.notes = domain.notes
+        self.s1 = domain.s1
+        self.s2 = domain.s2
+        self.s3 = domain.s3
+        self.s4 = domain.s4
+        self.s5 = domain.s5
+        self.s7 = domain.s7
+        self.s8 = domain.s8
+        self.s9 = domain.s9
+        self.s10 = domain.s10
+        self.s11 = domain.s11
+        self.s12 = domain.s12
+        self.s13 = Int(domain.s13)
     }
 }
 
@@ -199,6 +223,18 @@ extension NotesFeature {
                 currentMessage: store.state.currentMessage,
                 isInProgress: store.state.isInProgress,
                 notes: store.state.notes,
+                s1: store.state.s1,
+                s2: store.state.s2,
+                s3: store.state.s3,
+                s4: store.state.s4,
+                s5: store.state.s5,
+                s7: store.state.s7,
+                s8: store.state.s8,
+                s9: store.state.s9,
+                s10: store.state.s10,
+                s11: store.state.s11,
+                s12: store.state.s12,
+                s13: Int(store.state.s13),
                 _bridge: NotesStoreBridgeReducer.State()
             )
         ) {
@@ -207,5 +243,27 @@ extension NotesFeature {
             deps.notesStore = store
             configureDependencies(&deps)
         }
+    }
+}
+
+// MARK: - Equatable
+extension NotesFeature.State {
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        guard lhs.currentMessage == rhs.currentMessage else { return false }
+        guard lhs.isInProgress == rhs.isInProgress else { return false }
+        guard lhs.notes == rhs.notes else { return false }
+        guard lhs.s1 === rhs.s1 else { return false }
+        guard lhs.s2 == rhs.s2 else { return false }
+        guard lhs.s3 == rhs.s3 else { return false }
+        guard lhs.s4 === rhs.s4 else { return false }
+        guard lhs.s5 === rhs.s5 else { return false }
+        guard lhs.s7 === rhs.s7 else { return false }
+        guard lhs.s8 === rhs.s8 else { return false }
+        guard lhs.s9 === rhs.s9 else { return false }
+        guard lhs.s10 == rhs.s10 else { return false }
+        guard lhs.s11 === rhs.s11 else { return false }
+        guard lhs.s12 == rhs.s12 else { return false }
+        guard lhs.s13 == rhs.s13 else { return false }
+        return lhs._bridge == rhs._bridge
     }
 }
