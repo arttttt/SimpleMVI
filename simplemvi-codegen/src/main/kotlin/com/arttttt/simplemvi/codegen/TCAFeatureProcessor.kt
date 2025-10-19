@@ -136,7 +136,8 @@ class TCAFeatureProcessor(
      * Extracts properties from data class State
      */
     private fun extractStateProperties(stateDecl: KSClassDeclaration): List<StateProperty> {
-        return stateDecl.getAllProperties()
+        return stateDecl
+            .getAllProperties()
             .filter { !it.simpleName.asString().startsWith("_") }
             .map { prop ->
                 StateProperty(
@@ -149,6 +150,9 @@ class TCAFeatureProcessor(
 
     /**
      * Generates Swift code
+     *
+     * todo: remove bridge reducer
+     * todo: make separated functions for different pieces
      */
     private fun generateSwiftCode(
         storeName: String,
@@ -182,7 +186,7 @@ class TCAFeatureProcessor(
             appendLine("    func handle(_ effect: ${storeName}SideEffect) -> Effect<${featureName}Feature.Action>{")
             appendLine("        switch effect {")
             for (subtype in sideEffectInfos) {
-                appendLine("        case is ${storeName}SideEffect${subtype}:")
+                appendLine("        case is ${storeName}SideEffect${subtype.name}:")
                 appendLine("            return .none")
             }
             appendLine("        default:")
@@ -232,10 +236,11 @@ class TCAFeatureProcessor(
                 appendLine("        var ${prop.name}: $swiftType")
             }
             appendLine("        var _bridge = ${storeName}BridgeReducer.State()")
+            appendLine("        var _lifecycle: _${storeName}Lifecycle?")
             appendLine("    }")
             appendLine()
             appendLine("    @CasePathable")
-            appendLine("    enum Action: Equatable {")
+            appendLine("    enum Action {")
             for (intent in sealedTypeInfos) {
                 if (intent.parameters.isEmpty()) {
                     appendLine("        case ${intent.name.toCamelCase()}")
@@ -248,6 +253,7 @@ class TCAFeatureProcessor(
             }
             appendLine()
             appendLine("        case _bridge(${storeName}BridgeReducer.Action)")
+            appendLine("        case _setLifecycle(_${storeName}Lifecycle?)")
             appendLine("    }")
             appendLine()
             appendLine("    @Dependency(\\.${storeName.toCamelCase()}) var store")
@@ -283,6 +289,10 @@ class TCAFeatureProcessor(
             appendLine()
             appendLine("            case ._bridge(.startObserving), ._bridge(.stopObserving):")
             appendLine("              return .none")
+            appendLine("            case let ._setLifecycle(lifecycle):")
+            appendLine("                state._lifecycle = lifecycle")
+            appendLine("                return .none")
+            appendLine("                ")
             appendLine("            }")
             appendLine("        }")
             appendLine("    }")
@@ -385,7 +395,7 @@ class TCAFeatureProcessor(
             appendLine("        store: ${storeName},")
             appendLine("        withDependencies configureDependencies: @escaping (inout DependencyValues) -> Void = { _ in }")
             appendLine("    ) -> StoreOf<Self> {")
-            appendLine("        Store(")
+            appendLine("        let tcaStore = Store(")
             appendLine("            initialState: State(")
             for (prop in stateProperties) {
                 val conversion = if (prop.type.declaration.simpleName.asString() in listOf("Int", "Long"))  {
@@ -395,7 +405,8 @@ class TCAFeatureProcessor(
                 }
                 appendLine("                ${prop.name}: $conversion,")
             }
-            appendLine("                _bridge: ${storeName}BridgeReducer.State()")
+            appendLine("                _bridge: ${storeName}BridgeReducer.State(),")
+            appendLine("                _lifecycle: nil")  // новое
             appendLine("            )")
             appendLine("        ) {")
             appendLine("            ${featureName}Feature()")
@@ -403,13 +414,21 @@ class TCAFeatureProcessor(
             appendLine("            deps.${storeName.toCamelCase()} = store")
             appendLine("            configureDependencies(&deps)")
             appendLine("        }")
+            appendLine()
+            appendLine("        let lifecycle = _${storeName}Lifecycle(store: store) { action in")
+            appendLine("            await tcaStore.send(action)")
+            appendLine("        }")
+            appendLine("        Task { await tcaStore.send(._setLifecycle(lifecycle)) }")
+            appendLine()
+            appendLine("        return tcaStore")
             appendLine("    }")
             appendLine("}")
             appendLine()
             appendLine("// MARK: - Equatable")
             appendLine("extension ${featureName}Feature.State {")
             appendLine("    static func == (lhs: Self, rhs: Self) -> Bool {")
-            for (prop in stateProperties) {
+            for (index in stateProperties.indices) {
+                val prop = stateProperties[index]
                 val typeName = prop.type.declaration.simpleName.asString()
                 val isKotlinType = typeName in listOf(
                     "Array", "MutableList", "ArrayList",
@@ -418,11 +437,51 @@ class TCAFeatureProcessor(
                 )
 
                 val operator = if (isKotlinType) "===" else "=="
-                appendLine("        guard lhs.${prop.name} $operator rhs.${prop.name} else { return false }")
+                if (index == stateProperties.lastIndex) {
+                    appendLine("        return lhs.${prop.name} $operator rhs.${prop.name}")
+                } else {
+                    appendLine("        guard lhs.${prop.name} $operator rhs.${prop.name} else { return false }")
+                }
             }
-            appendLine("        return lhs._bridge == rhs._bridge")
             appendLine("    }")
             appendLine("}")
+            appendLine()
+            appendLine("// MARK: - Lifecycle Token")
+            appendLine("final class _${storeName}Lifecycle {")
+            appendLine("    private let store: ${storeName}")
+            appendLine("    private var observerTask: Task<Void, Never>?")
+            appendLine()
+            appendLine("    init(store: ${storeName}, send: @escaping (${featureName}Feature.Action) async -> Void) {")
+            appendLine("        self.store = store")
+            appendLine("        store.doInit()")
+            appendLine()
+            appendLine("        observerTask = Task {")
+            appendLine("            await withTaskGroup(of: Void.self) { group in")
+            appendLine("                group.addTask {")
+            appendLine("                    do {")
+            appendLine("                        for try await state in asAsyncThrowingStream(CStateFlow<${storeName}.State>(source: store.states)) {")
+            appendLine("                            await send(._bridge(.stateUpdated(state)))")
+            appendLine("                        }")
+            appendLine("                    } catch {}")
+            appendLine("                }")
+            appendLine()
+            appendLine("                group.addTask {")
+            appendLine("                    do {")
+            appendLine("                        for try await effect in asAsyncThrowingStream(CFlow<${storeName}SideEffect>(source: store.sideEffects)) {")
+            appendLine("                            await send(._bridge(.sideEffect(StoreSideEffectWrapper(wrapped: effect))))")
+            appendLine("                        }")
+            appendLine("                    } catch {}")
+            appendLine("                }")
+            appendLine("            }")
+            appendLine("        }")
+            appendLine("    }")
+            appendLine()
+            appendLine("    deinit {")
+            appendLine("        observerTask?.cancel()")
+            appendLine("        store.destroy()")
+            appendLine("    }")
+            appendLine("}")
+            appendLine()
         }
     }
 
