@@ -3,6 +3,7 @@ package com.arttttt.simplemvi.store
 import com.arttttt.simplemvi.actor.Actor
 import com.arttttt.simplemvi.config.simpleMVIConfig
 import com.arttttt.simplemvi.middleware.Middleware
+import com.arttttt.simplemvi.plugin.StorePlugin
 import com.arttttt.simplemvi.utils.CachingFlow
 import com.arttttt.simplemvi.utils.exceptions.StoreIsAlreadyDestroyedException
 import com.arttttt.simplemvi.utils.exceptions.StoreIsNotInitializedException
@@ -43,10 +44,15 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
     initialState: State,
     private val initialIntents: List<Intent>,
     private val middlewares: List<Middleware<Intent, State, SideEffect>>,
+    private val plugins: List<StorePlugin<Intent, State, SideEffect>>,
     private val actor: Actor<Intent, State, SideEffect>,
 ) : Store<Intent, State, SideEffect> {
 
-    private val _states: MutableStateFlow<State> = MutableStateFlow(initialState)
+    private val _states: MutableStateFlow<State> = MutableStateFlow(
+        plugins.fold(initialState) { state, plugin ->
+            plugin.provideInitialState(state)
+        }
+    )
 
     override val state: State
         get() = _states.value
@@ -68,6 +74,18 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
         if (isInitialized.getAndSet(true)) return
 
         middlewares.forEach { it.onInit(_states.value) }
+        val context = StorePlugin.Context<Intent, State, SideEffect>(
+            scope = scope,
+            name = null,
+            getCurrentState = this@DefaultStore::state::get,
+            sendIntent = this@DefaultStore::accept,
+            setState = { newState ->
+                val oldState = _states.value
+                _states.value = newState
+                plugins.forEach { it.onStateChanged(oldState, newState) }
+            },
+        )
+        plugins.forEach { plugin -> plugin.onInit(context) }
 
         actor.init(
             scope = scope,
@@ -76,6 +94,7 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
                 _states.update { state ->
                     block(state).also { newState ->
                         middlewares.forEach { it.onStateChanged(state, newState) }
+                        plugins.forEach { plugin -> plugin.onStateChanged(state, newState) }
                     }
                 }
             },
@@ -108,6 +127,7 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
         }
 
         middlewares.forEach { it.onIntent(intent, _states.value) }
+        plugins.forEach { plugin -> plugin.onIntent(intent) }
         actor.onIntent(intent)
     }
 
@@ -115,6 +135,7 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
         if (isDestroyed.getAndSet(true)) return
 
         middlewares.forEach { it.onDestroy(_states.value) }
+        plugins.forEach { plugin -> plugin.onDestroy() }
 
         actor.destroy()
         scope.cancel()
@@ -122,6 +143,7 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
 
     private fun postSideEffect(sideEffect: SideEffect) {
         middlewares.forEach { it.onSideEffect(sideEffect, _states.value) }
+        plugins.forEach { plugin -> plugin.onSideEffect(sideEffect) }
         scope.launch {
             _sideEffects.emit(sideEffect)
         }
