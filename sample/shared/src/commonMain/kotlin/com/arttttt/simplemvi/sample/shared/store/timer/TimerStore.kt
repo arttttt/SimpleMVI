@@ -1,13 +1,16 @@
 package com.arttttt.simplemvi.sample.shared.store.timer
 
 import com.arttttt.simplemvi.annotations.TCAFeature
+import com.arttttt.simplemvi.plugin.StorePlugin
 import com.arttttt.simplemvi.store.Store
 import com.arttttt.simplemvi.store.createStore
+import kotlinx.serialization.Serializable
 import kotlin.coroutines.CoroutineContext
 
 @TCAFeature
 class TimerStore(
     coroutineContext: CoroutineContext,
+    plugins: List<StorePlugin<Intent, State, SideEffect>>,
 ) : Store<TimerStore.Intent, TimerStore.State, TimerStore.SideEffect> by createStore(
     name = null,
     coroutineContext = coroutineContext,
@@ -19,6 +22,7 @@ class TimerStore(
     middlewares = listOf(
         TimerMiddleware(),
     ),
+    plugins = plugins,
     actor = TimerStoreActor(),
 ) {
 
@@ -29,6 +33,7 @@ class TimerStore(
         data object ResetTimer : Intent
     }
 
+    @Serializable
     data class State(
         val isTimerRunning: Boolean,
         val value: Int,

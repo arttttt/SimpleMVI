@@ -8,10 +8,14 @@ public interface StorePlugin<Intent : Any, State : Any, SideEffect : Any> {
     public data class Context<Intent : Any, State : Any, SideEffect : Any>(
         val scope: CoroutineScope,
         val name: StoreName?,
-        val getCurrentState: () -> State,
         val sendIntent: (Intent) -> Unit,
         val setState: (State) -> Unit,
-    )
+        private val getState: () -> State,
+    ) {
+
+        val state: State
+            get() = getState()
+    }
 
     public fun provideInitialState(defaultState: State): State = defaultState
 
