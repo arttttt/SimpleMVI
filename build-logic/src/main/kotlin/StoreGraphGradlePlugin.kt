@@ -35,7 +35,7 @@ class StoreGraphGradlePlugin : KotlinCompilerPluginSupportPlugin {
 
     override fun getPluginArtifact(): SubpluginArtifact = SubpluginArtifact(
         groupId = "io.github.arttttt.simplemvi",
-        artifactId = "simplemvi-compiler-plugin",
+        artifactId = "simplemvi-codegen",
         version = "1.0"
     )
 }
