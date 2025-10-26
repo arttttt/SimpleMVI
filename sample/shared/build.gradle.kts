@@ -12,6 +12,7 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.library)
     alias(libs.plugins.google.ksp)
+    id("storeGraphPlugin")
 }
 
 kotlin {

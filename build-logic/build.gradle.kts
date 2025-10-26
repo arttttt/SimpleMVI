@@ -30,6 +30,12 @@ gradlePlugin {
         implementationClass = "SimpleMVIPublishing"
         version = "1.0.0"
     }
+
+    plugins.register("storeGraphPlugin") {
+        id = "storeGraphPlugin"
+        implementationClass = "StoreGraphGradlePlugin"
+        version = "1.0.0"
+    }
 }
 
 tasks.withType<KotlinCompile>().configureEach {
