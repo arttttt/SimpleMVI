@@ -289,7 +289,7 @@ dependencies {
 
 ### @DelegatedStore Annotation
 
-Annotate your Store with `@DelegatedStore` to generate type-safe intent handler factories:
+Annotate your Store with `@DelegatedStore` to generate type-safe handler factories:
 
 ```kotlin
 @DelegatedStore
@@ -298,14 +298,19 @@ class MyStore : Store</* ... */> by createStore(/* ... */) {
 }
 ```
 
-This generates:
-- A type-safe intent handler factory function: `myStoreIntentHandler<T>()`
-- Proper type inference for your Intent, State, and SideEffect types
+**Generated code:**
+
+For a store `MyStore`, the annotation generates:
+- Intent handler factory: `myStoreIntentHandler<T>()` for creating type-safe intent handlers
+- Init handler factory: `myStoreInitHandler()` for initialization logic
+- Destroy handler factory: `myStoreDestroyHandler()` for cleanup logic
+- Proper type inference for Intent, State, and SideEffect types
 
 **Benefits:**
 
 - Less boilerplate code
 - Type-safe intent handler creation
+- Type-safe lifecycle handler creation
 - Better IDE support and autocomplete
 - Compile-time safety
 
