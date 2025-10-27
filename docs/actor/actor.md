@@ -223,7 +223,7 @@ SimpleMVI provides KSP-based code generation to simplify working with `delegated
 
 ### @DelegatedStore Annotation
 
-Annotate your Store with `@DelegatedStore` to generate type-safe intent handler factories:
+Annotate your Store with `@DelegatedStore` to generate type-safe handler factories:
 
 ```kotlin
 @DelegatedStore
@@ -231,10 +231,12 @@ class CounterStore : Store<CounterStore.Intent, CounterStore.State, CounterStore
     name = storeName<CounterStore>(),
     initialState = State(counter = 0),
     actor = delegatedActor(
+        initHandler = myInitHandler(),
         intentHandlers = listOf(
             incrementIntentHandler(),
             decrementIntentHandler(),
-        )
+        ), 
+        destroyHandler = myDestroyHandler(),
     )
 ) {
     sealed interface Intent {
@@ -246,13 +248,14 @@ class CounterStore : Store<CounterStore.Intent, CounterStore.State, CounterStore
     
     sealed interface SideEffect {
         data class CounterChanged(val value: Int) : SideEffect
+        data object Cleanup : SideEffect
     }
 }
 ```
 
-### Generated Intent Handlers
+### Generated Handlers
 
-The annotation processor generates a factory function for creating intent handlers:
+The annotation processor generates factory functions for creating handlers:
 
 ```kotlin
 // counterStoreIntentHandler is a generated function
@@ -267,9 +270,30 @@ fun decrementIntentHandler() = counterStoreIntentHandler<CounterStore.Intent.Dec
 }
 ```
 
+**Init Handler:**
+
+```kotlin
+// counterStoreInitHandler is a generated function
+fun myInitHandler() = counterStoreInitHandler {
+    reduce { copy(initialized = true) }
+    // Initialization logic
+}
+```
+
+**Destroy Handler:**
+
+```kotlin
+// counterStoreDestroyHandler is a generated function
+fun myDestroyHandler() = counterStoreDestroyHandler {
+    sideEffect(CounterStore.SideEffect.Cleanup)
+    // Cleanup logic
+}
+```
+
 **Benefits:**
 
 - Type-safe intent handler creation
+- Type-safe lifecycle handler creation
 - Less boilerplate code
 - Better code organization
 - Compile-time safety
