@@ -152,6 +152,40 @@ class DelegatedStoreProcessor(
             }.onFailure { e ->
                 logger.error("Error writing file: ${e.message}", classDeclaration)
             }
+
+            val initIfaceName = "${storeName}InitHandler"
+            val initFunName = storeName.replaceFirstChar(Char::lowercase) + "InitHandler"
+
+            val initFile = FileSpec.builder(pkg, initIfaceName)
+                .addType(buildInitHandlerInterfaceSpec(initIfaceName, types, classDeclaration.containingFile!!))
+                .addFunction(buildInitHandlerFactoryFunctionSpec(pkg, initIfaceName, initFunName, types, classDeclaration.containingFile!!))
+                .build()
+
+            runCatching {
+                initFile.writeTo(
+                    codeGenerator,
+                    Dependencies(aggregating = false, classDeclaration.containingFile!!)
+                )
+            }.onFailure { e ->
+                logger.error("Error writing InitHandler file: ${e.message}", classDeclaration)
+            }
+
+            val destroyIfaceName = "${storeName}DestroyHandler"
+            val destroyFunName = storeName.replaceFirstChar(Char::lowercase) + "DestroyHandler"
+
+            val destroyFile = FileSpec.builder(pkg, destroyIfaceName)
+                .addType(buildDestroyHandlerInterfaceSpec(destroyIfaceName, types, classDeclaration.containingFile!!))
+                .addFunction(buildDestroyHandlerFactoryFunctionSpec(pkg, destroyIfaceName, destroyFunName, types, classDeclaration.containingFile!!))
+                .build()
+
+            runCatching {
+                destroyFile.writeTo(
+                    codeGenerator,
+                    Dependencies(aggregating = false, classDeclaration.containingFile!!)
+                )
+            }.onFailure { e ->
+                logger.error("Error writing DestroyHandler file: ${e.message}", classDeclaration)
+            }
         }
 
         /**
@@ -250,6 +284,148 @@ class DelegatedStoreProcessor(
                 .addOriginatingKSFile(ksFile)
                 .build()
         }
+
+        /**
+         * Builds InitHandler interface specification
+         */
+        @OptIn(KspExperimental::class)
+        private fun buildInitHandlerInterfaceSpec(
+            ifaceName: String,
+            types: StoreTypes,
+            ksFile: KSFile
+        ): TypeSpec {
+            val initHandlerClass = classNameOf(INIT_HANDLER_FQN)
+
+            return TypeSpec.interfaceBuilder(ifaceName)
+                .addSuperinterface(
+                    initHandlerClass.parameterizedBy(
+                        types.intent,
+                        types.state,
+                        types.sideEffect,
+                    )
+                )
+                .addOriginatingKSFile(ksFile)
+                .build()
+        }
+
+        /**
+         * Builds InitHandler factory function specification
+         */
+        @OptIn(KspExperimental::class)
+        private fun buildInitHandlerFactoryFunctionSpec(
+            pkg: String,
+            ifaceName: String,
+            funName: String,
+            types: StoreTypes,
+            ksFile: KSFile
+        ): FunSpec {
+            val actorScope = classNameOf(ACTOR_SCOPE_FQN).parameterizedBy(
+                types.intent,
+                types.state,
+                types.sideEffect,
+            )
+
+            val blockLambda = LambdaTypeName.get(
+                receiver = actorScope,
+                returnType = UNIT,
+            )
+
+            val ifaceClass = ClassName(pkg, ifaceName)
+
+            val anonymousImpl = TypeSpec.anonymousClassBuilder()
+                .addSuperinterface(ifaceClass)
+                .addFunction(
+                    FunSpec.builder("onInit")
+                        .addModifiers(KModifier.OVERRIDE)
+                        .receiver(actorScope)
+                        .addStatement("block(this)")
+                        .build()
+                )
+                .build()
+
+            return FunSpec.builder(funName)
+                .addModifiers(KModifier.INLINE)
+                .addParameter(
+                    ParameterSpec.builder("block", blockLambda)
+                        .addModifiers(KModifier.CROSSINLINE)
+                        .build()
+                )
+                .returns(ifaceClass)
+                .addStatement("return %L", anonymousImpl)
+                .addOriginatingKSFile(ksFile)
+                .build()
+        }
+
+        /**
+         * Builds DestroyHandler interface specification
+         */
+        @OptIn(KspExperimental::class)
+        private fun buildDestroyHandlerInterfaceSpec(
+            ifaceName: String,
+            types: StoreTypes,
+            ksFile: KSFile
+        ): TypeSpec {
+            val destroyHandlerClass = classNameOf(DESTROY_HANDLER_FQN)
+
+            return TypeSpec.interfaceBuilder(ifaceName)
+                .addSuperinterface(
+                    destroyHandlerClass.parameterizedBy(
+                        types.intent,
+                        types.state,
+                        types.sideEffect,
+                    )
+                )
+                .addOriginatingKSFile(ksFile)
+                .build()
+        }
+
+        /**
+         * Builds DestroyHandler factory function specification
+         */
+        @OptIn(KspExperimental::class)
+        private fun buildDestroyHandlerFactoryFunctionSpec(
+            pkg: String,
+            ifaceName: String,
+            funName: String,
+            types: StoreTypes,
+            ksFile: KSFile
+        ): FunSpec {
+            val actorScope = classNameOf(ACTOR_SCOPE_FQN).parameterizedBy(
+                types.intent,
+                types.state,
+                types.sideEffect,
+            )
+
+            val blockLambda = LambdaTypeName.get(
+                receiver = actorScope,
+                returnType = UNIT,
+            )
+
+            val ifaceClass = ClassName(pkg, ifaceName)
+
+            val anonymousImpl = TypeSpec.anonymousClassBuilder()
+                .addSuperinterface(ifaceClass)
+                .addFunction(
+                    FunSpec.builder("onDestroy")
+                        .addModifiers(KModifier.OVERRIDE)
+                        .receiver(actorScope)
+                        .addStatement("block(this)")
+                        .build()
+                )
+                .build()
+
+            return FunSpec.builder(funName)
+                .addModifiers(KModifier.INLINE)
+                .addParameter(
+                    ParameterSpec.builder("block", blockLambda)
+                        .addModifiers(KModifier.CROSSINLINE)
+                        .build()
+                )
+                .returns(ifaceClass)
+                .addStatement("return %L", anonymousImpl)
+                .addOriginatingKSFile(ksFile)
+                .build()
+        }
     }
 
     /**
@@ -259,6 +435,8 @@ class DelegatedStoreProcessor(
         const val STORE_FQN = "com.arttttt.simplemvi.store.Store"
         const val INTENT_HANDLER_FQN = "com.arttttt.simplemvi.actor.delegated.IntentHandler"
         const val ACTOR_SCOPE_FQN = "com.arttttt.simplemvi.actor.ActorScope"
+        const val INIT_HANDLER_FQN = "com.arttttt.simplemvi.actor.delegated.InitHandler"
+        const val DESTROY_HANDLER_FQN = "com.arttttt.simplemvi.actor.delegated.DestroyHandler"
     }
 
     /**
