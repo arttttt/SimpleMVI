@@ -245,19 +245,6 @@ class TCAFeatureProcessor(
             appendLine("    static let liveValue: any ${storeName}SideEffectHandler = Default${storeName}SideEffectHandler()")
             appendLine("}")
             appendLine()
-            appendLine("extension DependencyValues {")
-            appendLine("    var ${storeName.toCamelCase()}Lifecycle: _${storeName}Lifecycle {")
-            appendLine("        get { self[_${storeName}LifecycleKey.self] }")
-            appendLine("        set { self[_${storeName}LifecycleKey.self] = newValue }")
-            appendLine("    }")
-            appendLine("}")
-            appendLine()
-            appendLine("private struct _${storeName}LifecycleKey: DependencyKey {")
-            appendLine("    static let liveValue: _${storeName}Lifecycle = {")
-            appendLine("        fatalError(\"Lifecycle not configured\")")
-            appendLine("    }()")
-            appendLine("}")
-            appendLine()
         }
     }
 
@@ -330,7 +317,6 @@ class TCAFeatureProcessor(
         return buildString {
             appendLine("    @Dependency(\\.${storeName.toCamelCase()}) var store")
             appendLine("    @Dependency(\\.${storeName.toCamelCase()}SideEffectHandler) var sideEffectHandler")
-            appendLine("    @Dependency(\\.${storeName.toCamelCase()}Lifecycle) var lifecycle")
             appendLine()
             appendLine("    var body: some ReducerOf<Self> {")
             appendLine("        Reduce { state, action in")
