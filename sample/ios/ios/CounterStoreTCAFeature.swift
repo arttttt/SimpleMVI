@@ -54,19 +54,6 @@ private struct CounterStoreSideEffectHandlerKey: DependencyKey {
     static let liveValue: any CounterStoreSideEffectHandler = DefaultCounterStoreSideEffectHandler()
 }
 
-extension DependencyValues {
-    var counterStoreLifecycle: _CounterStoreLifecycle {
-        get { self[_CounterStoreLifecycleKey.self] }
-        set { self[_CounterStoreLifecycleKey.self] = newValue }
-    }
-}
-
-private struct _CounterStoreLifecycleKey: DependencyKey {
-    static let liveValue: _CounterStoreLifecycle = {
-        fatalError("Lifecycle not configured")
-    }()
-}
-
 // MARK: - TCA Feature
 @Reducer
 struct CounterFeature {
@@ -88,7 +75,6 @@ struct CounterFeature {
 
     @Dependency(\.counterStore) var store
     @Dependency(\.counterStoreSideEffectHandler) var sideEffectHandler
-    @Dependency(\.counterStoreLifecycle) var lifecycle
 
     var body: some ReducerOf<Self> {
         Reduce { state, action in

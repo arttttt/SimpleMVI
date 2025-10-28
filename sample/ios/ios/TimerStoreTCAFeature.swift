@@ -48,19 +48,6 @@ private struct TimerStoreSideEffectHandlerKey: DependencyKey {
     static let liveValue: any TimerStoreSideEffectHandler = DefaultTimerStoreSideEffectHandler()
 }
 
-extension DependencyValues {
-    var timerStoreLifecycle: _TimerStoreLifecycle {
-        get { self[_TimerStoreLifecycleKey.self] }
-        set { self[_TimerStoreLifecycleKey.self] = newValue }
-    }
-}
-
-private struct _TimerStoreLifecycleKey: DependencyKey {
-    static let liveValue: _TimerStoreLifecycle = {
-        fatalError("Lifecycle not configured")
-    }()
-}
-
 // MARK: - TCA Feature
 @Reducer
 struct TimerFeature {
@@ -83,7 +70,6 @@ struct TimerFeature {
 
     @Dependency(\.timerStore) var store
     @Dependency(\.timerStoreSideEffectHandler) var sideEffectHandler
-    @Dependency(\.timerStoreLifecycle) var lifecycle
 
     var body: some ReducerOf<Self> {
         Reduce { state, action in

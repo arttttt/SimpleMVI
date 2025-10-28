@@ -48,19 +48,6 @@ private struct NotesStoreSideEffectHandlerKey: DependencyKey {
     static let liveValue: any NotesStoreSideEffectHandler = DefaultNotesStoreSideEffectHandler()
 }
 
-extension DependencyValues {
-    var notesStoreLifecycle: _NotesStoreLifecycle {
-        get { self[_NotesStoreLifecycleKey.self] }
-        set { self[_NotesStoreLifecycleKey.self] = newValue }
-    }
-}
-
-private struct _NotesStoreLifecycleKey: DependencyKey {
-    static let liveValue: _NotesStoreLifecycle = {
-        fatalError("Lifecycle not configured")
-    }()
-}
-
 // MARK: - TCA Feature
 @Reducer
 struct NotesFeature {
@@ -97,7 +84,6 @@ struct NotesFeature {
 
     @Dependency(\.notesStore) var store
     @Dependency(\.notesStoreSideEffectHandler) var sideEffectHandler
-    @Dependency(\.notesStoreLifecycle) var lifecycle
 
     var body: some ReducerOf<Self> {
         Reduce { state, action in

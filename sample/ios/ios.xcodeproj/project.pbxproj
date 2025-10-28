@@ -15,9 +15,9 @@
 		58C7A95581EA4CB285E66E81 /* StateFlowWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C7A1337DE2BFD0585E3025 /* StateFlowWrapper.swift */; };
 		58C7AB9F7B5B30FA12E97970 /* TimerTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C7A7053E7BF2227D186819 /* TimerTabView.swift */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
-		AC4BA77A2EB178B400227762 /* CounterStoreTCAFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC4BA7772EB178B400227762 /* CounterStoreTCAFeature.swift */; };
-		AC4BA77B2EB178B400227762 /* NotesStoreTCAFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC4BA7782EB178B400227762 /* NotesStoreTCAFeature.swift */; };
-		AC4BA77C2EB178B400227762 /* TimerStoreTCAFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC4BA7792EB178B400227762 /* TimerStoreTCAFeature.swift */; };
+		AC4BA7802EB181CE00227762 /* CounterStoreTCAFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC4BA77D2EB181CE00227762 /* CounterStoreTCAFeature.swift */; };
+		AC4BA7812EB181CE00227762 /* NotesStoreTCAFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC4BA77E2EB181CE00227762 /* NotesStoreTCAFeature.swift */; };
+		AC4BA7822EB181CE00227762 /* TimerStoreTCAFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC4BA77F2EB181CE00227762 /* TimerStoreTCAFeature.swift */; };
 		AC9C23882EA3964F0091FA2D /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9C23872EA396440091FA2D /* Helpers.swift */; };
 		ACFDD5BA2E9D9D05004F1096 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = ACFDD5B92E9D9D05004F1096 /* ComposableArchitecture */; };
 /* End PBXBuildFile section */
@@ -34,9 +34,9 @@
 		7555FF82242A565900829871 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AB3632DC29227652001CCB65 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
-		AC4BA7772EB178B400227762 /* CounterStoreTCAFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CounterStoreTCAFeature.swift; sourceTree = "<group>"; };
-		AC4BA7782EB178B400227762 /* NotesStoreTCAFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesStoreTCAFeature.swift; sourceTree = "<group>"; };
-		AC4BA7792EB178B400227762 /* TimerStoreTCAFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerStoreTCAFeature.swift; sourceTree = "<group>"; };
+		AC4BA77D2EB181CE00227762 /* CounterStoreTCAFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CounterStoreTCAFeature.swift; sourceTree = "<group>"; };
+		AC4BA77E2EB181CE00227762 /* NotesStoreTCAFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesStoreTCAFeature.swift; sourceTree = "<group>"; };
+		AC4BA77F2EB181CE00227762 /* TimerStoreTCAFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerStoreTCAFeature.swift; sourceTree = "<group>"; };
 		AC9C23872EA396440091FA2D /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -88,9 +88,9 @@
 		7555FF7D242A565900829871 /* ios */ = {
 			isa = PBXGroup;
 			children = (
-				AC4BA7772EB178B400227762 /* CounterStoreTCAFeature.swift */,
-				AC4BA7782EB178B400227762 /* NotesStoreTCAFeature.swift */,
-				AC4BA7792EB178B400227762 /* TimerStoreTCAFeature.swift */,
+				AC4BA77D2EB181CE00227762 /* CounterStoreTCAFeature.swift */,
+				AC4BA77E2EB181CE00227762 /* NotesStoreTCAFeature.swift */,
+				AC4BA77F2EB181CE00227762 /* TimerStoreTCAFeature.swift */,
 				AC9C23872EA396440091FA2D /* Helpers.swift */,
 				058557BA273AAA24004C7B11 /* Assets.xcassets */,
 				7555FF82242A565900829871 /* ContentView.swift */,
@@ -217,11 +217,11 @@
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
 				58C7A36CFBF0531FA0325B04 /* CounterTabView.swift in Sources */,
 				AC9C23882EA3964F0091FA2D /* Helpers.swift in Sources */,
-				AC4BA77A2EB178B400227762 /* CounterStoreTCAFeature.swift in Sources */,
-				AC4BA77B2EB178B400227762 /* NotesStoreTCAFeature.swift in Sources */,
-				AC4BA77C2EB178B400227762 /* TimerStoreTCAFeature.swift in Sources */,
 				58C7A95581EA4CB285E66E81 /* StateFlowWrapper.swift in Sources */,
 				58C7A0F9B9A126CDAC6E68B3 /* NotesTabView.swift in Sources */,
+				AC4BA7802EB181CE00227762 /* CounterStoreTCAFeature.swift in Sources */,
+				AC4BA7812EB181CE00227762 /* NotesStoreTCAFeature.swift in Sources */,
+				AC4BA7822EB181CE00227762 /* TimerStoreTCAFeature.swift in Sources */,
 				58C7AB9F7B5B30FA12E97970 /* TimerTabView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
