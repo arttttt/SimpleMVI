@@ -124,7 +124,6 @@ extension TimerFeature {
             TimerFeature()
         } withDependencies: { deps in
             deps.timerStore = store
-            deps.timerStoreLifecycle = lifecycle
             configureDependencies(&deps)
         }
 

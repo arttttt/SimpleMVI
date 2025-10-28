@@ -168,7 +168,6 @@ extension NotesFeature {
             NotesFeature()
         } withDependencies: { deps in
             deps.notesStore = store
-            deps.notesStoreLifecycle = lifecycle
             configureDependencies(&deps)
         }
 

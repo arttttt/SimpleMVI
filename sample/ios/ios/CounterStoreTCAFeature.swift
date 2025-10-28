@@ -127,7 +127,6 @@ extension CounterFeature {
             CounterFeature()
         } withDependencies: { deps in
             deps.counterStore = store
-            deps.counterStoreLifecycle = lifecycle
             configureDependencies(&deps)
         }
 

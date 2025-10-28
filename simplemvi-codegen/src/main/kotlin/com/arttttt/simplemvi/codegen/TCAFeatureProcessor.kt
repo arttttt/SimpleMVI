@@ -402,7 +402,6 @@ class TCAFeatureProcessor(
             appendLine("            ${featureName}Feature()")
             appendLine("        } withDependencies: { deps in")
             appendLine("            deps.${storeName.toCamelCase()} = store")
-            appendLine("            deps.${storeName.toCamelCase()}Lifecycle = lifecycle")
             appendLine("            configureDependencies(&deps)")
             appendLine("        }")
             appendLine()
