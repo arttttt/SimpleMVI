@@ -43,10 +43,23 @@ extension DependencyValues {
         set { self[TimerStoreSideEffectHandlerKey.self] = newValue }
     }
 }
+
 private struct TimerStoreSideEffectHandlerKey: DependencyKey {
     static let liveValue: any TimerStoreSideEffectHandler = DefaultTimerStoreSideEffectHandler()
 }
 
+extension DependencyValues {
+    var timerStoreLifecycle: _TimerStoreLifecycle {
+        get { self[_TimerStoreLifecycleKey.self] }
+        set { self[_TimerStoreLifecycleKey.self] = newValue }
+    }
+}
+
+private struct _TimerStoreLifecycleKey: DependencyKey {
+    static let liveValue: _TimerStoreLifecycle = {
+        fatalError("Lifecycle not configured")
+    }()
+}
 
 // MARK: - TCA Feature
 @Reducer
@@ -56,8 +69,6 @@ struct TimerFeature {
     struct State: Equatable {
         var isTimerRunning: Bool
         var value: Int
-        var _bridge = TimerStoreBridgeReducer.State()
-        var _lifecycle: _TimerStoreLifecycle?
     }
 
     @CasePathable
@@ -66,18 +77,15 @@ struct TimerFeature {
         case startTimer
         case stopTimer
 
-        case _bridge(TimerStoreBridgeReducer.Action)
-        case _setLifecycle(_TimerStoreLifecycle?)
+        case _stateUpdated(TimerStore.State)
+        case _sideEffect(TimerStoreSideEffect)
     }
 
     @Dependency(\.timerStore) var store
     @Dependency(\.timerStoreSideEffectHandler) var sideEffectHandler
+    @Dependency(\.timerStoreLifecycle) var lifecycle
 
     var body: some ReducerOf<Self> {
-        Scope(state: \._bridge, action: \._bridge) {
-            TimerStoreBridgeReducer()
-        }
-        
         Reduce { state, action in
             switch action {
             case .resetTimer:
@@ -92,19 +100,12 @@ struct TimerFeature {
                 store.accept(intent: TimerStoreIntentStopTimer())
                 return .none
                 
-            case let ._bridge(.stateUpdated(domain)):
-              state.apply(from: domain)
-              return .none
-
-            case let ._bridge(.sideEffect(sideEffect)):
-              return sideEffectHandler.handle(sideEffect.wrapped)
-
-            case ._bridge(.startObserving), ._bridge(.stopObserving):
-              return .none
-            case let ._setLifecycle(lifecycle):
-                state._lifecycle = lifecycle
+            case let ._stateUpdated(domain):
+                state.apply(from: domain)
                 return .none
-                
+
+            case let ._sideEffect(sideEffect):
+                return sideEffectHandler.handle(sideEffect)
             }
         }
     }
@@ -119,73 +120,6 @@ extension TimerFeature.State {
     }
 }
 
-@Reducer
-struct TimerStoreBridgeReducer {
-    
-    struct State : Equatable {}
-    
-    @CasePathable
-    enum Action : Equatable {
-        case startObserving
-        case stopObserving
-        case stateUpdated(TimerStore.State)
-        case sideEffect(StoreSideEffectWrapper<TimerStoreSideEffect>)
-    }
-    
-    @Dependency(\.timerStore) var store
-    
-    var body: some Reducer<State, Action> {
-        Reduce { state, action in
-            switch action {
-            case .startObserving:
-                return observe()
-
-            case .stopObserving:
-              return .merge(
-                .cancel(id: CancelID.state),
-                .cancel(id: CancelID.sideEffects)
-              )
-
-            default:
-              return .none
-            }
-        }
-    }
-}
-
-
-// MARK: - Observable Bridge
-extension TimerStoreBridgeReducer {
-    
-    private enum CancelID { case state, sideEffects }
-    
-    func observe() -> Effect<Action> {
-        .merge(
-            observeState(),
-            observeSideEffects()
-        )
-    }
-    
-    private func observeState() -> Effect<Action> {
-        .run { send in
-            for try await state in asAsyncThrowingStream(CStateFlow<TimerStore.State>(source: store.states)) {
-                await send(.stateUpdated(state))
-            }
-        }
-        .cancellable(id: CancelID.state, cancelInFlight: false)
-    }
-    
-    private func observeSideEffects() -> Effect<Action> {
-        .run { send in
-            for try await sideEffect in asAsyncThrowingStream(CFlow<TimerStoreSideEffect>(source: store.sideEffects)) {
-                await send(.sideEffect(StoreSideEffectWrapper(wrapped: sideEffect)))
-            }
-        }
-        .cancellable(id: CancelID.sideEffects, cancelInFlight: false)
-    }
-}
-
-
 // MARK: - Factory
 extension TimerFeature {
     
@@ -193,24 +127,24 @@ extension TimerFeature {
         store: TimerStore,
         withDependencies configureDependencies: @escaping (inout DependencyValues) -> Void = { _ in }
     ) -> StoreOf<Self> {
+        let lifecycle = _TimerStoreLifecycle(store: store)
+
         let tcaStore = Store(
             initialState: State(
                 isTimerRunning: store.state.isTimerRunning,
                 value: Int(store.state.value),
-                _bridge: TimerStoreBridgeReducer.State(),
-                _lifecycle: nil
             )
         ) {
             TimerFeature()
         } withDependencies: { deps in
             deps.timerStore = store
+            deps.timerStoreLifecycle = lifecycle
             configureDependencies(&deps)
         }
 
-        let lifecycle = _TimerStoreLifecycle(store: store) { action in
+        lifecycle.start { action in
             await tcaStore.send(action)
         }
-        Task { await tcaStore.send(._setLifecycle(lifecycle)) }
 
         return tcaStore
     }
@@ -220,8 +154,7 @@ extension TimerFeature {
 extension TimerFeature.State {
     static func == (lhs: Self, rhs: Self) -> Bool {
         guard lhs.isTimerRunning == rhs.isTimerRunning else { return false }
-        guard lhs.value == rhs.value else { return false }
-        return lhs._bridge == rhs._bridge
+        return lhs.value == rhs.value
     }
 }
 
@@ -230,24 +163,26 @@ final class _TimerStoreLifecycle {
     private let store: TimerStore
     private var observerTask: Task<Void, Never>?
 
-    init(store: TimerStore, send: @escaping (TimerFeature.Action) async -> Void) {
+    init(store: TimerStore) {
         self.store = store
         store.doInit()
+    }
 
+    func start(send: @escaping (TimerFeature.Action) async -> Void) {
         observerTask = Task {
             await withTaskGroup(of: Void.self) { group in
                 group.addTask {
                     do {
-                        for try await state in asAsyncThrowingStream(CStateFlow<TimerStore.State>(source: store.states)) {
-                            await send(._bridge(.stateUpdated(state)))
+                        for try await state in asAsyncThrowingStream(CStateFlow<TimerStore.State>(source: self.store.states)) {
+                            await send(._stateUpdated(state))
                         }
                     } catch {}
                 }
 
                 group.addTask {
                     do {
-                        for try await effect in asAsyncThrowingStream(CFlow<TimerStoreSideEffect>(source: store.sideEffects)) {
-                            await send(._bridge(.sideEffect(StoreSideEffectWrapper(wrapped: effect))))
+                        for try await effect in asAsyncThrowingStream(CFlow<TimerStoreSideEffect>(source: self.store.sideEffects)) {
+                            await send(._sideEffect(effect))
                         }
                     } catch {}
                 }

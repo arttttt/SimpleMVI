@@ -43,10 +43,23 @@ extension DependencyValues {
         set { self[NotesStoreSideEffectHandlerKey.self] = newValue }
     }
 }
+
 private struct NotesStoreSideEffectHandlerKey: DependencyKey {
     static let liveValue: any NotesStoreSideEffectHandler = DefaultNotesStoreSideEffectHandler()
 }
 
+extension DependencyValues {
+    var notesStoreLifecycle: _NotesStoreLifecycle {
+        get { self[_NotesStoreLifecycleKey.self] }
+        set { self[_NotesStoreLifecycleKey.self] = newValue }
+    }
+}
+
+private struct _NotesStoreLifecycleKey: DependencyKey {
+    static let liveValue: _NotesStoreLifecycle = {
+        fatalError("Lifecycle not configured")
+    }()
+}
 
 // MARK: - TCA Feature
 @Reducer
@@ -69,27 +82,24 @@ struct NotesFeature {
         var s11: KotlinMutableSet<NSString>
         var s12: MyEnum
         var s13: Int
-        var _bridge = NotesStoreBridgeReducer.State()
     }
 
     @CasePathable
-    enum Action: Equatable {
+    enum Action {
         case addNote
         case currentMessageChanged(message: String)
         case loadNotes
         case removeNote(id: String)
 
-        case _bridge(NotesStoreBridgeReducer.Action)
+        case _stateUpdated(NotesStore.State)
+        case _sideEffect(NotesStoreSideEffect)
     }
 
     @Dependency(\.notesStore) var store
     @Dependency(\.notesStoreSideEffectHandler) var sideEffectHandler
+    @Dependency(\.notesStoreLifecycle) var lifecycle
 
     var body: some ReducerOf<Self> {
-        Scope(state: \._bridge, action: \._bridge) {
-            NotesStoreBridgeReducer()
-        }
-        
         Reduce { state, action in
             switch action {
             case .addNote:
@@ -108,15 +118,12 @@ struct NotesFeature {
                 store.accept(intent: NotesStoreIntentRemoveNote(id: id))
                 return .none
                 
-            case let ._bridge(.stateUpdated(domain)):
-              state.apply(from: domain)
-              return .none
+            case let ._stateUpdated(domain):
+                state.apply(from: domain)
+                return .none
 
-            case let ._bridge(.sideEffect(sideEffect)):
-              return sideEffectHandler.handle(sideEffect.wrapped)
-
-            case ._bridge(.startObserving), ._bridge(.stopObserving):
-              return .none
+            case let ._sideEffect(sideEffect):
+                return sideEffectHandler.handle(sideEffect)
             }
         }
     }
@@ -144,73 +151,6 @@ extension NotesFeature.State {
     }
 }
 
-@Reducer
-struct NotesStoreBridgeReducer {
-    
-    struct State : Equatable {}
-    
-    @CasePathable
-    enum Action : Equatable {
-        case startObserving
-        case stopObserving
-        case stateUpdated(NotesStore.State)
-        case sideEffect(StoreSideEffectWrapper<NotesStoreSideEffect>)
-    }
-    
-    @Dependency(\.notesStore) var store
-    
-    var body: some Reducer<State, Action> {
-        Reduce { state, action in
-            switch action {
-            case .startObserving:
-                return observe()
-
-            case .stopObserving:
-              return .merge(
-                .cancel(id: CancelID.state),
-                .cancel(id: CancelID.sideEffects)
-              )
-
-            default:
-              return .none
-            }
-        }
-    }
-}
-
-
-// MARK: - Observable Bridge
-extension NotesStoreBridgeReducer {
-    
-    private enum CancelID { case state, sideEffects }
-    
-    func observe() -> Effect<Action> {
-        .merge(
-            observeState(),
-            observeSideEffects()
-        )
-    }
-    
-    private func observeState() -> Effect<Action> {
-        .run { send in
-            for try await state in asAsyncThrowingStream(CStateFlow<NotesStore.State>(source: store.states)) {
-                await send(.stateUpdated(state))
-            }
-        }
-        .cancellable(id: CancelID.state, cancelInFlight: false)
-    }
-    
-    private func observeSideEffects() -> Effect<Action> {
-        .run { send in
-            for try await sideEffect in asAsyncThrowingStream(CFlow<NotesStoreSideEffect>(source: store.sideEffects)) {
-                await send(.sideEffect(StoreSideEffectWrapper(wrapped: sideEffect)))
-            }
-        }
-        .cancellable(id: CancelID.sideEffects, cancelInFlight: false)
-    }
-}
-
-
 // MARK: - Factory
 extension NotesFeature {
     
@@ -218,7 +158,9 @@ extension NotesFeature {
         store: NotesStore,
         withDependencies configureDependencies: @escaping (inout DependencyValues) -> Void = { _ in }
     ) -> StoreOf<Self> {
-        Store(
+        let lifecycle = _NotesStoreLifecycle(store: store)
+
+        let tcaStore = Store(
             initialState: State(
                 currentMessage: store.state.currentMessage,
                 isInProgress: store.state.isInProgress,
@@ -235,14 +177,20 @@ extension NotesFeature {
                 s11: store.state.s11,
                 s12: store.state.s12,
                 s13: Int(store.state.s13),
-                _bridge: NotesStoreBridgeReducer.State()
             )
         ) {
             NotesFeature()
         } withDependencies: { deps in
             deps.notesStore = store
+            deps.notesStoreLifecycle = lifecycle
             configureDependencies(&deps)
         }
+
+        lifecycle.start { action in
+            await tcaStore.send(action)
+        }
+
+        return tcaStore
     }
 }
 
@@ -263,7 +211,45 @@ extension NotesFeature.State {
         guard lhs.s10 == rhs.s10 else { return false }
         guard lhs.s11 === rhs.s11 else { return false }
         guard lhs.s12 == rhs.s12 else { return false }
-        guard lhs.s13 == rhs.s13 else { return false }
-        return lhs._bridge == rhs._bridge
+        return lhs.s13 == rhs.s13
     }
 }
+
+// MARK: - Lifecycle Token
+final class _NotesStoreLifecycle {
+    private let store: NotesStore
+    private var observerTask: Task<Void, Never>?
+
+    init(store: NotesStore) {
+        self.store = store
+        store.doInit()
+    }
+
+    func start(send: @escaping (NotesFeature.Action) async -> Void) {
+        observerTask = Task {
+            await withTaskGroup(of: Void.self) { group in
+                group.addTask {
+                    do {
+                        for try await state in asAsyncThrowingStream(CStateFlow<NotesStore.State>(source: self.store.states)) {
+                            await send(._stateUpdated(state))
+                        }
+                    } catch {}
+                }
+
+                group.addTask {
+                    do {
+                        for try await effect in asAsyncThrowingStream(CFlow<NotesStoreSideEffect>(source: self.store.sideEffects)) {
+                            await send(._sideEffect(effect))
+                        }
+                    } catch {}
+                }
+            }
+        }
+    }
+
+    deinit {
+        observerTask?.cancel()
+        store.destroy()
+    }
+}
+

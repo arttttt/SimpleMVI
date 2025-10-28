@@ -57,9 +57,7 @@ struct CounterTabView: View {
                 }
             }
 
-            WithPerceptionTracking {
-                Text("counter \(store.counter)")
-            }
+            Text("counter \(store.counter)")
         }
     }
 }
