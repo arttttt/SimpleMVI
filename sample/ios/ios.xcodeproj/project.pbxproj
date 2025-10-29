@@ -3,22 +3,17 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557BA273AAA24004C7B11 /* Assets.xcassets */; };
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
-		58C7A0F9B9A126CDAC6E68B3 /* NotesTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C7A1B819EDE505BB5EBB37 /* NotesTabView.swift */; };
-		58C7A36CFBF0531FA0325B04 /* CounterTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C7AEA3A751D39CF9D7ACB8 /* CounterTabView.swift */; };
 		58C7A95581EA4CB285E66E81 /* StateFlowWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C7A1337DE2BFD0585E3025 /* StateFlowWrapper.swift */; };
-		58C7AB9F7B5B30FA12E97970 /* TimerTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C7A7053E7BF2227D186819 /* TimerTabView.swift */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
 		AC9C23882EA3964F0091FA2D /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9C23872EA396440091FA2D /* Helpers.swift */; };
 		ACCA9EF32EB2CADE00025281 /* NotesStoreTCAFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCA9EF12EB2CADE00025281 /* NotesStoreTCAFeature.swift */; };
-		ACCA9EF42EB2CADE00025281 /* TimerStoreTCAFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCA9EF22EB2CADE00025281 /* TimerStoreTCAFeature.swift */; };
-		ACCA9EF52EB2CADE00025281 /* CounterStoreTCAFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCA9EF02EB2CADE00025281 /* CounterStoreTCAFeature.swift */; };
 		ACCA9EF72EB2CFEA00025281 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCA9EF62EB2CFE900025281 /* AppDelegate.swift */; };
 		ACFDD5BA2E9D9D05004F1096 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = ACFDD5B92E9D9D05004F1096 /* ComposableArchitecture */; };
 /* End PBXBuildFile section */
@@ -28,19 +23,20 @@
 		058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		2152FB032600AC8F00CF470E /* iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSApp.swift; sourceTree = "<group>"; };
 		58C7A1337DE2BFD0585E3025 /* StateFlowWrapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StateFlowWrapper.swift; sourceTree = "<group>"; };
-		58C7A1B819EDE505BB5EBB37 /* NotesTabView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotesTabView.swift; sourceTree = "<group>"; };
-		58C7A7053E7BF2227D186819 /* TimerTabView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimerTabView.swift; sourceTree = "<group>"; };
-		58C7AEA3A751D39CF9D7ACB8 /* CounterTabView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CounterTabView.swift; sourceTree = "<group>"; };
 		7555FF7B242A565900829871 /* KotlinProject.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KotlinProject.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FF82242A565900829871 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AB3632DC29227652001CCB65 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		AC9C23872EA396440091FA2D /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
-		ACCA9EF02EB2CADE00025281 /* CounterStoreTCAFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CounterStoreTCAFeature.swift; sourceTree = "<group>"; };
 		ACCA9EF12EB2CADE00025281 /* NotesStoreTCAFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesStoreTCAFeature.swift; sourceTree = "<group>"; };
-		ACCA9EF22EB2CADE00025281 /* TimerStoreTCAFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerStoreTCAFeature.swift; sourceTree = "<group>"; };
 		ACCA9EF62EB2CFE900025281 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		ACCA9EF82EB2D14100025281 /* counter */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = counter; sourceTree = "<group>"; };
+		ACCA9EF92EB2D15800025281 /* timer */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = timer; sourceTree = "<group>"; };
+		ACCA9EFA2EB2D17F00025281 /* notes */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = notes; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		B92378962B6B1156000C7307 /* Frameworks */ = {
@@ -90,20 +86,18 @@
 		7555FF7D242A565900829871 /* ios */ = {
 			isa = PBXGroup;
 			children = (
+				ACCA9EFA2EB2D17F00025281 /* notes */,
+				ACCA9EF92EB2D15800025281 /* timer */,
+				ACCA9EF82EB2D14100025281 /* counter */,
 				ACCA9EF62EB2CFE900025281 /* AppDelegate.swift */,
-				ACCA9EF02EB2CADE00025281 /* CounterStoreTCAFeature.swift */,
 				ACCA9EF12EB2CADE00025281 /* NotesStoreTCAFeature.swift */,
-				ACCA9EF22EB2CADE00025281 /* TimerStoreTCAFeature.swift */,
 				AC9C23872EA396440091FA2D /* Helpers.swift */,
 				058557BA273AAA24004C7B11 /* Assets.xcassets */,
 				7555FF82242A565900829871 /* ContentView.swift */,
 				7555FF8C242A565B00829871 /* Info.plist */,
 				2152FB032600AC8F00CF470E /* iOSApp.swift */,
 				058557D7273AAEEB004C7B11 /* Preview Content */,
-				58C7AEA3A751D39CF9D7ACB8 /* CounterTabView.swift */,
 				58C7A1337DE2BFD0585E3025 /* StateFlowWrapper.swift */,
-				58C7A1B819EDE505BB5EBB37 /* NotesTabView.swift */,
-				58C7A7053E7BF2227D186819 /* TimerTabView.swift */,
 			);
 			path = ios;
 			sourceTree = "<group>";
@@ -131,6 +125,11 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				ACCA9EF82EB2D14100025281 /* counter */,
+				ACCA9EF92EB2D15800025281 /* timer */,
+				ACCA9EFA2EB2D17F00025281 /* notes */,
 			);
 			name = ios;
 			packageProductDependencies = (
@@ -219,14 +218,9 @@
 				ACCA9EF72EB2CFEA00025281 /* AppDelegate.swift in Sources */,
 				2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
-				58C7A36CFBF0531FA0325B04 /* CounterTabView.swift in Sources */,
 				AC9C23882EA3964F0091FA2D /* Helpers.swift in Sources */,
 				58C7A95581EA4CB285E66E81 /* StateFlowWrapper.swift in Sources */,
-				58C7A0F9B9A126CDAC6E68B3 /* NotesTabView.swift in Sources */,
 				ACCA9EF32EB2CADE00025281 /* NotesStoreTCAFeature.swift in Sources */,
-				ACCA9EF42EB2CADE00025281 /* TimerStoreTCAFeature.swift in Sources */,
-				ACCA9EF52EB2CADE00025281 /* CounterStoreTCAFeature.swift in Sources */,
-				58C7AB9F7B5B30FA12E97970 /* TimerTabView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
