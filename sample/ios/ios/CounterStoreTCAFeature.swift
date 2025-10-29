@@ -6,29 +6,6 @@ import Shared
 import Foundation
 
 
-// MARK: - SideEffect Handler Protocol
-protocol CounterStoreSideEffectHandler {
-    func handle(_ effect: CounterStoreSideEffect) -> Effect<CounterFeature.Action>
-}
-
-
-// MARK: - Default Handler Implementation
-struct DefaultCounterStoreSideEffectHandler: CounterStoreSideEffectHandler {
-    func handle(_ effect: CounterStoreSideEffect) -> Effect<CounterFeature.Action>{
-        switch effect {
-        case is CounterStoreSideEffectCantResetCounter:
-            return .none
-        case is CounterStoreSideEffectCounterChanged:
-            return .none
-        case is CounterStoreSideEffectCounterReset:
-            return .none
-        default:
-            return .none
-        }
-    }
-}
-
-
 // MARK: - TCA Dependency Registration
 extension DependencyValues {
     var counterStore: CounterStore {
@@ -41,17 +18,6 @@ private struct CounterStoreKey: DependencyKey {
     static let liveValue: CounterStore = {
         fatalError("CounterStore dependency not configured. Provide it via withDependencies.")
     }()
-}
-
-extension DependencyValues {
-    var counterStoreSideEffectHandler: any CounterStoreSideEffectHandler {
-        get { self[CounterStoreSideEffectHandlerKey.self] }
-        set { self[CounterStoreSideEffectHandlerKey.self] = newValue }
-    }
-}
-
-private struct CounterStoreSideEffectHandlerKey: DependencyKey {
-    static let liveValue: any CounterStoreSideEffectHandler = DefaultCounterStoreSideEffectHandler()
 }
 
 // MARK: - TCA Feature
@@ -74,7 +40,6 @@ struct CounterFeature {
     }
 
     @Dependency(\.counterStore) var store
-    @Dependency(\.counterStoreSideEffectHandler) var sideEffectHandler
 
     var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -96,7 +61,7 @@ struct CounterFeature {
                 return .none
 
             case let ._sideEffect(sideEffect):
-                return sideEffectHandler.handle(sideEffect)
+                return .none
             }
         }
     }

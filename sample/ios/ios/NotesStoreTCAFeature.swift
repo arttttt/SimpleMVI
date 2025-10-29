@@ -6,23 +6,6 @@ import Shared
 import Foundation
 
 
-// MARK: - SideEffect Handler Protocol
-protocol NotesStoreSideEffectHandler {
-    func handle(_ effect: NotesStoreSideEffect) -> Effect<NotesFeature.Action>
-}
-
-
-// MARK: - Default Handler Implementation
-struct DefaultNotesStoreSideEffectHandler: NotesStoreSideEffectHandler {
-    func handle(_ effect: NotesStoreSideEffect) -> Effect<NotesFeature.Action>{
-        switch effect {
-        default:
-            return .none
-        }
-    }
-}
-
-
 // MARK: - TCA Dependency Registration
 extension DependencyValues {
     var notesStore: NotesStore {
@@ -35,17 +18,6 @@ private struct NotesStoreKey: DependencyKey {
     static let liveValue: NotesStore = {
         fatalError("NotesStore dependency not configured. Provide it via withDependencies.")
     }()
-}
-
-extension DependencyValues {
-    var notesStoreSideEffectHandler: any NotesStoreSideEffectHandler {
-        get { self[NotesStoreSideEffectHandlerKey.self] }
-        set { self[NotesStoreSideEffectHandlerKey.self] = newValue }
-    }
-}
-
-private struct NotesStoreSideEffectHandlerKey: DependencyKey {
-    static let liveValue: any NotesStoreSideEffectHandler = DefaultNotesStoreSideEffectHandler()
 }
 
 // MARK: - TCA Feature
@@ -83,7 +55,6 @@ struct NotesFeature {
     }
 
     @Dependency(\.notesStore) var store
-    @Dependency(\.notesStoreSideEffectHandler) var sideEffectHandler
 
     var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -109,7 +80,7 @@ struct NotesFeature {
                 return .none
 
             case let ._sideEffect(sideEffect):
-                return sideEffectHandler.handle(sideEffect)
+                return .none
             }
         }
     }

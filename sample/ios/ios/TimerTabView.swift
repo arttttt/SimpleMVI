@@ -10,9 +10,7 @@ struct TimerTabView: View {
     init() {
         store = TimerFeature.from(
             store: TimerStore(coroutineContext: Dispatchers.shared.Main.immediate),
-            withDependencies: {
-                $0.timerStoreSideEffectHandler = DefaultTimerStoreSideEffectHandler()
-            },
+            withDependencies: { _ in },
         )
     }
 

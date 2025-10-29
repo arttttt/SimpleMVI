@@ -10,9 +10,7 @@ struct CounterTabView: View {
     init() {
         store = CounterFeature.from(
             store: CounterStore(coroutineContext: Dispatchers.shared.Main.immediate),
-            withDependencies: { deps in
-                deps.counterStoreSideEffectHandler = DefaultCounterStoreSideEffectHandler()
-            },
+            withDependencies: { _ in },
         )
 
     }

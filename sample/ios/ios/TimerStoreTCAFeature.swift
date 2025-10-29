@@ -6,23 +6,6 @@ import Shared
 import Foundation
 
 
-// MARK: - SideEffect Handler Protocol
-protocol TimerStoreSideEffectHandler {
-    func handle(_ effect: TimerStoreSideEffect) -> Effect<TimerFeature.Action>
-}
-
-
-// MARK: - Default Handler Implementation
-struct DefaultTimerStoreSideEffectHandler: TimerStoreSideEffectHandler {
-    func handle(_ effect: TimerStoreSideEffect) -> Effect<TimerFeature.Action>{
-        switch effect {
-        default:
-            return .none
-        }
-    }
-}
-
-
 // MARK: - TCA Dependency Registration
 extension DependencyValues {
     var timerStore: TimerStore {
@@ -35,17 +18,6 @@ private struct TimerStoreKey: DependencyKey {
     static let liveValue: TimerStore = {
         fatalError("TimerStore dependency not configured. Provide it via withDependencies.")
     }()
-}
-
-extension DependencyValues {
-    var timerStoreSideEffectHandler: any TimerStoreSideEffectHandler {
-        get { self[TimerStoreSideEffectHandlerKey.self] }
-        set { self[TimerStoreSideEffectHandlerKey.self] = newValue }
-    }
-}
-
-private struct TimerStoreSideEffectHandlerKey: DependencyKey {
-    static let liveValue: any TimerStoreSideEffectHandler = DefaultTimerStoreSideEffectHandler()
 }
 
 // MARK: - TCA Feature
@@ -69,7 +41,6 @@ struct TimerFeature {
     }
 
     @Dependency(\.timerStore) var store
-    @Dependency(\.timerStoreSideEffectHandler) var sideEffectHandler
 
     var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -91,7 +62,7 @@ struct TimerFeature {
                 return .none
 
             case let ._sideEffect(sideEffect):
-                return sideEffectHandler.handle(sideEffect)
+                return .none
             }
         }
     }
