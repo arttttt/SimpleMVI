@@ -153,8 +153,6 @@ class TCAFeatureProcessor(
 
         return buildString {
             append(generateHeader())
-            append(generateSideEffectHandlerProtocol(storeName, featureName))
-            append(generateDefaultSideEffectHandler(storeName, featureName, sideEffectInfos))
             append(generateDependencyRegistrations(storeName))
             append(generateTCAFeature(storeName, featureName, sealedTypeInfos, stateProperties))
             append(generateStateMapper(storeName, featureName, stateProperties))
@@ -177,46 +175,6 @@ class TCAFeatureProcessor(
         }
     }
 
-    // Generates SideEffect handler protocol
-    private fun generateSideEffectHandlerProtocol(
-        storeName: String,
-        featureName: String,
-    ): String {
-        return buildString {
-            appendLine("// MARK: - SideEffect Handler Protocol")
-            appendLine("protocol ${storeName}SideEffectHandler {")
-            appendLine("    func handle(_ effect: ${storeName}SideEffect) -> Effect<${featureName}Feature.Action>")
-            appendLine("}")
-            appendLine()
-            appendLine()
-        }
-    }
-
-    // Generates default SideEffect handler implementation
-    private fun generateDefaultSideEffectHandler(
-        storeName: String,
-        featureName: String,
-        sideEffectInfos: List<SealedTypeInfo>,
-    ): String {
-        return buildString {
-            appendLine("// MARK: - Default Handler Implementation")
-            appendLine("struct Default${storeName}SideEffectHandler: ${storeName}SideEffectHandler {")
-            appendLine("    func handle(_ effect: ${storeName}SideEffect) -> Effect<${featureName}Feature.Action>{")
-            appendLine("        switch effect {")
-            for (subtype in sideEffectInfos) {
-                appendLine("        case is ${storeName}SideEffect${subtype.name}:")
-                appendLine("            return .none")
-            }
-            appendLine("        default:")
-            appendLine("            return .none")
-            appendLine("        }")
-            appendLine("    }")
-            appendLine("}")
-            appendLine()
-            appendLine()
-        }
-    }
-
     // Generates TCA dependency registrations (store, handler, lifecycle)
     private fun generateDependencyRegistrations(storeName: String): String {
         return buildString {
@@ -232,17 +190,6 @@ class TCAFeatureProcessor(
             appendLine("    static let liveValue: $storeName = {")
             appendLine("        fatalError(\"$storeName dependency not configured. Provide it via withDependencies.\")")
             appendLine("    }()")
-            appendLine("}")
-            appendLine()
-            appendLine("extension DependencyValues {")
-            appendLine("    var ${storeName.toCamelCase()}SideEffectHandler: any ${storeName}SideEffectHandler {")
-            appendLine("        get { self[${storeName}SideEffectHandlerKey.self] }")
-            appendLine("        set { self[${storeName}SideEffectHandlerKey.self] = newValue }")
-            appendLine("    }")
-            appendLine("}")
-            appendLine()
-            appendLine("private struct ${storeName}SideEffectHandlerKey: DependencyKey {")
-            appendLine("    static let liveValue: any ${storeName}SideEffectHandler = Default${storeName}SideEffectHandler()")
             appendLine("}")
             appendLine()
         }
@@ -316,7 +263,6 @@ class TCAFeatureProcessor(
     ): String {
         return buildString {
             appendLine("    @Dependency(\\.${storeName.toCamelCase()}) var store")
-            appendLine("    @Dependency(\\.${storeName.toCamelCase()}SideEffectHandler) var sideEffectHandler")
             appendLine()
             appendLine("    var body: some ReducerOf<Self> {")
             appendLine("        Reduce { state, action in")
@@ -340,7 +286,7 @@ class TCAFeatureProcessor(
             appendLine("                return .none")
             appendLine()
             appendLine("            case let ._sideEffect(sideEffect):")
-            appendLine("                return sideEffectHandler.handle(sideEffect)")
+            appendLine("                return .none")
             appendLine("            }")
             appendLine("        }")
             appendLine("    }")
