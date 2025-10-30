@@ -282,7 +282,7 @@ class TCAFeatureProcessor(
             appendLine("                state.apply(from: domain)")
             appendLine("                return .none")
             appendLine()
-            appendLine("            case let ._sideEffect(sideEffect):")
+            appendLine("            case ._sideEffect:")
             appendLine("                return .none")
             appendLine("            }")
             appendLine("        }")
