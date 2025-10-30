@@ -5,57 +5,88 @@ import ComposableArchitecture
 
 struct CounterTabView: View {
     
-    let store: StoreOf<CounterStoreFeature>
+    let store: StoreOf<CounterFeature>
 
     init() {
-        store = CounterStoreFeature.from(
-            store: CounterStore(coroutineContext: Dispatchers.shared.Main.immediate),
-            withDependencies: { _ in },
+        let kmpStore = CounterStore(
+            coroutineContext: Dispatchers.shared.Main.immediate,
         )
-
+        
+        let store = Store(
+            initialState: CounterFeature.State(
+                counter: CounterStoreFeature.State.from(state: kmpStore.state),
+                toast: nil,
+            ),
+        ) {
+            CounterFeature()
+        } withDependencies: { deps in
+            deps.counterStore = kmpStore
+        }
+        
+        kmpStore.bindLifecycle(
+            send: { action in
+                store.send(.counter(action))
+            },
+        )
+        
+        self.store = store
     }
 
     var body: some View {
-        VStack(spacing: 16) {
-            HStack {
-                Button(
-                    action: {
-                        store.send(.increment)
+        ZStack {
+            VStack(spacing: 16) {
+                HStack {
+                    Button(
+                        action: {
+                            store.send(.counter(.increment))
+                        }
+                    ) {
+                        Text("Increment")
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
                     }
-                ) {
-                    Text("Increment")
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
+
+                    Button(
+                        action: {
+                            store.send(.counter(.decrement))
+                        }
+                    ) {
+                        Text("Decrement")
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
+
+                    Button(
+                        action: {
+                            store.send(.counter(.reset))
+                        }
+                    ) {
+                        Text("Reset")
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
                 }
 
-                Button(
-                    action: {
-                        store.send(.decrement)
-                    }
-                ) {
-                    Text("Decrement")
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                }
-
-                Button(
-                    action: {
-                        store.send(.reset)
-                    }
-                ) {
-                    Text("Reset")
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                }
+                Text("counter \(store.counter.counter)")
             }
-
-            Text("counter \(store.counter)")
+            
+            if let toast = store.toast {
+                ToastView(message: toast.text)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+                    .padding(.bottom, 16)
+                    .transition(.asymmetric(
+                        insertion: .opacity,
+                        removal: .opacity,
+                    ))
+                    .id(toast.id)
+            }
         }
+        .animation(.spring(), value: store.toast)
     }
 }

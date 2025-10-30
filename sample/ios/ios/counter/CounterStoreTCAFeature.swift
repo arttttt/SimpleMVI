@@ -60,7 +60,7 @@ struct CounterStoreFeature {
                 state.apply(from: domain)
                 return .none
 
-            case let ._sideEffect(sideEffect):
+            case ._sideEffect:
                 return .none
             }
         }
@@ -75,19 +75,36 @@ extension CounterStoreFeature.State {
     }
 }
 
+// MARK: - State Factory
+extension CounterStoreFeature.State {
+    
+    static func from(state: CounterStore.State) -> Self {
+        return State(
+            counter: Int(state.counter),
+        )
+    }
+}
+
+// MARK: - Lifecycle Binding
+extension CounterStore {
+    
+    func bindLifecycle(
+        send: @escaping (CounterStoreFeature.Action) async -> Void,
+    ) {
+        let lifecycle = _CounterStoreLifecycle(store: self)
+        lifecycle.start(send: send)
+    }
+}
+
 // MARK: - Factory
 extension CounterStoreFeature {
     
     static func from(
         store: CounterStore,
-        withDependencies configureDependencies: @escaping (inout DependencyValues) -> Void = { _ in }
+        withDependencies configureDependencies: @escaping (inout DependencyValues) -> Void = { _ in },
     ) -> StoreOf<Self> {
-        let lifecycle = _CounterStoreLifecycle(store: store)
-
         let tcaStore = Store(
-            initialState: State(
-                counter: Int(store.state.counter),
-            )
+            initialState: State.from(state: store.state)
         ) {
             CounterStoreFeature()
         } withDependencies: { deps in
@@ -95,7 +112,7 @@ extension CounterStoreFeature {
             configureDependencies(&deps)
         }
 
-        lifecycle.start { action in
+        store.bindLifecycle { action in
             await tcaStore.send(action)
         }
 
@@ -147,3 +164,4 @@ final class _CounterStoreLifecycle {
         store.destroy()
     }
 }
+
