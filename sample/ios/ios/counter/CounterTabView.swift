@@ -5,10 +5,10 @@ import ComposableArchitecture
 
 struct CounterTabView: View {
     
-    let store: StoreOf<CounterFeature>
+    let store: StoreOf<CounterStoreFeature>
 
     init() {
-        store = CounterFeature.from(
+        store = CounterStoreFeature.from(
             store: CounterStore(coroutineContext: Dispatchers.shared.Main.immediate),
             withDependencies: { _ in },
         )

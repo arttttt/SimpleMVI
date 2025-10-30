@@ -22,7 +22,7 @@ private struct CounterStoreKey: DependencyKey {
 
 // MARK: - TCA Feature
 @Reducer
-struct CounterFeature {
+struct CounterStoreFeature {
     
     @ObservableState
     struct State: Equatable {
@@ -69,14 +69,14 @@ struct CounterFeature {
 
 
 // MARK: - StoreState → Feature.State Mapper
-extension CounterFeature.State {
+extension CounterStoreFeature.State {
     mutating func apply(from domain: CounterStore.State) {
         self.counter = Int(domain.counter)
     }
 }
 
 // MARK: - Factory
-extension CounterFeature {
+extension CounterStoreFeature {
     
     static func from(
         store: CounterStore,
@@ -89,7 +89,7 @@ extension CounterFeature {
                 counter: Int(store.state.counter),
             )
         ) {
-            CounterFeature()
+            CounterStoreFeature()
         } withDependencies: { deps in
             deps.counterStore = store
             configureDependencies(&deps)
@@ -104,7 +104,7 @@ extension CounterFeature {
 }
 
 // MARK: - Equatable
-extension CounterFeature.State {
+extension CounterStoreFeature.State {
     static func == (lhs: Self, rhs: Self) -> Bool {
         return lhs.counter == rhs.counter
     }
@@ -120,7 +120,7 @@ final class _CounterStoreLifecycle {
         store.doInit()
     }
 
-    func start(send: @escaping (CounterFeature.Action) async -> Void) {
+    func start(send: @escaping (CounterStoreFeature.Action) async -> Void) {
         observerTask = Task {
             await withTaskGroup(of: Void.self) { group in
                 group.addTask {
@@ -147,4 +147,3 @@ final class _CounterStoreLifecycle {
         store.destroy()
     }
 }
-
