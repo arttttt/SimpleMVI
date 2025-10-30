@@ -14,9 +14,7 @@ struct CounterTabView: View {
         
         let store = Store(
             initialState: CounterFeature.State(
-                counter: CounterStoreFeature.State(
-                    counter: Int(kmpStore.state.counter),
-                ),
+                counter: CounterStoreFeature.State.from(state: kmpStore.state),
                 toast: nil,
             ),
         ) {

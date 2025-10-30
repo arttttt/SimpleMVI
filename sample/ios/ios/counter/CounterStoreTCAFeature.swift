@@ -60,7 +60,7 @@ struct CounterStoreFeature {
                 state.apply(from: domain)
                 return .none
 
-            case let ._sideEffect(sideEffect):
+            case ._sideEffect:
                 return .none
             }
         }
@@ -72,6 +72,16 @@ struct CounterStoreFeature {
 extension CounterStoreFeature.State {
     mutating func apply(from domain: CounterStore.State) {
         self.counter = Int(domain.counter)
+    }
+}
+
+// MARK: - State Factory
+extension CounterStoreFeature.State {
+    
+    static func from(state: CounterStore.State) -> Self {
+        return State(
+            counter: Int(state.counter),
+        )
     }
 }
 
@@ -94,9 +104,7 @@ extension CounterStoreFeature {
         withDependencies configureDependencies: @escaping (inout DependencyValues) -> Void = { _ in },
     ) -> StoreOf<Self> {
         let tcaStore = Store(
-            initialState: State(
-                counter: Int(store.state.counter),
-            )
+            initialState: State.from(state: store.state)
         ) {
             CounterStoreFeature()
         } withDependencies: { deps in
