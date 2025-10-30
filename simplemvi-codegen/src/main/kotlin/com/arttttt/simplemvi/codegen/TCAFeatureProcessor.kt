@@ -152,8 +152,9 @@ class TCAFeatureProcessor(
             append(generateDependencyRegistrations(storeName))
             append(generateTCAFeature(storeName, featureName, sealedTypeInfos, stateProperties))
             append(generateStateMapper(storeName, featureName, stateProperties))
+            append(generateStateFactory(storeName, featureName, stateProperties))
             append(generateBindLifecycleExtension(storeName, featureName))
-            append(generateFactory(storeName, featureName, stateProperties))
+            append(generateFactory(storeName, featureName))
             append(generateEquatable(featureName, stateProperties))
             append(generateLifecycleToken(storeName, featureName))
         }
@@ -314,6 +315,33 @@ class TCAFeatureProcessor(
         }
     }
 
+    // Generates State factory extension
+    private fun generateStateFactory(
+        storeName: String,
+        featureName: String,
+        stateProperties: List<StateProperty>,
+    ): String {
+        return buildString {
+            appendLine("// MARK: - State Factory")
+            appendLine("extension ${featureName}Feature.State {")
+            appendLine("    ")
+            appendLine("    static func from(state: ${storeName}.State) -> Self {")
+            appendLine("        return State(")
+            for (prop in stateProperties) {
+                val conversion = if (prop.type.declaration.simpleName.asString() in listOf("Int", "Long")) {
+                    "Int(state.${prop.name})"
+                } else {
+                    "state.${prop.name}"
+                }
+                appendLine("            ${prop.name}: $conversion,")
+            }
+            appendLine("        )")
+            appendLine("    }")
+            appendLine("}")
+            appendLine()
+        }
+    }
+
     // Generates KMP Store lifecycle binding
     private fun generateBindLifecycleExtension(
         storeName: String,
@@ -338,7 +366,6 @@ class TCAFeatureProcessor(
     private fun generateFactory(
         storeName: String,
         featureName: String,
-        stateProperties: List<StateProperty>,
     ): String {
         return buildString {
             appendLine("// MARK: - Factory")
@@ -349,16 +376,7 @@ class TCAFeatureProcessor(
             appendLine("        withDependencies configureDependencies: @escaping (inout DependencyValues) -> Void = { _ in },")
             appendLine("    ) -> StoreOf<Self> {")
             appendLine("        let tcaStore = Store(")
-            appendLine("            initialState: State(")
-            for (prop in stateProperties) {
-                val conversion = if (prop.type.declaration.simpleName.asString() in listOf("Int", "Long")) {
-                    "Int(store.state.${prop.name})"
-                } else {
-                    "store.state.${prop.name}"
-                }
-                appendLine("                ${prop.name}: $conversion,")
-            }
-            appendLine("            )")
+            appendLine("            initialState: State.from(kmpState: store.state)")
             appendLine("        ) {")
             appendLine("            ${featureName}Feature()")
             appendLine("        } withDependencies: { deps in")
