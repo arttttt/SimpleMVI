@@ -5,14 +5,12 @@ import ComposableArchitecture
 
 struct CounterTabView: View {
     
-    let store: StoreOf<CounterFeature>
+    let store: StoreOf<CounterStoreFeature>
 
     init() {
-        store = CounterFeature.from(
+        store = CounterStoreFeature.from(
             store: CounterStore(coroutineContext: Dispatchers.shared.Main.immediate),
-            withDependencies: { deps in
-                deps.counterStoreSideEffectHandler = DefaultCounterStoreSideEffectHandler()
-            },
+            withDependencies: { _ in },
         )
 
     }
@@ -57,9 +55,7 @@ struct CounterTabView: View {
                 }
             }
 
-            WithPerceptionTracking {
-                Text("counter \(store.counter)")
-            }
+            Text("counter \(store.counter)")
         }
     }
 }
