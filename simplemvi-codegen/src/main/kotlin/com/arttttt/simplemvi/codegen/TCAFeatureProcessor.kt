@@ -326,7 +326,7 @@ class TCAFeatureProcessor(
             appendLine("extension ${featureName}Feature.State {")
             appendLine("    ")
             appendLine("    static func from(state: ${storeName}.State) -> Self {")
-            appendLine("        return State(")
+            appendLine("        return Self(")
             for (prop in stateProperties) {
                 val conversion = if (prop.type.declaration.simpleName.asString() in listOf("Int", "Long")) {
                     "Int(state.${prop.name})"
