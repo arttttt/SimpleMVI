@@ -62,17 +62,14 @@ class TCAFeatureProcessor(
         val storeName = storeClass.simpleName.asString()
         val intentType = storeTypes.intentDeclaration
         val stateType = storeTypes.stateDeclaration
-        val sideEffectType = storeTypes.sideEffectDeclaration
 
         val intentInfos = extractSealedTypeInfo(intentType)
-        val sideEffectInfos = extractSealedTypeInfo(sideEffectType)
 
         val stateProperties = extractStateProperties(stateType)
 
         val swiftCode = generateSwiftCode(
             storeName = storeName,
             sealedTypeInfos = intentInfos,
-            sideEffectInfos = sideEffectInfos,
             stateProperties = stateProperties,
         )
 
@@ -146,16 +143,16 @@ class TCAFeatureProcessor(
     private fun generateSwiftCode(
         storeName: String,
         sealedTypeInfos: List<SealedTypeInfo>,
-        sideEffectInfos: List<SealedTypeInfo>,
         stateProperties: List<StateProperty>,
     ): String {
-        val featureName = storeName.removeSuffix("Store")
+        val featureName = storeName
 
         return buildString {
             append(generateHeader())
             append(generateDependencyRegistrations(storeName))
             append(generateTCAFeature(storeName, featureName, sealedTypeInfos, stateProperties))
             append(generateStateMapper(storeName, featureName, stateProperties))
+            append(generateBindLifecycleExtension(storeName, featureName))
             append(generateFactory(storeName, featureName, stateProperties))
             append(generateEquatable(featureName, stateProperties))
             append(generateLifecycleToken(storeName, featureName))
@@ -317,6 +314,26 @@ class TCAFeatureProcessor(
         }
     }
 
+    // Generates KMP Store lifecycle binding
+    private fun generateBindLifecycleExtension(
+        storeName: String,
+        featureName: String,
+    ): String {
+        return buildString {
+            appendLine("// MARK: - Lifecycle Binding")
+            appendLine("extension $storeName {")
+            appendLine("    ")
+            appendLine("    func bindLifecycle(")
+            appendLine("        send: @escaping (${featureName}Feature.Action) async -> Void,")
+            appendLine("    ) {")
+            appendLine("        let lifecycle = _${storeName}Lifecycle(store: self)")
+            appendLine("        lifecycle.start(send: send)")
+            appendLine("    }")
+            appendLine("}")
+            appendLine()
+        }
+    }
+
     // Generates factory extension with lifecycle binding
     private fun generateFactory(
         storeName: String,
@@ -329,10 +346,8 @@ class TCAFeatureProcessor(
             appendLine("    ")
             appendLine("    static func from(")
             appendLine("        store: ${storeName},")
-            appendLine("        withDependencies configureDependencies: @escaping (inout DependencyValues) -> Void = { _ in }")
+            appendLine("        withDependencies configureDependencies: @escaping (inout DependencyValues) -> Void = { _ in },")
             appendLine("    ) -> StoreOf<Self> {")
-            appendLine("        let lifecycle = _${storeName}Lifecycle(store: store)")
-            appendLine()
             appendLine("        let tcaStore = Store(")
             appendLine("            initialState: State(")
             for (prop in stateProperties) {
@@ -351,7 +366,7 @@ class TCAFeatureProcessor(
             appendLine("            configureDependencies(&deps)")
             appendLine("        }")
             appendLine()
-            appendLine("        lifecycle.start { action in")
+            appendLine("        store.bindLifecycle { action in")
             appendLine("            await tcaStore.send(action)")
             appendLine("        }")
             appendLine()
