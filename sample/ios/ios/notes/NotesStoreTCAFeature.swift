@@ -108,15 +108,24 @@ extension NotesFeature.State {
     }
 }
 
+// MARK: - Lifecycle Binding
+extension NotesStore {
+    
+    func bindLifecycle(
+        send: @escaping (NotesFeature.Action) async -> Void,
+    ) {
+        let lifecycle = _NotesStoreLifecycle(store: self)
+        lifecycle.start(send: send)
+    }
+}
+
 // MARK: - Factory
 extension NotesFeature {
     
     static func from(
         store: NotesStore,
-        withDependencies configureDependencies: @escaping (inout DependencyValues) -> Void = { _ in }
+        withDependencies configureDependencies: @escaping (inout DependencyValues) -> Void = { _ in },
     ) -> StoreOf<Self> {
-        let lifecycle = _NotesStoreLifecycle(store: store)
-
         let tcaStore = Store(
             initialState: State(
                 currentMessage: store.state.currentMessage,
@@ -142,7 +151,7 @@ extension NotesFeature {
             configureDependencies(&deps)
         }
 
-        lifecycle.start { action in
+        store.bindLifecycle { action in
             await tcaStore.send(action)
         }
 

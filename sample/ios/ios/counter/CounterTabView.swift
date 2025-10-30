@@ -5,14 +5,33 @@ import ComposableArchitecture
 
 struct CounterTabView: View {
     
-    let store: StoreOf<CounterStoreFeature>
+    let store: StoreOf<CounterFeature>
 
     init() {
-        store = CounterStoreFeature.from(
-            store: CounterStore(coroutineContext: Dispatchers.shared.Main.immediate),
-            withDependencies: { _ in },
+        let kmpStore = CounterStore(
+            coroutineContext: Dispatchers.shared.Main.immediate,
         )
-
+        
+        let store = Store(
+            initialState: CounterFeature.State(
+                counter: CounterStoreFeature.State(
+                    counter: Int(kmpStore.state.counter),
+                ),
+                toast: nil,
+            ),
+        ) {
+            CounterFeature()
+        } withDependencies: { deps in
+            deps.counterStore = kmpStore
+        }
+        
+        kmpStore.bindLifecycle(
+            send: { action in
+                store.send(.counter(action))
+            },
+        )
+        
+        self.store = store
     }
 
     var body: some View {
@@ -20,7 +39,7 @@ struct CounterTabView: View {
             HStack {
                 Button(
                     action: {
-                        store.send(.increment)
+                        store.send(.counter(.increment))
                     }
                 ) {
                     Text("Increment")
@@ -32,7 +51,7 @@ struct CounterTabView: View {
 
                 Button(
                     action: {
-                        store.send(.decrement)
+                        store.send(.counter(.decrement))
                     }
                 ) {
                     Text("Decrement")
@@ -44,7 +63,7 @@ struct CounterTabView: View {
 
                 Button(
                     action: {
-                        store.send(.reset)
+                        store.send(.counter(.reset))
                     }
                 ) {
                     Text("Reset")
@@ -55,7 +74,7 @@ struct CounterTabView: View {
                 }
             }
 
-            Text("counter \(store.counter)")
+            Text("counter \(store.counter.counter)")
         }
     }
 }

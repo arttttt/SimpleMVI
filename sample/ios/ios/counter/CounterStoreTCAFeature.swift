@@ -75,15 +75,24 @@ extension CounterStoreFeature.State {
     }
 }
 
+// MARK: - Lifecycle Binding
+extension CounterStore {
+    
+    func bindLifecycle(
+        send: @escaping (CounterStoreFeature.Action) async -> Void,
+    ) {
+        let lifecycle = _CounterStoreLifecycle(store: self)
+        lifecycle.start(send: send)
+    }
+}
+
 // MARK: - Factory
 extension CounterStoreFeature {
     
     static func from(
         store: CounterStore,
-        withDependencies configureDependencies: @escaping (inout DependencyValues) -> Void = { _ in }
+        withDependencies configureDependencies: @escaping (inout DependencyValues) -> Void = { _ in },
     ) -> StoreOf<Self> {
-        let lifecycle = _CounterStoreLifecycle(store: store)
-
         let tcaStore = Store(
             initialState: State(
                 counter: Int(store.state.counter),
@@ -95,7 +104,7 @@ extension CounterStoreFeature {
             configureDependencies(&deps)
         }
 
-        lifecycle.start { action in
+        store.bindLifecycle { action in
             await tcaStore.send(action)
         }
 
@@ -147,3 +156,4 @@ final class _CounterStoreLifecycle {
         store.destroy()
     }
 }
+

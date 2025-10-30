@@ -13,7 +13,6 @@
 		58C7A95581EA4CB285E66E81 /* StateFlowWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C7A1337DE2BFD0585E3025 /* StateFlowWrapper.swift */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
 		AC9C23882EA3964F0091FA2D /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9C23872EA396440091FA2D /* Helpers.swift */; };
-		ACCA9EF32EB2CADE00025281 /* NotesStoreTCAFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCA9EF12EB2CADE00025281 /* NotesStoreTCAFeature.swift */; };
 		ACCA9EF72EB2CFEA00025281 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCA9EF62EB2CFE900025281 /* AppDelegate.swift */; };
 		ACFDD5BA2E9D9D05004F1096 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = ACFDD5B92E9D9D05004F1096 /* ComposableArchitecture */; };
 /* End PBXBuildFile section */
@@ -28,7 +27,6 @@
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AB3632DC29227652001CCB65 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		AC9C23872EA396440091FA2D /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
-		ACCA9EF12EB2CADE00025281 /* NotesStoreTCAFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesStoreTCAFeature.swift; sourceTree = "<group>"; };
 		ACCA9EF62EB2CFE900025281 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -90,7 +88,6 @@
 				ACCA9EF92EB2D15800025281 /* timer */,
 				ACCA9EF82EB2D14100025281 /* counter */,
 				ACCA9EF62EB2CFE900025281 /* AppDelegate.swift */,
-				ACCA9EF12EB2CADE00025281 /* NotesStoreTCAFeature.swift */,
 				AC9C23872EA396440091FA2D /* Helpers.swift */,
 				058557BA273AAA24004C7B11 /* Assets.xcassets */,
 				7555FF82242A565900829871 /* ContentView.swift */,
@@ -220,7 +217,6 @@
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
 				AC9C23882EA3964F0091FA2D /* Helpers.swift in Sources */,
 				58C7A95581EA4CB285E66E81 /* StateFlowWrapper.swift in Sources */,
-				ACCA9EF32EB2CADE00025281 /* NotesStoreTCAFeature.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

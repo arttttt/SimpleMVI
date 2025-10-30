@@ -24,7 +24,6 @@ struct CounterFeature {
     @Dependency(\.counterStore) var store
     
     var body: some ReducerOf<Self> {
-        let childTCA = CounterStoreFeature.from(store: store)
         Scope(state: \.counter, action: \.counter) {
             CounterStoreFeature()
         }

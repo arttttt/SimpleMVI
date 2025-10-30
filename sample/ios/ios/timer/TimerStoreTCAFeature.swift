@@ -77,15 +77,24 @@ extension TimerFeature.State {
     }
 }
 
+// MARK: - Lifecycle Binding
+extension TimerStore {
+    
+    func bindLifecycle(
+        send: @escaping (TimerFeature.Action) async -> Void,
+    ) {
+        let lifecycle = _TimerStoreLifecycle(store: self)
+        lifecycle.start(send: send)
+    }
+}
+
 // MARK: - Factory
 extension TimerFeature {
     
     static func from(
         store: TimerStore,
-        withDependencies configureDependencies: @escaping (inout DependencyValues) -> Void = { _ in }
+        withDependencies configureDependencies: @escaping (inout DependencyValues) -> Void = { _ in },
     ) -> StoreOf<Self> {
-        let lifecycle = _TimerStoreLifecycle(store: store)
-
         let tcaStore = Store(
             initialState: State(
                 isTimerRunning: store.state.isTimerRunning,
@@ -98,7 +107,7 @@ extension TimerFeature {
             configureDependencies(&deps)
         }
 
-        lifecycle.start { action in
+        store.bindLifecycle { action in
             await tcaStore.send(action)
         }
 
