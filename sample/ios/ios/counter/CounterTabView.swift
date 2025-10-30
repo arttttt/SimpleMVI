@@ -35,46 +35,60 @@ struct CounterTabView: View {
     }
 
     var body: some View {
-        VStack(spacing: 16) {
-            HStack {
-                Button(
-                    action: {
-                        store.send(.counter(.increment))
+        ZStack {
+            VStack(spacing: 16) {
+                HStack {
+                    Button(
+                        action: {
+                            store.send(.counter(.increment))
+                        }
+                    ) {
+                        Text("Increment")
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
                     }
-                ) {
-                    Text("Increment")
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
+
+                    Button(
+                        action: {
+                            store.send(.counter(.decrement))
+                        }
+                    ) {
+                        Text("Decrement")
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
+
+                    Button(
+                        action: {
+                            store.send(.counter(.reset))
+                        }
+                    ) {
+                        Text("Reset")
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
                 }
 
-                Button(
-                    action: {
-                        store.send(.counter(.decrement))
-                    }
-                ) {
-                    Text("Decrement")
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                }
-
-                Button(
-                    action: {
-                        store.send(.counter(.reset))
-                    }
-                ) {
-                    Text("Reset")
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                }
+                Text("counter \(store.counter.counter)")
             }
-
-            Text("counter \(store.counter.counter)")
+            
+            if let toast = store.toast {
+                ToastView(message: toast.text)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+                    .padding(.bottom, 16)
+                    .transition(.asymmetric(
+                        insertion: .opacity,
+                        removal: .opacity,
+                    ))
+                    .id(toast.id)
+            }
         }
+        .animation(.spring(), value: store.toast)
     }
 }
