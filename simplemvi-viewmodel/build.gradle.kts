@@ -10,6 +10,11 @@ kotlin {
 
             implementation(libs.kotlin.coroutines.core)
             implementation(libs.jetbrains.androidx.lifecycle.viewmodel.compose)
+            implementation(libs.kotlin.serialization.json)
+        }
+
+        androidMain.dependencies {
+            implementation(libs.androidx.lifecycle.viewmodel.savedstate)
         }
     }
 }

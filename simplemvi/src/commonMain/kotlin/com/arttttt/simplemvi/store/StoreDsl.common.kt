@@ -3,7 +3,9 @@ package com.arttttt.simplemvi.store
 import com.arttttt.simplemvi.actor.Actor
 import com.arttttt.simplemvi.config.simpleMVIConfig
 import com.arttttt.simplemvi.logging.LoggingMiddleware
+import com.arttttt.simplemvi.logging.LoggingPlugin
 import com.arttttt.simplemvi.middleware.Middleware
+import com.arttttt.simplemvi.plugin.StorePlugin
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
 
@@ -29,19 +31,30 @@ public fun <Intent : Any, State : Any, SideEffect : Any> createStore(
     initialState: State,
     initialIntents: List<Intent> = emptyList(),
     middlewares: List<Middleware<Intent, State, SideEffect>> = emptyList(),
+    plugins: List<StorePlugin<Intent, State, SideEffect>> = emptyList(),
     actor: Actor<Intent, State, SideEffect>,
 ): Store<Intent, State, SideEffect> {
     val realMiddlewares = buildList {
-        if (name != null && simpleMVIConfig.logger != null) {
+/*        if (name != null && simpleMVIConfig.logger != null) {
             add(
                 LoggingMiddleware(
                     name = name.name,
                     logger = simpleMVIConfig.logger!!,
                 )
             )
-        }
+        }*/
 
         addAll(middlewares)
+    }
+
+    val realPlugins = buildList<StorePlugin<Intent, State, SideEffect>> {
+        if (name != null && simpleMVIConfig.logger != null) {
+            this += LoggingPlugin(
+                logger = simpleMVIConfig.logger!!,
+            )
+        }
+
+        this += plugins
     }
 
     return DefaultStore(
@@ -49,6 +62,7 @@ public fun <Intent : Any, State : Any, SideEffect : Any> createStore(
         initialState = initialState,
         initialIntents = initialIntents,
         middlewares = realMiddlewares,
+        plugins = realPlugins,
         actor = actor,
     ).apply {
         if (initialize) {
