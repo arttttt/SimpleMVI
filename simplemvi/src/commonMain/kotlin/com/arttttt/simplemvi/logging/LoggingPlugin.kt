@@ -5,6 +5,7 @@ import com.arttttt.simplemvi.plugin.StorePlugin
 import kotlin.properties.Delegates
 
 public class LoggingPlugin<Intent : Any, State : Any, SideEffect : Any>(
+    private val name: String?,
     private val logger: Logger,
 ) : StorePlugin<Intent, State, SideEffect> {
 
@@ -14,9 +15,6 @@ public class LoggingPlugin<Intent : Any, State : Any, SideEffect : Any>(
     }
 
     private var context: StorePlugin.Context<Intent, State, SideEffect> by Delegates.notNull()
-
-    private val name: String?
-        get() = context.name?.name
 
     override fun onInit(context: StorePlugin.Context<Intent, State, SideEffect>) {
         this.context = context

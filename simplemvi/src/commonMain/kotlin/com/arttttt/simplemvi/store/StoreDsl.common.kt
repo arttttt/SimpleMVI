@@ -50,6 +50,7 @@ public fun <Intent : Any, State : Any, SideEffect : Any> createStore(
     val realPlugins = buildList<StorePlugin<Intent, State, SideEffect>> {
         if (name != null && simpleMVIConfig.logger != null) {
             this += LoggingPlugin(
+                name = name.name,
                 logger = simpleMVIConfig.logger!!,
             )
         }
