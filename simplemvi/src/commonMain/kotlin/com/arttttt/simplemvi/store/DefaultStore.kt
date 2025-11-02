@@ -76,14 +76,14 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
         middlewares.forEach { it.onInit(_states.value) }
         val context = StorePlugin.Context<Intent, State, SideEffect>(
             scope = scope,
-            name = null,
-            getCurrentState = this@DefaultStore::state::get,
             sendIntent = this@DefaultStore::accept,
             setState = { newState ->
                 val oldState = _states.value
                 _states.value = newState
                 plugins.forEach { it.onStateChanged(oldState, newState) }
             },
+            sendSideEffect = this::postSideEffect,
+            getState = this@DefaultStore::state::get,
         )
         plugins.forEach { plugin -> plugin.onInit(context) }
 
