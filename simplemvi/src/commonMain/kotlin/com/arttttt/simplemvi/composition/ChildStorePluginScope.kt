@@ -46,7 +46,6 @@ public class ChildStorePluginScope<ParentIntent : Any, ParentState : Any, Parent
  *     childStorePlugin {
  *         install(
  *             store = feedStore,
- *             getChildState = { feed },
  *             updateParentState = { copy(feed = it) },
  *             unwrapIntent = { (it as? HomeIntent.Feed)?.intent },
  *             wrapSideEffect = { HomeSideEffect.Feed(it) },
@@ -54,7 +53,6 @@ public class ChildStorePluginScope<ParentIntent : Any, ParentState : Any, Parent
  *
  *         install(
  *             store = accountStore,
- *             getChildState = { account },
  *             updateParentState = { copy(account = it) },
  *             unwrapIntent = { (it as? HomeIntent.Account)?.intent },
  *             wrapSideEffect = { HomeSideEffect.Account(it) },
