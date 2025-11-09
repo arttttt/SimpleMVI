@@ -49,7 +49,7 @@ public class DefaultStore<Intent : Any, State : Any, SideEffect : Any>(
     override val plugins: List<StorePlugin<Intent, State, SideEffect>>,
     private val initialIntents: List<Intent>,
     private val actor: Actor<Intent, State, SideEffect>,
-) : Store<Intent, State, SideEffect>, PluginsOwner<Intent, State, SideEffect> {
+) : Store<Intent, State, SideEffect>{
 
     private val _states: MutableStateFlow<State> = MutableStateFlow(
         plugins.fold(initialState) { state, plugin ->
