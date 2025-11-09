@@ -32,7 +32,7 @@ class NotesStore(
         notes = emptyList(),
     ),
     initialIntents = listOf(Intent.LoadNotes),
-    middlewares = emptyList(),
+    plugins = emptyList(),
     actor = delegatedActor(
         intentHandlers = listOf(
             addNoteIntentHandler(notesRepository),

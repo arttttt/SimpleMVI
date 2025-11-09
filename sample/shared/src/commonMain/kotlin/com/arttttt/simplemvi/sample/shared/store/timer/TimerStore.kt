@@ -16,8 +16,8 @@ class TimerStore(
         value = 0,
     ),
     initialIntents = emptyList(),
-    middlewares = listOf(
-        TimerMiddleware(),
+    plugins = listOf(
+        TimerPlugin(),
     ),
     actor = TimerStoreActor(),
 ) {

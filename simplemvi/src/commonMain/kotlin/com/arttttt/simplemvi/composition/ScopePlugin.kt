@@ -27,6 +27,7 @@ public class ScopePlugin<ParentIntent : Any, ParentState : Any, ParentSideEffect
      * @throws IllegalStateException if key not found
      */
     @Suppress("UNCHECKED_CAST")
+    @PublishedApi
     internal fun <ChildIntent : Any, ChildState : Any, ChildSideEffect : Any> childStore(
         key: String,
     ): Store<ChildIntent, ChildState, ChildSideEffect> {
