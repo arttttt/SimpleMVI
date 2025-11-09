@@ -17,19 +17,28 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.arttttt.simplemvi.composition.scoped
 import com.arttttt.simplemvi.sample.Screens
 import com.arttttt.simplemvi.sample.bottomnavigation.BottomNavigationContent
+import com.arttttt.simplemvi.sample.feature1.container.Feature1ContainerScreen
+import com.arttttt.simplemvi.sample.feature1.container.Feature1ContainerStore
 import com.arttttt.simplemvi.store.plusAssign
 
 @Composable
 fun RootScreen() {
-    val rootStore = remember { RootStore() }
+    val rootStore = remember {
+        RootStore(
+            feature1ContainerStore = Feature1ContainerStore(),
+        )
+    }
 
     val state by rootStore.states.collectAsState()
 
     when (state.mode) {
         SampleMode.Classic -> ClassicModeContent()
-        SampleMode.Composition -> {}
+        SampleMode.Composition -> Feature1ContainerScreen(
+            store = rootStore.scoped(),
+        )
         SampleMode.Unknown -> ChooseMode(
             onClassicModeClick = {
                 rootStore += RootStore.Intent.SetClassicMode
