@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.arttttt.simplemvi.sample.bottomnavigation.BottomNavigationContent
+import com.arttttt.simplemvi.sample.root.RootScreen
 import com.arttttt.simplemvi.sample.ui.theme.SimpleMVITheme
 
 class MainActivity : ComponentActivity() {
@@ -20,17 +21,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             SimpleMVITheme {
-                val navController = rememberNavController()
-
-                NavHost(
-                    modifier = Modifier.imePadding(),
-                    navController = navController,
-                    startDestination = Screens.BottomNavigation
-                ) {
-                    composable<Screens.BottomNavigation> {
-                        BottomNavigationContent()
-                    }
-                }
+                RootScreen()
             }
         }
     }
