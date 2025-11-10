@@ -10,11 +10,9 @@ import com.arttttt.simplemvi.store.Store
  * @return Child store
  * @throws IllegalStateException if ScopePlugin not found or key not found
  */
-public inline fun <reified Intent : Any, reified State : Any, reified SideEffect : Any> Store<*, *, *>.scoped(
+public inline fun <reified Intent : Any, reified State : Any, reified SideEffect : Any> PluginsOwner<*, *, *>.scoped(
     key: String = key<State>(),
 ): Store<Intent, State, SideEffect> {
-    require(this is PluginsOwner<*, *, *>) { "Store must be a PluginsOwner" }
-
     val scopePlugin = plugins
         .filterIsInstance<ScopePlugin<*, *, *>>()
         .firstOrNull()
