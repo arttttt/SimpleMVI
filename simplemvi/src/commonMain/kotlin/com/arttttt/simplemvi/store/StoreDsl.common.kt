@@ -2,8 +2,8 @@ package com.arttttt.simplemvi.store
 
 import com.arttttt.simplemvi.actor.Actor
 import com.arttttt.simplemvi.config.simpleMVIConfig
-import com.arttttt.simplemvi.logging.LoggingMiddleware
-import com.arttttt.simplemvi.middleware.Middleware
+import com.arttttt.simplemvi.logging.LoggingPlugin
+import com.arttttt.simplemvi.plugin.StorePlugin
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
 
@@ -15,12 +15,12 @@ import kotlin.coroutines.CoroutineContext
  * @param coroutineContext [CoroutineContext] to be used inside the [Store] for launching coroutines
  * @param initialState initial [State] of the [Store]
  * @param initialIntents a [List] of the initial [Intent] to start the [Store]
- * @param middlewares a [List] of the [Store] [Middleware]
+ * @param plugins a [List] of the [StorePlugin]
  * @param actor an [Actor] to be used within the [Store]
  *
  * @see Store
  * @see Actor
- * @see Middleware
+ * @see StorePlugin
  */
 public fun <Intent : Any, State : Any, SideEffect : Any> createStore(
     name: StoreName?,
@@ -28,27 +28,25 @@ public fun <Intent : Any, State : Any, SideEffect : Any> createStore(
     coroutineContext: CoroutineContext = Dispatchers.Main.immediate,
     initialState: State,
     initialIntents: List<Intent> = emptyList(),
-    middlewares: List<Middleware<Intent, State, SideEffect>> = emptyList(),
+    plugins: List<StorePlugin<Intent, State, SideEffect>> = emptyList(),
     actor: Actor<Intent, State, SideEffect>,
 ): Store<Intent, State, SideEffect> {
-    val realMiddlewares = buildList {
+    val realPlugins = buildList<StorePlugin<Intent, State, SideEffect>> {
         if (name != null && simpleMVIConfig.logger != null) {
-            add(
-                LoggingMiddleware(
-                    name = name.name,
-                    logger = simpleMVIConfig.logger!!,
-                )
+            this += LoggingPlugin(
+                name = name.name,
+                logger = simpleMVIConfig.logger!!,
             )
         }
 
-        addAll(middlewares)
+        this += plugins
     }
 
     return DefaultStore(
         coroutineContext = coroutineContext,
         initialState = initialState,
         initialIntents = initialIntents,
-        middlewares = realMiddlewares,
+        plugins = realPlugins,
         actor = actor,
     ).apply {
         if (initialize) {

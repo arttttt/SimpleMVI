@@ -1,51 +1,24 @@
 package com.arttttt.simplemvi.logging
 
-import com.arttttt.simplemvi.store.Store
-import com.arttttt.simplemvi.store.StoreName
 import com.arttttt.simplemvi.logging.logger.Logger
-import com.arttttt.simplemvi.middleware.Middleware
+import com.arttttt.simplemvi.plugin.StorePlugin
+import kotlin.properties.Delegates
 
-/**
- * [Middleware] implementation that logs all [Store] events
- *
- * This middleware provides comprehensive logging of store lifecycle and operations:
- * - Store initialization
- * - Intent reception
- * - State changes (both old and new states)
- * - Side effect emission
- * - Store destruction
- *
- * The log format is: `[StoreName] | [EventType] | [Message]`
- *
- * Example log output:
- * ```
- * MyStore | Initialization
- * MyStore | Intent | MyIntent.LoadData
- * MyStore | Old state | MyState(loading=false, data=null)
- * MyStore | New state | MyState(loading=true, data=null)
- * MyStore | SideEffect | MySideEffect.DataLoaded
- * MyStore | Destroying
- * ```
- *
- * If no name is provided, "UnnamedStore" is used as the tag.
- *
- * @param name Optional name of the [Store] for logging. If null, uses default name
- * @param logger [Logger] implementation to use for logging
- *
- * @see Middleware
- * @see Logger
- */
-public class LoggingMiddleware<Intent : Any, State : Any, SideEffect : Any>(
+public class LoggingPlugin<Intent : Any, State : Any, SideEffect : Any>(
     private val name: String?,
     private val logger: Logger,
-) : Middleware<Intent, State, SideEffect> {
+) : StorePlugin<Intent, State, SideEffect> {
 
     public companion object {
 
         private const val DEFAULT_STORE_NAME = "UnnamedStore"
     }
 
-    override fun onInit(state: State) {
+    private var context: StorePlugin.Context<Intent, State, SideEffect> by Delegates.notNull()
+
+    override fun onInit(context: StorePlugin.Context<Intent, State, SideEffect>) {
+        this.context = context
+
         logger.log(
             buildMessage(
                 tag = name,
@@ -54,7 +27,7 @@ public class LoggingMiddleware<Intent : Any, State : Any, SideEffect : Any>(
         )
     }
 
-    override fun onIntent(intent: Intent, state: State) {
+    override fun onIntent(intent: Intent) {
         logger.log(
             buildMessage(
                 tag = name,
@@ -82,7 +55,7 @@ public class LoggingMiddleware<Intent : Any, State : Any, SideEffect : Any>(
         )
     }
 
-    override fun onSideEffect(sideEffect: SideEffect, state: State) {
+    override fun onSideEffect(sideEffect: SideEffect) {
         logger.log(
             buildMessage(
                 tag = name,
@@ -92,7 +65,7 @@ public class LoggingMiddleware<Intent : Any, State : Any, SideEffect : Any>(
         )
     }
 
-    override fun onDestroy(state: State) {
+    override fun onDestroy() {
         logger.log(
             buildMessage(
                 tag = name,

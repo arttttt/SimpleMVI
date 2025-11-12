@@ -19,7 +19,7 @@ class CounterStore(
         counter = 0,
     ),
     initialIntents = emptyList(),
-    middlewares = emptyList(),
+    plugins = emptyList(),
     actor = delegatedActor(
         intentHandlers = listOf(
             incrementIntentHandler(),

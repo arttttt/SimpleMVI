@@ -1,5 +1,5 @@
 import UIKit
-import Shared // ← ваш KMM-модуль (имя может отличаться)
+import Shared
 
 final class AppDelegate: NSObject, UIApplicationDelegate {
 

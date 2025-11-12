@@ -2,7 +2,8 @@ package com.arttttt.simplemvi.store
 
 import com.arttttt.simplemvi.actor.Actor
 import com.arttttt.simplemvi.config.simpleMVIConfig
-import com.arttttt.simplemvi.middleware.Middleware
+import com.arttttt.simplemvi.plugin.PluginsOwner
+import com.arttttt.simplemvi.plugin.StorePlugin
 import com.arttttt.simplemvi.utils.CachingFlow
 import com.arttttt.simplemvi.utils.exceptions.StoreIsAlreadyDestroyedException
 import com.arttttt.simplemvi.utils.exceptions.StoreIsNotInitializedException
@@ -11,7 +12,11 @@ import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
@@ -31,22 +36,26 @@ import kotlin.coroutines.CoroutineContext
  * @param coroutineContext [CoroutineContext] for the [Store]'s [CoroutineScope]
  * @param initialState The initial [State] value
  * @param initialIntents List of [Intent]s to be processed after initialization
- * @param middlewares List of [Middleware] instances to observe store events
+ * @param plugins List of [Plugin] instances to extend functionality
  * @param actor The [Actor] responsible for business logic
  *
  * @see Store
  * @see Actor
- * @see Middleware
+ * @see StorePlugin
  */
-public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any>(
+public class DefaultStore<Intent : Any, State : Any, SideEffect : Any>(
     coroutineContext: CoroutineContext,
     initialState: State,
+    override val plugins: List<StorePlugin<Intent, State, SideEffect>>,
     private val initialIntents: List<Intent>,
-    private val middlewares: List<Middleware<Intent, State, SideEffect>>,
     private val actor: Actor<Intent, State, SideEffect>,
-) : Store<Intent, State, SideEffect> {
+) : Store<Intent, State, SideEffect>{
 
-    private val _states: MutableStateFlow<State> = MutableStateFlow(initialState)
+    private val _states: MutableStateFlow<State> = MutableStateFlow(
+        plugins.fold(initialState) { state, plugin ->
+            plugin.provideInitialState(state)
+        }
+    )
 
     override val state: State
         get() = _states.value
@@ -67,7 +76,18 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
     override fun init() {
         if (isInitialized.getAndSet(true)) return
 
-        middlewares.forEach { it.onInit(_states.value) }
+        val context = StorePlugin.Context<Intent, State, SideEffect>(
+            scope = scope,
+            sendIntent = this@DefaultStore::accept,
+            setState = { newState ->
+                val oldState = _states.value
+                _states.value = newState
+                plugins.forEach { it.onStateChanged(oldState, newState) }
+            },
+            sendSideEffect = this::postSideEffect,
+            getState = this@DefaultStore::state::get,
+        )
+        plugins.forEach { plugin -> plugin.onInit(context) }
 
         actor.init(
             scope = scope,
@@ -75,7 +95,7 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
             reduce = { block ->
                 _states.update { state ->
                     block(state).also { newState ->
-                        middlewares.forEach { it.onStateChanged(state, newState) }
+                        plugins.forEach { plugin -> plugin.onStateChanged(state, newState) }
                     }
                 }
             },
@@ -107,21 +127,21 @@ public class DefaultStore<in Intent : Any, out State : Any, out SideEffect : Any
             }
         }
 
-        middlewares.forEach { it.onIntent(intent, _states.value) }
+        plugins.forEach { plugin -> plugin.onIntent(intent) }
         actor.onIntent(intent)
     }
 
     override fun destroy() {
         if (isDestroyed.getAndSet(true)) return
 
-        middlewares.forEach { it.onDestroy(_states.value) }
+        plugins.forEach { plugin -> plugin.onDestroy() }
 
         actor.destroy()
         scope.cancel()
     }
 
     private fun postSideEffect(sideEffect: SideEffect) {
-        middlewares.forEach { it.onSideEffect(sideEffect, _states.value) }
+        plugins.forEach { plugin -> plugin.onSideEffect(sideEffect) }
         scope.launch {
             _sideEffects.emit(sideEffect)
         }
