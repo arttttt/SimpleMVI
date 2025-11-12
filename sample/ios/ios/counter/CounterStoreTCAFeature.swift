@@ -79,7 +79,7 @@ extension CounterStoreFeature.State {
 extension CounterStoreFeature.State {
     
     static func from(state: CounterStore.State) -> Self {
-        return State(
+        return CounterStoreFeature.State(
             counter: Int(state.counter),
         )
     }
