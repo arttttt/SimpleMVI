@@ -1,12 +1,18 @@
 package com.arttttt.simplemvi.sample.shared.store.timer
 
-import com.arttttt.simplemvi.middleware.Middleware
+import com.arttttt.simplemvi.plugin.StorePlugin
+import kotlin.properties.Delegates
 
-class TimerMiddleware : Middleware<TimerStore.Intent, TimerStore.State, TimerStore.SideEffect> {
+class TimerPlugin : StorePlugin<TimerStore.Intent, TimerStore.State, TimerStore.SideEffect> {
 
-    private val tag = "TimerMiddleware"
+    private val tag = "TimerLoggingPlugin"
 
-    override fun onInit(state: TimerStore.State) {
+    private var context: StorePlugin.Context<TimerStore.Intent, TimerStore.State, TimerStore.SideEffect> by Delegates.notNull()
+
+
+    override fun onInit(context: StorePlugin.Context<TimerStore.Intent, TimerStore.State, TimerStore.SideEffect>) {
+        this.context = context
+
         logV(
             """
                 TimerStore initialized
@@ -14,11 +20,11 @@ class TimerMiddleware : Middleware<TimerStore.Intent, TimerStore.State, TimerSto
         )
     }
 
-    override fun onIntent(intent: TimerStore.Intent, state: TimerStore.State) {
+    override fun onIntent(intent: TimerStore.Intent) {
         logV(
             """
                 TimerStore received intent: $intent,
-                current state: $state,
+                current state: ${context.state},
             """.trimIndent()
         )
     }
@@ -33,16 +39,16 @@ class TimerMiddleware : Middleware<TimerStore.Intent, TimerStore.State, TimerSto
         )
     }
 
-    override fun onSideEffect(sideEffect: TimerStore.SideEffect, state: TimerStore.State) {
+    override fun onSideEffect(sideEffect: TimerStore.SideEffect) {
         logV(
             """
                 TimerStore emitted side effect: $sideEffect
-                current state: $state
+                current state: ${context.state}
             """.trimIndent()
         )
     }
 
-    override fun onDestroy(state: TimerStore.State) {
+    override fun onDestroy() {
         logV(
             """
                 TimerStore destroyed
