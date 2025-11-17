@@ -19,7 +19,7 @@ public interface StorePlugin<Intent : Any, State : Any, SideEffect : Any> {
     public fun provideInitialState(defaultState: State): State = defaultState
 
     public fun onInit(context: Context<Intent, State, SideEffect>) {}
-    public fun onIntent(intent: Intent) {}
+    public fun Pipeline<Intent>.onIntent(intent: Intent) {}
     public fun onStateChanged(oldState: State, newState: State) {}
     public fun onSideEffect(sideEffect: SideEffect) {}
     public fun onDestroy() {}

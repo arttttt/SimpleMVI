@@ -1,6 +1,7 @@
 package com.arttttt.simplemvi.logging
 
 import com.arttttt.simplemvi.logging.logger.Logger
+import com.arttttt.simplemvi.plugin.Pipeline
 import com.arttttt.simplemvi.plugin.StorePlugin
 import kotlin.properties.Delegates
 
@@ -27,7 +28,7 @@ public class LoggingPlugin<Intent : Any, State : Any, SideEffect : Any>(
         )
     }
 
-    override fun onIntent(intent: Intent) {
+    override fun Pipeline<Intent>.onIntent(intent: Intent) {
         logger.log(
             buildMessage(
                 tag = name,

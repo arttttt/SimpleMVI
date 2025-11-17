@@ -2,7 +2,7 @@ package com.arttttt.simplemvi.store
 
 import com.arttttt.simplemvi.actor.Actor
 import com.arttttt.simplemvi.config.simpleMVIConfig
-import com.arttttt.simplemvi.plugin.PluginsOwner
+import com.arttttt.simplemvi.plugin.Pipeline
 import com.arttttt.simplemvi.plugin.StorePlugin
 import com.arttttt.simplemvi.utils.CachingFlow
 import com.arttttt.simplemvi.utils.exceptions.StoreIsAlreadyDestroyedException
@@ -127,7 +127,18 @@ public class DefaultStore<Intent : Any, State : Any, SideEffect : Any>(
             }
         }
 
-        plugins.forEach { plugin -> plugin.onIntent(intent) }
+        val pipeline = Pipeline(intent)
+
+        for (plugin in plugins) {
+            if (!pipeline.canProceed()) break
+
+            with(pipeline) {
+                plugin.handleIntent()
+            }
+        }
+
+        if (!pipeline.canProceed()) return
+
         actor.onIntent(intent)
     }
 
