@@ -1,5 +1,6 @@
 package com.arttttt.simplemvi.sample.shared.store.timer
 
+import com.arttttt.simplemvi.plugin.Pipeline
 import com.arttttt.simplemvi.plugin.StorePlugin
 import kotlin.properties.Delegates
 
@@ -20,7 +21,7 @@ class TimerPlugin : StorePlugin<TimerStore.Intent, TimerStore.State, TimerStore.
         )
     }
 
-    override fun onIntent(intent: TimerStore.Intent) {
+    override fun Pipeline<TimerStore.Intent>.onIntent(intent: TimerStore.Intent) {
         logV(
             """
                 TimerStore received intent: $intent,
