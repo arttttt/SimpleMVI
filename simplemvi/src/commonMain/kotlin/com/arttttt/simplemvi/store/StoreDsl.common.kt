@@ -5,6 +5,7 @@ import com.arttttt.simplemvi.config.simpleMVIConfig
 import com.arttttt.simplemvi.logging.LoggingPlugin
 import com.arttttt.simplemvi.plugin.StorePlugin
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -25,7 +26,7 @@ import kotlin.coroutines.CoroutineContext
 public fun <Intent : Any, State : Any, SideEffect : Any> createStore(
     name: StoreName?,
     initialize: Boolean = true,
-    coroutineContext: CoroutineContext = Dispatchers.Main.immediate,
+    coroutineContext: CoroutineContext = Dispatchers.Main.immediate + Job(),
     initialState: State,
     initialIntents: List<Intent> = emptyList(),
     plugins: List<StorePlugin<Intent, State, SideEffect>> = emptyList(),
