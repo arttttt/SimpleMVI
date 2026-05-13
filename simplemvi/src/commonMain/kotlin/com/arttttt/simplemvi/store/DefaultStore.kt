@@ -62,7 +62,7 @@ public class DefaultStore<Intent : Any, State : Any, SideEffect : Any>(
 
     override val states: StateFlow<State> = _states.asStateFlow()
 
-    private val scope: CoroutineScope = CoroutineScope(coroutineContext + Job())
+    private val scope: CoroutineScope = CoroutineScope(coroutineContext)
 
     private val _sideEffects: CachingFlow<SideEffect> = CachingFlow(
         capacity = 64,
