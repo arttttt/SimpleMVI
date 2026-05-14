@@ -3,8 +3,10 @@ plugins {
     alias(libs.plugins.simplemvi.publishing)
 }
 
-android {
-    namespace = "com.arttttt.simplemvi.annotations"
+kotlin {
+    android {
+        namespace = "com.arttttt.simplemvi.annotations"
+    }
 }
 
 libraryPublishing {

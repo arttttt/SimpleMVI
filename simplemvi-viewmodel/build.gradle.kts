@@ -4,6 +4,10 @@ plugins {
 }
 
 kotlin {
+    android {
+        namespace = "com.arttttt.simplemvi.viewmodel"
+    }
+
     sourceSets {
         commonMain.dependencies {
             implementation(project(":simplemvi"))
@@ -12,10 +16,6 @@ kotlin {
             implementation(libs.jetbrains.androidx.lifecycle.viewmodel.compose)
         }
     }
-}
-
-android {
-    namespace = "com.arttttt.simplemvi.viewmodel"
 }
 
 libraryPublishing {
