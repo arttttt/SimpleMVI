@@ -61,15 +61,15 @@ internal fun Project.kotlinOptions(block: KotlinJvmCompilerOptions.() -> Unit) {
     }
 }
 
-context(Project)
-internal fun CommonExtension<*, *, *, *, *, *>.configureAndroid() {
+context(project: Project)
+internal fun CommonExtension.configureAndroid() {
     compileSdk = COMPILE_SDK_VERSION
 
-    defaultConfig {
+    defaultConfig.apply {
         minSdk = MIN_SDK_VERSION
     }
 
-    compileOptions {
+    compileOptions.apply {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
