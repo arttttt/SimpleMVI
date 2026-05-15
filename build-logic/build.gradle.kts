@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -32,8 +33,8 @@ gradlePlugin {
     }
 }
 
-tasks.withType<KotlinCompile>().configureEach {
+tasks.withType<KotlinCompilationTask<*>>().configureEach {
     compilerOptions {
-        freeCompilerArgs.add("-Xcontext-receivers")
+        freeCompilerArgs.add("-Xcontext-parameters")
     }
 }

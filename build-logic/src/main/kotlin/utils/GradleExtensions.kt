@@ -1,7 +1,5 @@
 package utils
 
-import com.android.build.api.dsl.CommonExtension
-import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ExternalModuleDependencyBundle
 import org.gradle.api.artifacts.MinimalExternalModuleDependency
@@ -58,19 +56,5 @@ internal fun DependencyHandlerScope.ksp(plugin: Any) {
 internal fun Project.kotlinOptions(block: KotlinJvmCompilerOptions.() -> Unit) {
     tasks.withType<KotlinJvmCompile>().configureEach {
         compilerOptions(block)
-    }
-}
-
-context(Project)
-internal fun CommonExtension<*, *, *, *, *, *>.configureAndroid() {
-    compileSdk = COMPILE_SDK_VERSION
-
-    defaultConfig {
-        minSdk = MIN_SDK_VERSION
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
     }
 }

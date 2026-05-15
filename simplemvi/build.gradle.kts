@@ -5,16 +5,16 @@ plugins {
 }
 
 kotlin {
+    android {
+        namespace = "com.arttttt.simplemvi"
+    }
+
     sourceSets {
         commonMain.dependencies {
             implementation(libs.kotlin.coroutines.core)
             implementation(libs.kotlin.atomicfu)
         }
     }
-}
-
-android {
-    namespace = "com.arttttt.simplemvi"
 }
 
 libraryPublishing {

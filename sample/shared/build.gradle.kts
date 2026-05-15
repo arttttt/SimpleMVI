@@ -1,21 +1,23 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinCommonCompilation
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinMetadataTarget
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import utils.COMPILE_SDK_VERSION
 import utils.MIN_SDK_VERSION
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.android.kotlin.multiplatform.library)
     alias(libs.plugins.google.ksp)
 }
 
 kotlin {
-    androidTarget()
+    android {
+        namespace = "com.arttttt.simplemvi.sample.shared"
+        compileSdk = COMPILE_SDK_VERSION
+        minSdk = MIN_SDK_VERSION
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
+    }
 
     listOf(
         iosX64(),
@@ -49,33 +51,10 @@ kotlin {
         }
     }
 
-    targets.configureEach {
-        when (this) {
-            is KotlinAndroidTarget ->
-                compilerOptions {
-                    jvmTarget.set(JvmTarget.JVM_17)
-                }
-
-            is KotlinJvmTarget ->
-                compilerOptions {
-                    jvmTarget.set(JvmTarget.JVM_17)
-                }
+    targets.withType<KotlinJvmTarget>().configureEach {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
         }
-    }
-}
-
-android {
-    namespace = "com.arttttt.simplemvi.sample.shared"
-
-    compileSdk = COMPILE_SDK_VERSION
-
-    defaultConfig {
-        minSdk = MIN_SDK_VERSION
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 

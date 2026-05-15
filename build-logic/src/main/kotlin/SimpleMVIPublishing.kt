@@ -22,7 +22,6 @@ class SimpleMVIPublishing : Plugin<Project> {
             configureVanniktech(
                 publication = KotlinMultiplatform(
                     sourcesJar = true,
-                    androidVariantsToPublish = listOf("debug", "release"),
                 )
             )
         }
