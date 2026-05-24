@@ -27,8 +27,8 @@ nav:
   - Actor:
       - Overview: actor/actor.md
       - ActorScope: actor/actorscope.md
-  - Middleware:
-      - Overview: middleware/middleware.md
+  - Plugin:
+      - Overview: plugin/plugin.md
   - Guides:
       - Best Practices: guides/bestpractices.md
 
