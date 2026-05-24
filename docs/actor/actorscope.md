@@ -142,7 +142,7 @@ reduce {
 
 - State must be immutable (use `data class` with `val` properties)
 - Each `reduce` call creates a new state instance
-- Middleware is notified of every state change
+- Plugins are notified of every state change (via `StorePlugin.onStateChanged`)
 - The lambda should be a pure function without side effects
 
 **Example - Complex state transformation:**
