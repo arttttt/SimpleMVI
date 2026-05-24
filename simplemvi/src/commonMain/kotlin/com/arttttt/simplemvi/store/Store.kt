@@ -18,12 +18,16 @@ import kotlinx.coroutines.flow.StateFlow
  * Every [Store] must have an [Actor]. [Actor] contains all [Store] logic.
  * [Actor] handles [Intent] which you pass to a [Store]
  *
- * [Store] also supports [StorePlugin]. [StorePlugin] can be used if you want to extend [Store] functionality.
+ * [Store] also supports [StorePlugin]. Plugins extend the [Store] by observing its lifecycle
+ * (init, state changes, side effects, destroy) and by participating in intent processing through
+ * the [com.arttttt.simplemvi.plugin.Pipeline] — a plugin can rewrite or drop an [Intent] before
+ * it reaches the [Actor]. The list of attached plugins is exposed via [plugins].
  *
  * @see Actor
  * @see StorePlugin
+ * @see com.arttttt.simplemvi.plugin.Pipeline
  */
-public interface Store<Intent : Any, State : Any, SideEffect : Any> : PluginsOwner<Intent, State, SideEffect>  {
+public interface Store<Intent : Any, State : Any, SideEffect : Any> : PluginsOwner<Intent, State, SideEffect> {
 
     /**
      * Returns [Store] state

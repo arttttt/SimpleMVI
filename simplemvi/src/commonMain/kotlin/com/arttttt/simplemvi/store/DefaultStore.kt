@@ -21,27 +21,33 @@ import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
 /**
- * Default [Store] implementation
+ * Default [Store] implementation.
  *
- * This class provides the core functionality for managing state, processing intents,
- * and emitting side effects.
+ * Manages state, runs the intent [Pipeline] through registered [StorePlugin]s, delegates business
+ * logic to the [Actor], and emits side effects.
  *
- * The implementation ensures:
- * - Thread-safe state updates using [MutableStateFlow]
- * - Proper initialization and destruction lifecycle
- * - Intent processing through the [Actor]
- * - State change notifications to middleware
- * - Side effect caching when there are no active collectors
+ * Guarantees:
+ * - thread-safe state updates via [MutableStateFlow];
+ * - one-shot `init`/`destroy` lifecycle (subsequent calls are no-ops);
+ * - intents are passed through every plugin in registration order before reaching the actor —
+ *   a plugin may [Pipeline.transform] or [Pipeline.block] them;
+ * - state changes (from `reduce` or from plugin `setState`) are broadcast to every plugin;
+ * - side effects are cached (up to 64) while no subscriber is collecting [sideEffects].
  *
- * @param coroutineContext [CoroutineContext] for the [Store]'s [CoroutineScope]
- * @param initialState The initial [State] value
- * @param initialIntents List of [Intent]s to be processed after initialization
- * @param plugins List of [Plugin] instances to extend functionality
- * @param actor The [Actor] responsible for business logic
+ * The constructor does **not** wrap [coroutineContext] in a fresh [kotlinx.coroutines.Job]. The
+ * caller is responsible for supplying a [kotlinx.coroutines.Job] (or [kotlinx.coroutines.SupervisorJob])
+ * in the context — `createStore` does this by default.
+ *
+ * @param coroutineContext context for the store's [CoroutineScope] (must include a [kotlinx.coroutines.Job]).
+ * @param initialState the [State] seed; plugins may transform it via [StorePlugin.provideInitialState].
+ * @param initialIntents intents to dispatch immediately after [init].
+ * @param plugins [StorePlugin] chain. Invoked in list order at every hook.
+ * @param actor the [Actor] that owns business logic.
  *
  * @see Store
  * @see Actor
  * @see StorePlugin
+ * @see Pipeline
  */
 public class DefaultStore<Intent : Any, State : Any, SideEffect : Any>(
     coroutineContext: CoroutineContext,

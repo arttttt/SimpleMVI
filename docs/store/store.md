@@ -19,14 +19,15 @@ The `Store` is designed to encapsulate different logic in applications. It allow
 
 Every `Store` must have an `Actor`. The `Actor` contains all `Store` logic and handles the `Intent` that you pass to a `Store`.
 
-### Middleware
+### StorePlugin
 
-`Store` also supports `Middleware`. `Middleware` can be used as a spy - it receives all store events but cannot modify them.
+`Store` also supports `StorePlugin`. Plugins extend the store by observing its lifecycle and by participating in intent processing — a plugin can rewrite or drop an `Intent` before it reaches the `Actor`. Plugins also see state changes, side effects, and destruction. The list of attached plugins is exposed via `Store.plugins`.
 
 ## Interface
 
 ```kotlin
-public interface Store<in Intent : Any, out State : Any, out SideEffect : Any> {
+public interface Store<Intent : Any, State : Any, SideEffect : Any> :
+    PluginsOwner<Intent, State, SideEffect> {
 
     /** Returns Store state */
     public val state: State
@@ -37,14 +38,17 @@ public interface Store<in Intent : Any, out State : Any, out SideEffect : Any> {
     /** Returns Store side effects Flow */
     public val sideEffects: Flow<SideEffect>
 
+    /** Plugins attached to this Store, in invocation order */
+    public val plugins: List<StorePlugin<Intent, State, SideEffect>>
+
     /**
      * Initializes the Store
      */
     public fun init()
 
     /**
-     * Accepts an Intent and passes it to the Actor
-     * Intent is also available inside the Middleware
+     * Accepts an Intent and passes it through the plugin pipeline,
+     * then to the Actor (unless a plugin blocks it).
      */
     public fun accept(intent: Intent)
 
@@ -55,11 +59,14 @@ public interface Store<in Intent : Any, out State : Any, out SideEffect : Any> {
 }
 ```
 
+> **Note:** `Store` is invariant in `Intent`, `State`, and `SideEffect` (since 0.8.0). Earlier versions used `in`/`out` projections; that was changed because plugins need both read and write access to all three.
+
 ## Important Notes
 
 - After calling `destroy()`, the Store cannot be used anymore.
-- When a new State is emitted, it's available inside the Middleware.
-- When a SideEffect is emitted, it's available inside the Middleware.
+- When a new State is emitted, every plugin is notified through `onStateChanged`.
+- When a SideEffect is emitted, every plugin is notified through `onSideEffect`.
+- Intents pass through the plugin pipeline before reaching the actor — see `StorePlugin` and `Pipeline`.
 - Background work should be handled inside Actors using coroutines with the provided `CoroutineScope`.
 
-For more information, refer to the documentation for `Actor` and `Middleware`.
+For more information, refer to the documentation for `Actor` and `StorePlugin`.

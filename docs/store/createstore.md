@@ -8,10 +8,10 @@ The `createStore` function is the primary way to create a `Store` instance:
 public fun <Intent : Any, State : Any, SideEffect : Any> createStore(
     name: StoreName?,
     initialize: Boolean = true,
-    coroutineContext: CoroutineContext = Dispatchers.Main.immediate,
+    coroutineContext: CoroutineContext = Dispatchers.Main.immediate + Job(),
     initialState: State,
     initialIntents: List<Intent> = emptyList(),
-    middlewares: List<Middleware<Intent, State, SideEffect>> = emptyList(),
+    plugins: List<StorePlugin<Intent, State, SideEffect>> = emptyList(),
     actor: Actor<Intent, State, SideEffect>,
 ): Store<Intent, State, SideEffect>
 ```
@@ -30,10 +30,10 @@ name = storeName<MyStore>()
 You can also pass `null` to disable automatic logging:
 
 ```kotlin
-name = null  // No automatic logging middleware
+name = null  // No automatic LoggingPlugin
 ```
 
-**Note:** If you provide a non-null `name` and have configured a logger via `configureSimpleMVI`, a `LoggingMiddleware` will be automatically added to your store.
+**Note:** If you provide a non-null `name` and have configured a logger via `configureSimpleMVI`, a `LoggingPlugin` will be automatically added to your store.
 
 ### initialState (required)
 **Type:** `State`
@@ -113,20 +113,20 @@ store.accept(MyIntent.DoSomething)
 
 ### coroutineContext (optional)
 **Type:** `CoroutineContext`  
-**Default:** `Dispatchers.Main.immediate`
+**Default:** `Dispatchers.Main.immediate + Job()`
 
-The coroutine context used by the store for launching coroutines within the actor:
+The coroutine context used by the store for launching coroutines within the actor and plugins:
 
 ```kotlin
-// Default: Main dispatcher (recommended for UI-related stores)
+// Default: Main dispatcher with a fresh Job (recommended for UI-related stores)
 createStore(
     name = storeName<MyStore>(),
-    coroutineContext = Dispatchers.Main.immediate,
+    coroutineContext = Dispatchers.Main.immediate + Job(),
     initialState = MyState(),
     actor = myActor
 )
 
-// Custom context for specific use cases
+// Override the Job — e.g. use SupervisorJob so a failing child does not cancel siblings
 createStore(
     name = storeName<MyStore>(),
     coroutineContext = Dispatchers.Default + SupervisorJob(),
@@ -136,6 +136,8 @@ createStore(
 ```
 
 **Note:** The default `Dispatchers.Main.immediate` is recommended for stores that interact with UI, as it ensures state updates are immediately available to the UI layer. For background-only stores, you may choose a different dispatcher.
+
+> **Behavioral change (0.8.0):** the store no longer wraps the supplied context in a fresh `Job`. The default value now includes `+ Job()` to preserve old behavior, but you can override the `Job` (for example with `SupervisorJob`) by passing your own context.
 
 ### initialIntents (optional)
 **Type:** `List<Intent>`  
@@ -168,31 +170,33 @@ store.accept(MyIntent.CheckAuthStatus)
 - Triggering startup tasks
 - Setting up subscriptions or listeners
 
-### middlewares (optional)
-**Type:** `List<Middleware<Intent, State, SideEffect>>`  
+### plugins (optional)
+**Type:** `List<StorePlugin<Intent, State, SideEffect>>`  
 **Default:** `emptyList()`
 
-A list of middleware to observe store events:
+A list of plugins that extend the store — they can observe its lifecycle and rewrite or block intents on their way to the actor:
 
 ```kotlin
 createStore(
     name = storeName<MyStore>(),
     initialState = MyState(),
     actor = myActor,
-    middlewares = listOf(
-        analyticsMiddleware,
-        customLoggingMiddleware,
-        performanceMiddleware
+    plugins = listOf(
+        analyticsPlugin,
+        customLoggingPlugin,
+        performancePlugin
     )
 )
 ```
 
-**Note:** If you provide a `name` and have configured a logger via `configureSimpleMVI`, a `LoggingMiddleware` will be automatically prepended to your middleware list.
+**Note:** If you provide a `name` and have configured a logger via `configureSimpleMVI`, a `LoggingPlugin` will be automatically prepended to your plugin list.
 
-**Middleware execution order:**
+**Plugin execution order:**
 
-1. Automatic `LoggingMiddleware` (if name is provided and logger is configured)
-2. Your custom middlewares in the order they appear in the list
+1. Automatic `LoggingPlugin` (if name is provided and logger is configured)
+2. Your custom plugins in the order they appear in the list
+
+Order matters for `onIntent`: an earlier plugin can `transform` or `block` an intent through its `Pipeline` before later plugins see it. See `StorePlugin` for details.
 
 ## Complete Example with Domain-Focused Design
 
@@ -203,7 +207,7 @@ class CounterStore : Store<CounterStore.Intent, CounterStore.State, CounterStore
     initialize = true,
     initialState = State(counter = 0),
     initialIntents = listOf(Intent.Initialize),
-    middlewares = listOf(analyticsMiddleware),
+    plugins = listOf(analyticsPlugin),
     actor = delegatedActor(
         initHandler = InitHandler {
             // Optional: initialization logic

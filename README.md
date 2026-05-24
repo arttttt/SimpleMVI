@@ -25,7 +25,7 @@ SimpleMVI follows these core principles:
 
 - **Store**: Central component managing state and coordinating other components
 - **Actor**: Business logic processor handling intents and producing state changes
-- **Middleware**: Optional interceptors for logging, analytics, etc.
+- **StorePlugin**: Optional extensions for logging, analytics, intent transformation, state persistence, etc. — can observe the store lifecycle and rewrite or block intents before they reach the actor
 - **Intent**: Represents user actions or system events
 - **State**: Immutable data representing application state
 - **Side Effect**: One-time events that can't be represented in state

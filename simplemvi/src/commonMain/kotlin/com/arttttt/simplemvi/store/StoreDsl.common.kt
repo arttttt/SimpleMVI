@@ -9,19 +9,28 @@ import kotlinx.coroutines.Job
 import kotlin.coroutines.CoroutineContext
 
 /**
- * Creates a new [Store] with given parameters
+ * Creates a new [Store] with the given parameters.
  *
- * @param name is a name of the [Store]
- * @param initialize is responsible for [Store] auto initialization
- * @param coroutineContext [CoroutineContext] to be used inside the [Store] for launching coroutines
- * @param initialState initial [State] of the [Store]
- * @param initialIntents a [List] of the initial [Intent] to start the [Store]
- * @param plugins a [List] of the [StorePlugin]
- * @param actor an [Actor] to be used within the [Store]
+ * When [name] is not `null` and a logger is configured via `configureSimpleMVI`, a [LoggingPlugin]
+ * is prepended to the [plugins] list automatically.
+ *
+ * @param name the [Store] name used by [LoggingPlugin] and debugging. Pass `null` to opt out of
+ *   the automatic logging plugin.
+ * @param initialize if `true`, [Store.init] is called before this function returns.
+ * @param coroutineContext context for the [Store]'s [CoroutineScope]. The default
+ *   `Dispatchers.Main.immediate + Job()` gives the [Store] its own root [Job]; override the
+ *   [Job] (e.g. with a [kotlinx.coroutines.SupervisorJob]) when you need different cancellation
+ *   semantics.
+ * @param initialState the initial [State].
+ * @param initialIntents intents dispatched immediately after [Store.init].
+ * @param plugins the [StorePlugin] chain, invoked in list order. The automatic [LoggingPlugin]
+ *   (when added) runs first.
+ * @param actor the [Actor] hosted by the [Store].
  *
  * @see Store
  * @see Actor
  * @see StorePlugin
+ * @see LoggingPlugin
  */
 public fun <Intent : Any, State : Any, SideEffect : Any> createStore(
     name: StoreName?,
