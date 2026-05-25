@@ -255,26 +255,24 @@ object MermaidGenerator {
             appendLine()
 
             graph.intents.forEach { (intentName, node) ->
-                // Reduce переходы
+                val intent = intentName.simpleName()
+
                 node.reduces.forEach { reduce ->
                     val fields = reduce.changedFields.joinToString(", ")
-                    appendLine("    $intentName --> State: reduce {$fields} (${node.reduces.size}x)")
+                    appendLine("    $intent --> State: reduce {$fields} (${node.reduces.size}x)")
                 }
 
-                // Side effects
                 node.sideEffects.forEach { effect ->
                     val count = node.sideEffects.count { it == effect }
-                    appendLine("    $intentName --> $effect: postSideEffect (${count}x)")
+                    appendLine("    $intent --> ${effect.simpleName()}: postSideEffect (${count}x)")
                 }
 
-                // Intent dispatch
                 node.dispatchedIntents.forEach { targetIntent ->
-                    appendLine("    $intentName --> $targetIntent: intent")
+                    appendLine("    $intent --> ${targetIntent.simpleName()}: intent")
                 }
 
-                // Conditionals
                 if (node.conditionals.isNotEmpty()) {
-                    appendLine("    note right of $intentName")
+                    appendLine("    note right of $intent")
                     node.conditionals.forEach { cond ->
                         appendLine("        $cond")
                     }
@@ -287,6 +285,8 @@ object MermaidGenerator {
 
 private val STORE_FQN = FqName("com.arttttt.simplemvi.store.Store")
 private val ACTOR_SCOPE_FQN = FqName("com.arttttt.simplemvi.actor.ActorScope")
+
+private fun String.simpleName(): String = substringAfterLast('.')
 
 /**
  * Проверяет, реализует ли класс интерфейс Store
