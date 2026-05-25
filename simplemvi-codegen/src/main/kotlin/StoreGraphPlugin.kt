@@ -265,21 +265,22 @@ object MermaidGenerator {
                     .groupingBy { it.changedFields.sorted() }
                     .eachCount()
                     .forEach { (fields, count) ->
-                        appendLine("    $intent --> State: reduce {${fields.joinToString(", ")}} (${count}x)")
+                        val payload = if (fields.isEmpty()) "" else "(${fields.joinToString(", ")})"
+                        appendLine("    $intent --> State: reduce$payload ×$count")
                     }
 
                 node.sideEffects
                     .groupingBy { it }
                     .eachCount()
                     .forEach { (effect, count) ->
-                        appendLine("    $intent --> ${effect.simpleName()}: postSideEffect (${count}x)")
+                        appendLine("    $intent --> ${effect.simpleName()}: sideEffect ×$count")
                     }
 
                 node.dispatchedIntents
                     .groupingBy { it }
                     .eachCount()
                     .forEach { (target, count) ->
-                        val suffix = if (count > 1) " (${count}x)" else ""
+                        val suffix = if (count > 1) " ×$count" else ""
                         appendLine("    $intent --> ${target.simpleName()}: intent$suffix")
                     }
 
