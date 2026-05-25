@@ -1,4 +1,5 @@
-import org.jetbrains.kotlin.DeprecatedForRemovalCompilerApi
+@file:OptIn(org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI::class)
+
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
@@ -12,6 +13,8 @@ import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
+import org.jetbrains.kotlin.ir.declarations.IrParameterKind
+import org.jetbrains.kotlin.ir.declarations.IrValueParameter
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrGetValue
@@ -120,7 +123,6 @@ class StoreGraphIrTransformer(
         }
     }
 
-    @OptIn(DeprecatedForRemovalCompilerApi::class)
     override fun visitCall(expression: IrCall): IrExpression {
         val intentCls = currentIntent
         val storeName = intentCls?.enclosingStoreName()
@@ -128,10 +130,12 @@ class StoreGraphIrTransformer(
         val funcName = expression.symbol.owner.name.asString()
 
         if (reduceDepth > 0 && funcName == "copy") {
-            val params = expression.symbol.owner.valueParameters
+            val params = expression.symbol.owner.parameters
             for (i in params.indices) {
-                if (expression.getValueArgument(i) != null) {
-                    stateFieldAccess += params[i].name.asString()
+                val param = params[i]
+                if (param.kind != IrParameterKind.Regular) continue
+                if (expression.arguments[i] != null) {
+                    stateFieldAccess += param.name.asString()
                 }
             }
         }
@@ -307,36 +311,33 @@ fun IrClass.implementsStore(): Boolean {
 }
 
 /**
- * Проверяет, является ли функция intent handler'ом
- * Intent handler — это lambda внутри actorDsl { onIntent<T> { ... } }
- * или функция с receiver типа ActorScope<Intent, State, SideEffect>
+ * Returns whether this function is an intent handler — i.e. has [ActorScope] as its extension receiver.
+ * Inlined DSL handlers (`actorDsl { onIntent<T> { ... } }`, `intentHandler<...> { ... }`,
+ * `<storeName>IntentHandler<T> { ... }`) all reduce to `handle(intent: T)` with this receiver shape.
  */
-@OptIn(DeprecatedForRemovalCompilerApi::class)
 fun IrFunction.isIntentHandler(): Boolean {
-    val receiverType = extensionReceiverParameter?.type ?: return false
-    val receiverClass = receiverType.classOrNull?.owner as? IrClass ?: return false
-
+    val receiver = parameters.firstOrNull { it.kind == IrParameterKind.ExtensionReceiver } ?: return false
+    val receiverClass = receiver.type.classOrNull?.owner ?: return false
     return receiverClass.fqNameWhenAvailable == ACTOR_SCOPE_FQN
 }
+
+/** Returns the first regular value parameter, or null if there is none. */
+private fun IrFunction.firstValueParam(): IrValueParameter? =
+    parameters.firstOrNull { it.kind == IrParameterKind.Regular }
 
 /**
  * Извлекает тип Intent из функции или выражения
  */
-@OptIn(DeprecatedForRemovalCompilerApi::class)
 fun IrFunction.extractIntentType(): String? {
-    // Intent handler имеет параметр типа Intent
-    val intentParam = valueParameters.firstOrNull() ?: return null
-    return intentParam.type.renderTypeName()
+    return firstValueParam()?.type?.renderTypeName()
 }
 
 /**
  * Returns the IrClass of the intent parameter of an intent-handler function (`handle(intent: T)`),
  * or null if the parameter is unresolved (e.g. unsubstituted generic `T`).
  */
-@OptIn(DeprecatedForRemovalCompilerApi::class)
 fun IrFunction.intentClassOrNull(): IrClass? {
-    val intentParam = valueParameters.firstOrNull() ?: return null
-    return intentParam.type.classOrNull?.owner as? IrClass
+    return firstValueParam()?.type?.classOrNull?.owner
 }
 
 /**
@@ -355,22 +356,28 @@ fun IrClass.enclosingStoreName(): String? {
     return null
 }
 
+/** Returns the first value argument of a call, or null if no regular parameter has an argument. */
+private fun IrCall.firstValueArgument(): IrExpression? {
+    val params = symbol.owner.parameters
+    for (i in params.indices) {
+        if (params[i].kind != IrParameterKind.Regular) continue
+        return arguments[i]
+    }
+    return null
+}
+
 /**
  * Извлекает тип Intent из вызова intent()/onNewIntent()
  */
-@OptIn(DeprecatedForRemovalCompilerApi::class)
 fun extractIntentType(call: IrCall): String? {
-    val arg = call.getValueArgument(0) ?: return null
-    return arg.type.renderTypeName()
+    return call.firstValueArgument()?.type?.renderTypeName()
 }
 
 /**
  * Извлекает тип SideEffect из вызова postSideEffect()/sideEffect()
  */
-@OptIn(DeprecatedForRemovalCompilerApi::class)
 fun extractSideEffectType(call: IrCall): String? {
-    val arg = call.getValueArgument(0) ?: return null
-    return arg.type.renderTypeName()
+    return call.firstValueArgument()?.type?.renderTypeName()
 }
 
 /**
