@@ -57,7 +57,6 @@ public annotation class SimpleMVIConfigDsl
  * @see SimpleMVIConfig
  * @see SimpleMVIConfigBuilder
  */
-@SimpleMVIConfigDsl
 public fun configureSimpleMVI(block: SimpleMVIConfigBuilder.() -> Unit) {
     val builder = SimpleMVIConfigBuilder()
     builder.apply(block)
