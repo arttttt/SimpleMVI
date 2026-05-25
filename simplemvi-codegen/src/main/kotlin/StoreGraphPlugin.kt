@@ -34,6 +34,8 @@ class StoreGraphPlugin : CompilerPluginRegistrar() {
         val KEY_OUTPUT_DIR = CompilerConfigurationKey<String>("storeGraphOutputDir")
     }
 
+    override val pluginId: String = "com.arttttt.simplemvi.compiler.storegraph"
+
     override val supportsK2: Boolean = true
 
     override fun ExtensionStorage.registerExtensions(configuration: CompilerConfiguration) {
