@@ -257,23 +257,31 @@ object MermaidGenerator {
             graph.intents.forEach { (intentName, node) ->
                 val intent = intentName.simpleName()
 
-                node.reduces.forEach { reduce ->
-                    val fields = reduce.changedFields.joinToString(", ")
-                    appendLine("    $intent --> State: reduce {$fields} (${node.reduces.size}x)")
-                }
+                node.reduces
+                    .groupingBy { it.changedFields.sorted() }
+                    .eachCount()
+                    .forEach { (fields, count) ->
+                        appendLine("    $intent --> State: reduce {${fields.joinToString(", ")}} (${count}x)")
+                    }
 
-                node.sideEffects.forEach { effect ->
-                    val count = node.sideEffects.count { it == effect }
-                    appendLine("    $intent --> ${effect.simpleName()}: postSideEffect (${count}x)")
-                }
+                node.sideEffects
+                    .groupingBy { it }
+                    .eachCount()
+                    .forEach { (effect, count) ->
+                        appendLine("    $intent --> ${effect.simpleName()}: postSideEffect (${count}x)")
+                    }
 
-                node.dispatchedIntents.forEach { targetIntent ->
-                    appendLine("    $intent --> ${targetIntent.simpleName()}: intent")
-                }
+                node.dispatchedIntents
+                    .groupingBy { it }
+                    .eachCount()
+                    .forEach { (target, count) ->
+                        val suffix = if (count > 1) " (${count}x)" else ""
+                        appendLine("    $intent --> ${target.simpleName()}: intent$suffix")
+                    }
 
                 if (node.conditionals.isNotEmpty()) {
                     appendLine("    note right of $intent")
-                    node.conditionals.forEach { cond ->
+                    node.conditionals.distinct().forEach { cond ->
                         appendLine("        $cond")
                     }
                     appendLine("    end note")
