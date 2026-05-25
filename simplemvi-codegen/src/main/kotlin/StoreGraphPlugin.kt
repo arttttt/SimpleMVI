@@ -14,7 +14,6 @@ import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
-import org.jetbrains.kotlin.ir.expressions.IrFunctionExpression
 import org.jetbrains.kotlin.ir.expressions.IrGetValue
 import org.jetbrains.kotlin.ir.expressions.IrWhen
 import org.jetbrains.kotlin.ir.types.IrSimpleType
@@ -108,6 +107,7 @@ class StoreGraphIrTransformer(
 ) : IrElementTransformerVoid() {
 
     private var currentIntent: IrClass? = null
+    private var reduceDepth: Int = 0
     private val stateFieldAccess = mutableSetOf<String>()
 
     override fun visitFunction(declaration: IrFunction): IrStatement {
@@ -122,41 +122,64 @@ class StoreGraphIrTransformer(
 
     @OptIn(DeprecatedForRemovalCompilerApi::class)
     override fun visitCall(expression: IrCall): IrExpression {
-        val intentCls = currentIntent ?: return super.visitCall(expression)
-        val storeName = intentCls.enclosingStoreName() ?: return super.visitCall(expression)
-        val intentName = intentCls.fqNameWhenAvailable?.asString() ?: intentCls.name.asString()
+        val intentCls = currentIntent
+        val storeName = intentCls?.enclosingStoreName()
+        val intentName = intentCls?.fqNameWhenAvailable?.asString() ?: intentCls?.name?.asString()
+        val funcName = expression.symbol.owner.name.asString()
 
-        when (expression.symbol.owner.name.asString()) {
+        if (reduceDepth > 0 && funcName == "copy") {
+            val params = expression.symbol.owner.valueParameters
+            for (i in params.indices) {
+                if (expression.getValueArgument(i) != null) {
+                    stateFieldAccess += params[i].name.asString()
+                }
+            }
+        }
+
+        if (storeName == null || intentName == null) {
+            return super.visitCall(expression)
+        }
+
+        return when (funcName) {
             "reduce" -> {
-                val lambda = expression.getValueArgument(0) as? IrFunctionExpression
-                lambda?.let { analyzeReduceLambda(it) }
+                val outerFields = stateFieldAccess.toSet()
+                stateFieldAccess.clear()
+                reduceDepth++
+                val result = super.visitCall(expression)
+                reduceDepth--
+                val collected = stateFieldAccess.toList()
+                stateFieldAccess.clear()
+                stateFieldAccess += outerFields
 
                 collector.recordReduce(
                     store = storeName,
                     intent = intentName,
-                    changedFields = stateFieldAccess.toList()
+                    changedFields = collected,
                 )
-                stateFieldAccess.clear()
+                result
             }
             "postSideEffect", "sideEffect" -> {
-                val sideEffect = extractSideEffectType(expression) ?: return super.visitCall(expression)
-                collector.recordSideEffect(
-                    store = storeName,
-                    intent = intentName,
-                    sideEffect = sideEffect,
-                )
+                extractSideEffectType(expression)?.let { sideEffect ->
+                    collector.recordSideEffect(
+                        store = storeName,
+                        intent = intentName,
+                        sideEffect = sideEffect,
+                    )
+                }
+                super.visitCall(expression)
             }
             "onNewIntent", "intent" -> {
-                val targetIntent = extractIntentType(expression) ?: return super.visitCall(expression)
-                collector.recordIntentDispatch(
-                    store = storeName,
-                    fromIntent = intentName,
-                    toIntent = targetIntent,
-                )
+                extractIntentType(expression)?.let { targetIntent ->
+                    collector.recordIntentDispatch(
+                        store = storeName,
+                        fromIntent = intentName,
+                        toIntent = targetIntent,
+                    )
+                }
+                super.visitCall(expression)
             }
+            else -> super.visitCall(expression)
         }
-
-        return super.visitCall(expression)
     }
 
     override fun visitWhen(expression: IrWhen): IrExpression {
@@ -178,24 +201,6 @@ class StoreGraphIrTransformer(
         return super.visitWhen(expression)
     }
 
-    @OptIn(DeprecatedForRemovalCompilerApi::class)
-    private fun analyzeReduceLambda(lambda: IrFunctionExpression) {
-        // Посетитель для copy() вызовов внутри reduce
-        lambda.accept(object : IrVisitorVoid() {
-            override fun visitCall(expression: IrCall) {
-                if (expression.symbol.owner.name.asString() == "copy") {
-                    // Извлекаем изменённые поля из copy(field1 = ..., field2 = ...)
-                    for (i in 0 until expression.valueArgumentsCount) {
-                        expression.getValueArgument(i)?.let {
-                            val paramName = expression.symbol.owner.valueParameters[i].name.asString()
-                            stateFieldAccess.add(paramName)
-                        }
-                    }
-                }
-                super.visitCall(expression)
-            }
-        }, null)
-    }
 }
 
 data class IntentNode(
