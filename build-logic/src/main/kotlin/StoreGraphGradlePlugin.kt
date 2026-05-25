@@ -5,6 +5,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilerPluginSupportPlugin
 import org.jetbrains.kotlin.gradle.plugin.SubpluginArtifact
 import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
+import utils.LIBRARY_VERSION
 
 class StoreGraphGradlePlugin : KotlinCompilerPluginSupportPlugin {
 
@@ -36,7 +37,7 @@ class StoreGraphGradlePlugin : KotlinCompilerPluginSupportPlugin {
     override fun getPluginArtifact(): SubpluginArtifact = SubpluginArtifact(
         groupId = "io.github.arttttt.simplemvi",
         artifactId = "simplemvi-codegen",
-        version = "1.0"
+        version = LIBRARY_VERSION
     )
 }
 
