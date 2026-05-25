@@ -10,15 +10,6 @@ internal var simpleMVIConfig: SimpleMVIConfig = DefaultSimpleMVIConfig()
     private set
 
 /**
- * DSL marker annotation for SimpleMVI configuration
- *
- * This annotation ensures proper scoping of the configuration DSL
- * and prevents nested configuration blocks.
- */
-@DslMarker
-public annotation class SimpleMVIConfigDsl
-
-/**
  * Configures SimpleMVI global behavior
  *
  * This function provides a DSL for configuring library-wide settings.
@@ -72,7 +63,6 @@ public fun configureSimpleMVI(block: SimpleMVIConfigBuilder.() -> Unit) {
  * @see configureSimpleMVI
  * @see SimpleMVIConfig
  */
-@SimpleMVIConfigDsl
 public class SimpleMVIConfigBuilder {
     /**
      * Defines the error handling mode for the library.
