@@ -42,8 +42,6 @@ class StoreGraphPlugin : CompilerPluginRegistrar() {
         val outputDir = configuration.get(KEY_OUTPUT_DIR)
             ?: "build/generated/store-graphs"
 
-        error(outputDir)
-
         IrGenerationExtension.registerExtension(
             StoreGraphIrExtension(outputDir)
         )
