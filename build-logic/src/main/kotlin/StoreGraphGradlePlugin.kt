@@ -18,14 +18,15 @@ class StoreGraphGradlePlugin : KotlinCompilerPluginSupportPlugin {
     override fun applyToCompilation(
         kotlinCompilation: KotlinCompilation<*>
     ): Provider<List<SubpluginOption>> {
-        val extension = kotlinCompilation.target.project.extensions
+        val project = kotlinCompilation.target.project
+        val extension = project.extensions
             .getByType(StoreGraphExtension::class.java)
 
-        return kotlinCompilation.target.project.provider {
+        return project.provider {
             listOf(
                 SubpluginOption(
                     key = "storeGraphOutputDir",
-                    value = extension.outputDir.get()
+                    value = project.file(extension.outputDir.get()).absolutePath
                 )
             )
         }
