@@ -70,7 +70,7 @@ public class DelegatedActor<Intent : Any, State : Any, SideEffect : Any>(
         val handler = intentHandlers[intent::class] ?: throw IllegalArgumentException("intent handler not found for $intent")
 
         @Suppress("UNCHECKED_CAST")
-        with(handler as IntentHandler<Intent, State, SideEffect, Any>) {
+        with(handler as IntentHandler<Intent, State, SideEffect, Intent>) {
             actorScope.handle(intent)
         }
     }
