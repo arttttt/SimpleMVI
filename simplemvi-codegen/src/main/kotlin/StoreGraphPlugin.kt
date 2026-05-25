@@ -253,9 +253,8 @@ object MermaidGenerator {
         file.parentFile.mkdirs()
 
         file.writeText(buildString {
-            appendLine("stateDiagram-v2")
-            appendLine("    direction LR")
-            appendLine("    [*] --> State")
+            appendLine("flowchart LR")
+            appendLine("    State((State))")
             appendLine()
 
             graph.intents.forEach { (intentName, node) ->
@@ -266,14 +265,14 @@ object MermaidGenerator {
                     .eachCount()
                     .forEach { (fields, count) ->
                         val payload = if (fields.isEmpty()) "" else "(${fields.joinToString(", ")})"
-                        appendLine("    $intent --> State: reduce$payload ×$count")
+                        appendLine("    $intent -->|\"reduce$payload ×$count\"| State")
                     }
 
                 node.sideEffects
                     .groupingBy { it }
                     .eachCount()
                     .forEach { (effect, count) ->
-                        appendLine("    $intent --> ${effect.simpleName()}: sideEffect ×$count")
+                        appendLine("    $intent -->|\"sideEffect ×$count\"| ${effect.simpleName()}")
                     }
 
                 node.dispatchedIntents
@@ -281,15 +280,13 @@ object MermaidGenerator {
                     .eachCount()
                     .forEach { (target, count) ->
                         val suffix = if (count > 1) " ×$count" else ""
-                        appendLine("    $intent --> ${target.simpleName()}: intent$suffix")
+                        appendLine("    $intent -->|\"intent$suffix\"| ${target.simpleName()}")
                     }
 
                 if (node.conditionals.isNotEmpty()) {
-                    appendLine("    note right of $intent")
-                    node.conditionals.distinct().forEach { cond ->
-                        appendLine("        $cond")
-                    }
-                    appendLine("    end note")
+                    val notes = node.conditionals.distinct().joinToString("<br/>") { it.replace("\"", "'") }
+                    appendLine("    ${intent}_note[\"$notes\"]")
+                    appendLine("    $intent -.- ${intent}_note")
                 }
             }
         })
