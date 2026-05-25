@@ -1,6 +1,9 @@
 import org.jetbrains.kotlin.DeprecatedForRemovalCompilerApi
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
+import org.jetbrains.kotlin.compiler.plugin.CliOption
+import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
 import org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.jetbrains.kotlin.config.CompilerConfiguration
@@ -45,6 +48,32 @@ class StoreGraphPlugin : CompilerPluginRegistrar() {
         IrGenerationExtension.registerExtension(
             StoreGraphIrExtension(outputDir)
         )
+    }
+}
+
+@OptIn(ExperimentalCompilerApi::class)
+class StoreGraphCommandLineProcessor : CommandLineProcessor {
+
+    override val pluginId: String = "com.arttttt.simplemvi.compiler.storegraph"
+
+    override val pluginOptions: Collection<AbstractCliOption> = listOf(
+        CliOption(
+            optionName = "storeGraphOutputDir",
+            valueDescription = "directory",
+            description = "Output directory for generated .mermaid files",
+            required = false,
+            allowMultipleOccurrences = false,
+        )
+    )
+
+    override fun processOption(
+        option: AbstractCliOption,
+        value: String,
+        configuration: CompilerConfiguration,
+    ) {
+        when (option.optionName) {
+            "storeGraphOutputDir" -> configuration.put(StoreGraphPlugin.KEY_OUTPUT_DIR, value)
+        }
     }
 }
 
