@@ -107,54 +107,51 @@ class StoreGraphIrTransformer(
     private val collector: StoreGraphCollector,
 ) : IrElementTransformerVoid() {
 
-    private var currentStore: String? = null
-    private var currentIntent: String? = null
+    private var currentIntent: IrClass? = null
     private val stateFieldAccess = mutableSetOf<String>()
 
-    override fun visitClass(declaration: IrClass): IrStatement {
-        if (declaration.implementsStore()) {
-            currentStore = declaration.name.asString()
-        }
-        return super.visitClass(declaration)
-    }
-
     override fun visitFunction(declaration: IrFunction): IrStatement {
+        val previousIntent = currentIntent
         if (declaration.isIntentHandler()) {
-            currentIntent = declaration.extractIntentType()
+            currentIntent = declaration.intentClassOrNull()
         }
-        return super.visitFunction(declaration)
+        return super.visitFunction(declaration).also {
+            currentIntent = previousIntent
+        }
     }
 
     @OptIn(DeprecatedForRemovalCompilerApi::class)
     override fun visitCall(expression: IrCall): IrExpression {
-        val functionName = expression.symbol.owner.name.asString()
+        val intentCls = currentIntent ?: return super.visitCall(expression)
+        val storeName = intentCls.enclosingStoreName() ?: return super.visitCall(expression)
+        val intentName = intentCls.fqNameWhenAvailable?.asString() ?: intentCls.name.asString()
 
-        when (functionName) {
+        when (expression.symbol.owner.name.asString()) {
             "reduce" -> {
                 val lambda = expression.getValueArgument(0) as? IrFunctionExpression
                 lambda?.let { analyzeReduceLambda(it) }
 
                 collector.recordReduce(
-                    store = currentStore!!,
-                    intent = currentIntent!!,
+                    store = storeName,
+                    intent = intentName,
                     changedFields = stateFieldAccess.toList()
                 )
                 stateFieldAccess.clear()
             }
             "postSideEffect", "sideEffect" -> {
-                val sideEffect = extractSideEffectType(expression)
+                val sideEffect = extractSideEffectType(expression) ?: return super.visitCall(expression)
                 collector.recordSideEffect(
-                    store = currentStore!!,
-                    intent = currentIntent!!,
-                    sideEffect = sideEffect!!
+                    store = storeName,
+                    intent = intentName,
+                    sideEffect = sideEffect,
                 )
             }
             "onNewIntent", "intent" -> {
-                val targetIntent = extractIntentType(expression)
+                val targetIntent = extractIntentType(expression) ?: return super.visitCall(expression)
                 collector.recordIntentDispatch(
-                    store = currentStore!!,
-                    fromIntent = currentIntent!!,
-                    toIntent = targetIntent!!
+                    store = storeName,
+                    fromIntent = intentName,
+                    toIntent = targetIntent,
                 )
             }
         }
@@ -163,15 +160,19 @@ class StoreGraphIrTransformer(
     }
 
     override fun visitWhen(expression: IrWhen): IrExpression {
-        // Анализируем if/when по state
-        expression.branches.forEach { branch ->
-            val condition = branch.condition
-            if (referencesState(condition)) {
-                collector.recordConditional(
-                    store = currentStore!!,
-                    intent = currentIntent!!,
-                    condition = condition.dump()
-                )
+        val intentCls = currentIntent
+        val storeName = intentCls?.enclosingStoreName()
+        val intentName = intentCls?.fqNameWhenAvailable?.asString() ?: intentCls?.name?.asString()
+        if (storeName != null && intentName != null) {
+            expression.branches.forEach { branch ->
+                val condition = branch.condition
+                if (referencesState(condition)) {
+                    collector.recordConditional(
+                        store = storeName,
+                        intent = intentName,
+                        condition = condition.dump()
+                    )
+                }
             }
         }
         return super.visitWhen(expression)
@@ -313,6 +314,32 @@ fun IrFunction.extractIntentType(): String? {
     // Intent handler имеет параметр типа Intent
     val intentParam = valueParameters.firstOrNull() ?: return null
     return intentParam.type.renderTypeName()
+}
+
+/**
+ * Returns the IrClass of the intent parameter of an intent-handler function (`handle(intent: T)`),
+ * or null if the parameter is unresolved (e.g. unsubstituted generic `T`).
+ */
+@OptIn(DeprecatedForRemovalCompilerApi::class)
+fun IrFunction.intentClassOrNull(): IrClass? {
+    val intentParam = valueParameters.firstOrNull() ?: return null
+    return intentParam.type.classOrNull?.owner as? IrClass
+}
+
+/**
+ * Walks the enclosing-class chain of this class and returns the name of the first ancestor that
+ * implements [com.arttttt.simplemvi.store.Store]. Returns null if no such ancestor exists.
+ *
+ * This lets us infer "which store does this intent belong to" without relying on visitor traversal
+ * order (which is unreliable across files and inlined call sites).
+ */
+fun IrClass.enclosingStoreName(): String? {
+    var parent = parent as? IrClass
+    while (parent != null) {
+        if (parent.implementsStore()) return parent.name.asString()
+        parent = parent.parent as? IrClass
+    }
+    return null
 }
 
 /**
