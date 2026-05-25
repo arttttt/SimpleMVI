@@ -1,5 +1,6 @@
 @file:OptIn(org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI::class)
 
+import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
@@ -14,11 +15,17 @@ import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.declarations.IrParameterKind
+import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.declarations.IrValueParameter
 import org.jetbrains.kotlin.ir.expressions.IrCall
+import org.jetbrains.kotlin.ir.expressions.IrContainerExpression
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrGetValue
+import org.jetbrains.kotlin.ir.expressions.IrReturn
+import org.jetbrains.kotlin.ir.expressions.IrTypeOperator
+import org.jetbrains.kotlin.ir.expressions.IrTypeOperatorCall
 import org.jetbrains.kotlin.ir.expressions.IrWhen
+import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.types.IrSimpleType
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.IrTypeProjection
@@ -28,6 +35,7 @@ import org.jetbrains.kotlin.ir.util.dump
 import org.jetbrains.kotlin.ir.util.fqNameWhenAvailable
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.ir.visitors.IrVisitorVoid
+import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
 import org.jetbrains.kotlin.name.FqName
 import java.io.File
@@ -113,13 +121,73 @@ class StoreGraphIrTransformer(
     private var reduceDepth: Int = 0
     private val stateFieldAccess = mutableSetOf<String>()
 
+    /**
+     * Maps private/internal `DefaultActor` methods (dispatched from `when (intent) { is X -> doX() }`)
+     * to the intent class that triggered them. Populated when entering a `DefaultActor` subclass and
+     * consulted in [visitFunction] so reduce/sideEffect calls inside `doX()` get attributed to `X`.
+     */
+    private val defaultActorMethodToIntent = mutableMapOf<IrSimpleFunctionSymbol, IrClass>()
+
+    override fun visitClass(declaration: IrClass): IrStatement {
+        if (declaration.isDefaultActorSubclass()) {
+            indexDefaultActorHandlers(declaration)
+        }
+        return super.visitClass(declaration)
+    }
+
     override fun visitFunction(declaration: IrFunction): IrStatement {
         val previousIntent = currentIntent
-        if (declaration.isIntentHandler()) {
-            currentIntent = declaration.intentClassOrNull()
+        when {
+            declaration.isIntentHandler() -> currentIntent = declaration.intentClassOrNull()
+            declaration is IrSimpleFunction && declaration.symbol in defaultActorMethodToIntent ->
+                currentIntent = defaultActorMethodToIntent[declaration.symbol]
         }
         return super.visitFunction(declaration).also {
             currentIntent = previousIntent
+        }
+    }
+
+    private fun indexDefaultActorHandlers(actor: IrClass) {
+        val handleIntent = actor.declarations
+            .filterIsInstance<IrSimpleFunction>()
+            .firstOrNull { it.name.asString() == "handleIntent" }
+            ?: return
+
+        handleIntent.body?.acceptVoid(object : IrVisitorVoid() {
+            override fun visitElement(element: IrElement) {
+                element.acceptChildrenVoid(this)
+            }
+
+            override fun visitWhen(expression: IrWhen) {
+                for (branch in expression.branches) {
+                    val intentCls = (branch.condition as? IrTypeOperatorCall)
+                        ?.takeIf { it.operator == IrTypeOperator.INSTANCEOF }
+                        ?.typeOperand
+                        ?.classOrNull
+                        ?.owner
+                        ?: continue
+                    val targetSymbol = branch.result.dispatchTargetSymbol() ?: continue
+                    if (targetSymbol.owner.parent == actor) {
+                        defaultActorMethodToIntent[targetSymbol] = intentCls
+                    }
+                }
+                super.visitWhen(expression)
+            }
+        })
+    }
+
+    private fun IrExpression.dispatchTargetSymbol(): IrSimpleFunctionSymbol? {
+        return when (this) {
+            is IrCall -> symbol
+            is IrContainerExpression -> {
+                val last = statements.lastOrNull()
+                when (last) {
+                    is IrCall -> last.symbol
+                    is IrReturn -> (last.value as? IrCall)?.symbol
+                    else -> null
+                }
+            }
+            else -> null
         }
     }
 
@@ -295,6 +363,19 @@ object MermaidGenerator {
 
 private val STORE_FQN = FqName("com.arttttt.simplemvi.store.Store")
 private val ACTOR_SCOPE_FQN = FqName("com.arttttt.simplemvi.actor.ActorScope")
+private val DEFAULT_ACTOR_FQN = FqName("com.arttttt.simplemvi.actor.DefaultActor")
+
+/**
+ * Returns true if this class transitively extends [com.arttttt.simplemvi.actor.DefaultActor].
+ * Used to recognise the imperative actor pattern where intent dispatch happens via
+ * `handleIntent` + `when (intent) { is X -> doX() }`.
+ */
+fun IrClass.isDefaultActorSubclass(): Boolean {
+    return superTypes.any { superType ->
+        val cls = superType.classifierOrNull?.owner as? IrClass ?: return@any false
+        cls.fqNameWhenAvailable == DEFAULT_ACTOR_FQN || cls.isDefaultActorSubclass()
+    }
+}
 
 private fun String.simpleName(): String = substringAfterLast('.')
 
