@@ -31,8 +31,7 @@ nav:
       - Overview: plugin/plugin.md
   - Guides:
       - Best Practices: guides/bestpractices.md
-  - Migration:
-      - 0.7 → 0.8: migration/0.7-to-0.8.md
+      - Migration 0.7 → 0.8: guides/migration-0.7-to-0.8.md
 
 extra:
   social:
