@@ -2,7 +2,7 @@
 
 `StorePlugin` extends a `Store` without touching its `Actor`. A plugin can observe the lifecycle, transform the initial state, and rewrite or drop intents before they reach the actor. Multiple plugins compose in registration order to form a pipeline.
 
-> Coming from `Middleware`? See the [0.7 → 0.8 migration guide](../migration/0.7-to-0.8.md).
+> Coming from `Middleware`? See the [0.7 → 0.8 migration guide](../guides/migration-0.7-to-0.8.md).
 
 ## Overview
 
